@@ -12,7 +12,8 @@ import {
   Info, 
   CheckCircle, 
   RefreshCw,
-  Clock
+  Clock,
+  Home
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ProjectSurvey, CustomerInfo, TechRequirements, CameraPoint, PricingItem } from "./types";
@@ -318,19 +319,104 @@ export default function App() {
   const loadSavedProjects = async () => {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase
+        // Fetch projects with related camera_points and pricing_items
+        const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
           .select("*")
-          .order("createdAt", { ascending: false });
+          .order("created_at", { ascending: false });
 
-        if (error) {
-          console.error("Failed to fetch from Supabase:", error.message);
-        } else if (data) {
-          const parsed = data as ProjectSurvey[];
-          setProjectsList(parsed);
-          if (parsed.length > 0) {
-            loadProject(parsed[0]);
-          }
+        if (projectsError) {
+          console.error("Failed to fetch projects from Supabase:", projectsError.message);
+        } else if (projectsData && projectsData.length > 0) {
+          const projectIds = projectsData.map((p: any) => p.id);
+
+          // Fetch all camera_points for these projects
+          const { data: camsData } = await supabase
+            .from("camera_points")
+            .select("*")
+            .in("project_id", projectIds)
+            .order("point_index", { ascending: true });
+
+          // Fetch all pricing_items for these projects
+          const { data: pricesData } = await supabase
+            .from("pricing_items")
+            .select("*")
+            .in("project_id", projectIds)
+            .order("item_index", { ascending: true });
+
+          // Reconstruct ProjectSurvey objects
+          const assembled: ProjectSurvey[] = projectsData.map((row: any) => {
+            const cams = (camsData || []).filter((c: any) => c.project_id === row.id);
+            const prices = (pricesData || []).filter((p: any) => p.project_id === row.id);
+            return {
+              id: row.id,
+              customerInfo: {
+                customerName: row.customer_name || "",
+                projectName: row.project_name || "",
+                contactPerson: row.contact_person || "",
+                contactPhone: row.contact_phone || "",
+                address: row.address || "",
+                latitude: row.latitude || "",
+                longitude: row.longitude || "",
+                surveyorName: row.surveyor_name || "",
+                surveyDate: row.survey_date || "",
+                province: row.province || "",
+              },
+              requirements: {
+                cameraCount: row.camera_count || 4,
+                cameraBrand: row.camera_brand || "Hikvision",
+                nvrBrand: row.nvr_brand || "",
+                nvrChannels: row.nvr_channels || 8,
+                storagePackage: row.storage_package || "",
+                otherRequirements: row.other_requirements || "",
+                standardCableLimit: row.standard_cable_limit ?? 25,
+                extraCablePricePerMeter: row.extra_cable_price_per_m ?? 35,
+                extraLaborPricePerMeter: row.extra_labor_price_per_m ?? 25,
+                rackType: row.rack_type ?? undefined,
+                monitorType: row.monitor_type ?? undefined,
+                upsType: row.ups_type ?? undefined,
+              },
+              hasSurveyReport: row.has_survey_report ?? true,
+              discount: parseFloat(row.discount) || 0,
+              vatRate: parseFloat(row.vat_rate) || 7,
+              status: row.status || "draft",
+              createdAt: row.created_at || new Date().toISOString(),
+              cameraPoints: cams.map((c: any) => ({
+                id: c.id,
+                name: c.name || "",
+                type: c.type || "Dome",
+                poleType: c.pole_type || "None",
+                hasSupportArm: c.has_support_arm || false,
+                notes: c.notes || "",
+                photoUrl: c.photo_url_cache || "",
+                x: parseFloat(c.x) || 50,
+                y: parseFloat(c.y) || 50,
+                focalAngle: parseFloat(c.focal_angle) || 90,
+                rotation: parseFloat(c.rotation) || 0,
+                lat: c.lat ?? undefined,
+                lng: c.lng ?? undefined,
+                lanCableLength: c.lan_cable_length ?? 25,
+                hasOutdoorCabinet: c.has_outdoor_cabinet || false,
+                hasGroundRod: c.has_ground_rod || false,
+                hasPowerMeter: c.has_power_meter || false,
+                hasSdCard: c.has_sd_card || false,
+                hasCabinetUps: c.has_cabinet_ups || false,
+                hasPoeSwitch: c.has_poe_switch || false,
+                selectedSet: c.selected_set ?? undefined,
+              })),
+              pricingItems: prices.map((p: any) => ({
+                id: p.id,
+                name: p.name || "",
+                quantity: parseFloat(p.quantity) || 1,
+                unit: p.unit || "ชิ้น",
+                unitPrice: parseFloat(p.unit_price) || 0,
+                category: p.category || "hardware",
+              })),
+            };
+          });
+
+          setProjectsList(assembled);
+          // Don't auto-load first project — let user choose from history
           return;
         }
       } catch (err) {
@@ -344,9 +430,6 @@ export default function App() {
       try {
         const parsed = JSON.parse(localData) as ProjectSurvey[];
         setProjectsList(parsed);
-        if (parsed.length > 0) {
-          loadProject(parsed[0]);
-        }
       } catch (err) {
         console.error("Failed to parse existing local survey history:", err);
       }
@@ -471,17 +554,99 @@ export default function App() {
     setProjectsList(updatedList);
     setActiveProjectId(freshId);
 
-    // Save to Supabase Cloud if configured
+    // Save to Supabase Cloud (3-table schema)
     if (isSupabaseConfigured) {
       try {
-        const { error } = await supabase
-          .from("projects")
-          .upsert(formattedProject);
+        // 1. Upsert main project row
+        const projectRow = {
+          id: freshId,
+          customer_name: customerInfo.customerName,
+          project_name: customerInfo.projectName,
+          contact_person: customerInfo.contactPerson,
+          contact_phone: customerInfo.contactPhone,
+          address: customerInfo.address,
+          latitude: customerInfo.latitude,
+          longitude: customerInfo.longitude,
+          surveyor_name: customerInfo.surveyorName,
+          survey_date: customerInfo.surveyDate,
+          province: customerInfo.province || "",
+          camera_count: requirements.cameraCount,
+          camera_brand: requirements.cameraBrand,
+          nvr_brand: requirements.nvrBrand,
+          nvr_channels: requirements.nvrChannels,
+          storage_package: requirements.storagePackage,
+          other_requirements: requirements.otherRequirements,
+          standard_cable_limit: requirements.standardCableLimit ?? 25,
+          extra_cable_price_per_m: requirements.extraCablePricePerMeter ?? 35,
+          extra_labor_price_per_m: requirements.extraLaborPricePerMeter ?? 25,
+          rack_type: requirements.rackType ?? null,
+          monitor_type: requirements.monitorType ?? null,
+          ups_type: requirements.upsType ?? null,
+          has_survey_report: hasSurveyReport,
+          discount,
+          vat_rate: vatRate,
+          status: "draft",
+        };
 
-        if (error) {
-          console.error("Supabase Save Error:", error.message);
-          alert("❌ ไม่สามารถสำรองข้อมูลลงระบบคลาวด์ได้: " + error.message);
+        const { error: projError } = await supabase
+          .from("projects")
+          .upsert(projectRow);
+
+        if (projError) {
+          console.error("Supabase project upsert error:", projError.message);
+          alert("❌ บันทึกข้อมูลหลักไม่ได้: " + projError.message);
+          return;
         }
+
+        // 2. Replace camera_points: delete old, insert new
+        await supabase.from("camera_points").delete().eq("project_id", freshId);
+        if (cameraPoints.length > 0) {
+          const camRows = cameraPoints.map((c, idx) => ({
+            id: c.id,
+            project_id: freshId,
+            point_index: idx,
+            name: c.name,
+            type: c.type,
+            pole_type: c.poleType,
+            has_support_arm: c.hasSupportArm,
+            notes: c.notes,
+            photo_url_cache: c.photoUrl,
+            x: c.x,
+            y: c.y,
+            focal_angle: c.focalAngle,
+            rotation: c.rotation,
+            lat: c.lat ?? null,
+            lng: c.lng ?? null,
+            lan_cable_length: c.lanCableLength ?? 25,
+            has_outdoor_cabinet: c.hasOutdoorCabinet || false,
+            has_ground_rod: c.hasGroundRod || false,
+            has_power_meter: c.hasPowerMeter || false,
+            has_sd_card: c.hasSdCard || false,
+            has_cabinet_ups: c.hasCabinetUps || false,
+            has_poe_switch: c.hasPoeSwitch || false,
+            selected_set: c.selectedSet ?? null,
+          }));
+          const { error: camError } = await supabase.from("camera_points").insert(camRows);
+          if (camError) console.error("Camera points insert error:", camError.message);
+        }
+
+        // 3. Replace pricing_items: delete old, insert new
+        await supabase.from("pricing_items").delete().eq("project_id", freshId);
+        if (pricingItems.length > 0) {
+          const priceRows = pricingItems.map((p, idx) => ({
+            id: p.id,
+            project_id: freshId,
+            item_index: idx,
+            name: p.name,
+            quantity: p.quantity,
+            unit: p.unit,
+            unit_price: p.unitPrice,
+            category: p.category,
+          }));
+          const { error: priceError } = await supabase.from("pricing_items").insert(priceRows);
+          if (priceError) console.error("Pricing items insert error:", priceError.message);
+        }
+
       } catch (err) {
         console.error("Supabase Save Exception:", err);
       }
@@ -489,6 +654,7 @@ export default function App() {
 
     // Always back up to LocalStorage (offline-first!)
     localStorage.setItem("cctv_surveys_data", JSON.stringify(updatedList));
+    alert("✅ บันทึกโครงการเรียบร้อยแล้วค่ะ");
   };
 
   // Delete a project from list and database/LocalStorage
@@ -618,12 +784,35 @@ export default function App() {
             </div>
           </div>
 
-          {/* User Badge with Current Time */}
-          <div className="flex items-center gap-3 text-xs font-normal text-zinc-600">
+          {/* Right side controls */}
+          <div className="flex items-center gap-2 text-xs font-normal text-zinc-600">
+            {/* Home Button */}
+            {step > 1 && (
+              <button
+                id="btn-go-home"
+                type="button"
+                onClick={() => {
+                  showConfirm(
+                    "🏠 กลับหน้าแรก",
+                    "ต้องการกลับไปหน้าแรก (ขั้นตอนที่ 1) ใช่ไหมคะ? ข้อมูลที่กรอกไว้จะยังคงอยู่ค่ะ",
+                    () => setStep(1)
+                  );
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-700 font-semibold text-[11px] transition-all border border-zinc-200/50 cursor-pointer"
+                title="กลับหน้าแรก"
+              >
+                <Home className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">หน้าแรก</span>
+              </button>
+            )}
+            {/* Clock */}
             <div className="flex items-center gap-1.5 bg-zinc-100/80 px-2.5 py-1.5 rounded-lg border border-zinc-200/40">
               <Clock className="w-3.5 h-3.5 text-zinc-500" />
-              <span className="font-mono text-[10px] font-medium text-zinc-700">2026-05-22 UTC</span>
+              <span className="font-mono text-[10px] font-medium text-zinc-700">
+                {new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" })}
+              </span>
             </div>
+            {/* Surveyor Badge */}
             <div className="flex items-center gap-2 bg-zinc-100/80 px-2.5 py-1 rounded-lg border border-zinc-200/40">
               <div className="w-6 h-6 rounded-full bg-[#0071e3] text-center flex items-center justify-center font-bold text-white uppercase text-[10px]">
                 {customerInfo.surveyorName?.substring(0, 2) || "SV"}
