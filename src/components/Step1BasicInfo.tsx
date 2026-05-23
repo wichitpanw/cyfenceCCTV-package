@@ -115,40 +115,17 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
 
   return (
     <div className="space-y-6" id="step1-container">
-      {/* Quick Autofill Buttons (Helpful for testing) */}
-      <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-        <p className="text-xs font-semibold text-zinc-555 mb-2.5 font-mono uppercase tracking-wider">⚡ QUICK SYSTEM TEMPLES / กรอกข้อมูลตัวอย่างแบบคลิกเดียว:</p>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => autofillTemplate("subdistrict")}
-            className="px-3.5 py-2 bg-gradient-to-r from-emerald-550 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-semibold rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer flex items-center gap-1.5"
-          >
-            🏛️ อบต.ต่างจังหวัด (หนองนาคำ อุดรธานี) [แนะนำจุดเสี่ยงนอกเมือง]
-          </button>
-          <button
-            type="button"
-            onClick={() => autofillTemplate("factory")}
-            className="px-3 py-1.5 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-medium rounded-lg border border-zinc-200 transition-colors cursor-pointer"
-          >
-            🏭 โรงงาน (จ.สมุทรปราการ)
-          </button>
-          <button
-            type="button"
-            onClick={() => autofillTemplate("home")}
-            className="px-3 py-1.5 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-medium rounded-lg border border-zinc-200 transition-colors cursor-pointer"
-          >
-            🏡 บ้านพักอาศัย (สุขุมวิท กรุงเทพฯ)
-          </button>
-          <button
-            type="button"
-            onClick={() => autofillTemplate("office")}
-            className="px-3 py-1.5 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-medium rounded-lg border border-zinc-200 transition-colors cursor-pointer"
-          >
-            🏢 ออฟฟิศสำนักงาน (สาทร กรุงเทพฯ)
-          </button>
+      {/* Quick Autofill Button */}
+      <div className="bg-zinc-50/80 px-4 py-3 rounded-xl border border-zinc-200 flex items-center gap-3">
+        <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider font-mono shrink-0">⚡ ลองดูตัวอย่าง:</span>
+        <button
+          type="button"
+          onClick={() => autofillTemplate("subdistrict")}
+          className="px-3.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-700 text-xs font-medium rounded-lg border border-zinc-300 transition-all shadow-xs active:scale-95 cursor-pointer flex items-center gap-1.5"
+        >
+          🏗️ อบต.หนองนาคำ (อุดรธานี) — กรอกข้อมูลตัวอย่าง
+        </button>
       </div>
-    </div>
 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -980,6 +980,8 @@ export default function App() {
                     onSaveProject={handleSaveProject}
                     onPrev={handlePrevStep}
                     customerName={customerInfo.customerName}
+                    customerInfo={customerInfo}
+                    requirements={requirements}
                     showConfirm={showConfirm}
                     onGoToStep1={() => setStep(1)}
                     cameraPoints={cameraPoints}
