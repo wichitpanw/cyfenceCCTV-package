@@ -35,6 +35,7 @@ const DEFAULT_CUSTOMER_INFO: CustomerInfo = {
   longitude: "",
   surveyorName: "",
   surveyDate: new Date().toISOString().split("T")[0],
+  province: "",
 };
 
 const DEFAULT_REQUIREMENTS: TechRequirements = {
@@ -320,7 +321,7 @@ export default function App() {
         const { data, error } = await supabase
           .from("projects")
           .select("*")
-          .order("created_at", { ascending: false });
+          .order("createdAt", { ascending: false });
 
         if (error) {
           console.error("Failed to fetch from Supabase:", error.message);
@@ -426,6 +427,7 @@ export default function App() {
       longitude: "",
       surveyorName: "",
       surveyDate: new Date().toISOString().split("T")[0],
+      province: "",
     });
     setRequirements({
       cameraCount: 4,

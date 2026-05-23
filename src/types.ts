@@ -37,6 +37,7 @@ export interface CustomerInfo {
   longitude: string;
   surveyorName: string; // Staff in charge
   surveyDate: string;
+  province?: string; // Selected province for filtering
 }
 
 export interface TechRequirements {

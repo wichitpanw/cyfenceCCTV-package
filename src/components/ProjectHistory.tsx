@@ -20,12 +20,24 @@ export default function ProjectHistory({
   isCloudSyncActive = false
 }: ProjectHistoryProps) {
   const [search, setSearch] = useState("");
+  const [selectedProvince, setSelectedProvince] = useState("all");
 
-  const filtered = projects.filter(
-    (p) =>
+  // Extract unique provinces present in history list
+  const uniqueProvinces = [
+    "all",
+    ...Array.from(new Set(projects.map(p => p.customerInfo.province).filter(Boolean)))
+  ];
+
+  const filtered = projects.filter((p) => {
+    const matchesSearch =
       p.customerInfo.customerName.toLowerCase().includes(search.toLowerCase()) ||
-      p.customerInfo.projectName.toLowerCase().includes(search.toLowerCase())
-  );
+      p.customerInfo.projectName.toLowerCase().includes(search.toLowerCase()) ||
+      (p.customerInfo.province && p.customerInfo.province.toLowerCase().includes(search.toLowerCase()));
+
+    const matchesProvince = selectedProvince === "all" || p.customerInfo.province === selectedProvince;
+
+    return matchesSearch && matchesProvince;
+  });
 
   return (
     <div className="bg-white p-4 rounded-2xl border border-zinc-200/75 h-auto flex flex-col justify-between" id="project-history-panel">
@@ -60,12 +72,34 @@ export default function ProjectHistory({
           <input
             id="history-search-input"
             type="text"
-            placeholder="ค้นหาชื่อลูกค้า / ชื่อโครงการ..."
+            placeholder="ค้นหาชื่อลูกค้า / ชื่อโครงการ / จังหวัด..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-1.5 rounded-lg border text-[11px] bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] transition-all"
           />
         </div>
+
+        {/* Province Filter Dropdown */}
+        {uniqueProvinces.length > 1 && (
+          <div className="flex items-center justify-between gap-2 bg-zinc-50/50 p-2 rounded-xl border border-zinc-150 text-[10px] select-none">
+            <span className="text-zinc-500 font-semibold shrink-0">📍 จังหวัด:</span>
+            <select
+              value={selectedProvince}
+              onChange={(e) => setSelectedProvince(e.target.value)}
+              className="grow bg-white border border-zinc-200 rounded px-1.5 py-0.5 text-[10px] focus:outline-none focus:ring-1 focus:ring-[#0071e3] cursor-pointer"
+            >
+              <option value="all">ทั้งหมด ({projects.length})</option>
+              {uniqueProvinces.filter(p => p !== "all").map((prov) => {
+                const count = projects.filter(p => p.customerInfo.province === prov).length;
+                return (
+                  <option key={prov} value={prov}>
+                    {prov} ({count})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        )}
 
         {/* List of projects */}
         <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
@@ -85,7 +119,7 @@ export default function ProjectHistory({
                   }`}
                 >
                   <div className="flex justify-between items-start gap-2">
-                    <span className="text-[10px] text-[#0071e3] font-sans font-semibold truncate">
+                    <span className="grow text-[10px] text-[#0071e3] font-sans font-semibold whitespace-normal break-words leading-tight">
                       {proj.customerInfo.projectName || "โครงการเว้นว่าง"}
                     </span>
                     <button
@@ -94,20 +128,25 @@ export default function ProjectHistory({
                         e.stopPropagation();
                         onDeleteProject(proj.id);
                       }}
-                      className="p-1 hover:bg-red-50 text-zinc-400 hover:text-red-600 rounded cursor-pointer transition-colors"
+                      className="p-1 hover:bg-red-50 text-zinc-400 hover:text-red-600 rounded cursor-pointer transition-colors shrink-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  <strong className="block text-xs text-zinc-800 font-semibold mt-1 truncate">
+                  <strong className="block text-xs text-zinc-800 font-semibold mt-1 whitespace-normal break-words leading-snug">
                     {proj.customerInfo.customerName || "ไม่ระบุชื่อบริษัท"}
                   </strong>
 
-                  <div className="flex items-center justify-between text-[10px] text-zinc-400 mt-2">
-                    <span className="flex items-center gap-1 font-mono">
-                      <Calendar className="w-3 h-3" />
-                      {proj.createdAt.split("T")[0]}
+                  <div className="flex items-center justify-between text-[10px] text-zinc-400 mt-2.5 pt-2.5 border-t border-zinc-100/50">
+                    <span className="flex flex-wrap items-center gap-1.5 font-mono">
+                      <Calendar className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                      <span>{proj.createdAt.split("T")[0]}</span>
+                      {proj.customerInfo.province && (
+                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-650 text-[8px] font-semibold tracking-wide font-sans shrink-0">
+                          {proj.customerInfo.province}
+                        </span>
+                      )}
                     </span>
                     <strong className="text-zinc-900 text-xs font-semibold">
                       ฿{subtotal.toLocaleString("th-TH")}

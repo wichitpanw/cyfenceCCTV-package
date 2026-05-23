@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { User, MapPin, Calendar, Building, Phone, ArrowRight, Crosshair } from "lucide-react";
 import { CustomerInfo } from "../types";
 
+const THAI_PROVINCES = [
+  "กรุงเทพมหานคร", "กระบี่", "กาญจนบุรี", "กาฬสินธุ์", "กำแพงเพชร", "ขอนแก่น", "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ชัยนาท", "ชัยภูมิ", "ชุมพร", "เชียงราย", "เชียงใหม่", "ตรัง", "ตราด", "ตาก", "นครนายก", "นครปฐม", "นครพนม", "นครราชสีมา", "นครศรีธรรมราช", "นครสวรรค์", "นนทบุรี", "นราธิวาส", "น่าน", "บึงกาฬ", "บุรีรัมย์", "ปทุมธานี", "ประจวบคีรีขันธ์", "ปราจีนบุรี", "ปัตตานี", "พระนครศรีอยุธยา", "พังงา", "พัทลุง", "พิจิตร", "พิษณุโลก", "เพชรบุรี", "เพชรบูรณ์", "แพร่", "พะเยา", "ภูเก็ต", "มหาสารคาม", "มุกดาหาร", "แม่ฮ่องสอน", "ยโสธร", "ยะลา", "ร้อยเอ็ด", "ระนอง", "ระยอง", "ราชบุรี", "ลพบุรี", "ลำปาง", "ลำพูน", "เลย", "ศรีสะเกษ", "สกลนคร", "สงขลา", "สตูล", "สมุทรปราการ", "สมุทรสงคราม", "สมุทรสาคร", "สระแก้ว", "สระบุรี", "สิงห์บุรี", "สุโขทัย", "สุพรรณบุรี", "สุราษฎร์ธานี", "สุรินทร์", "หนองคาย", "หนองบัวลำภู", "อ่างทอง", "อำนาจเจริญ", "อุดรธานี", "อุตรดิตถ์", "อุทัยธานี", "อุบลราชธานี"
+];
+
 interface Step1Props {
   data: CustomerInfo;
   onChange: (data: CustomerInfo) => void;
@@ -14,6 +18,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
 
   const validate = () => {
     const newErrors: Partial<Record<keyof CustomerInfo, string>> = {};
+    if (!data.province || !data.province.trim()) newErrors.province = "กรุณาเลือกจังหวัด";
     if (!data.customerName.trim()) newErrors.customerName = "กรุณากรอกชื่อลูกค้า/บริษัท";
     if (!data.projectName.trim()) newErrors.projectName = "กรุณากรอกชื่อโครงการ";
     if (!data.surveyorName.trim()) newErrors.surveyorName = "กรุณากรอกชื่อพนักงานผู้รับผิดชอบ";
@@ -64,6 +69,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
         longitude: "100.623456",
         surveyorName: "สมชาย รักบริการ (ทีมเทคนิค)",
         surveyDate: new Date().toISOString().split("T")[0],
+        province: "สมุทรปราการ",
       });
     } else if (type === "home") {
       onChange({
@@ -76,6 +82,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
         longitude: "100.609123",
         surveyorName: "นารี ดวงดี (ฝ่ายขายพรีเมียม)",
         surveyDate: new Date().toISOString().split("T")[0],
+        province: "กรุงเทพมหานคร",
       });
     } else if (type === "office") {
       onChange({
@@ -88,6 +95,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
         longitude: "100.528456",
         surveyorName: "สมรัก ดีเสมอ (เจ้าหน้าที่โครงการ)",
         surveyDate: new Date().toISOString().split("T")[0],
+        province: "กรุงเทพมหานคร",
       });
     } else if (type === "subdistrict") {
       onChange({
@@ -100,6 +108,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
         longitude: "102.859345",
         surveyorName: "วิศวกรระบบสำรวจ NT",
         surveyDate: new Date().toISOString().split("T")[0],
+        province: "อุดรธานี",
       });
     }
   };
@@ -145,6 +154,38 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Column: Client primary details */}
         <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+              จังหวัดติดตั้ง <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+                <MapPin className="h-4 w-4" />
+              </span>
+              <select
+                id="province-select"
+                value={data.province || ""}
+                onChange={(e) => onChange({ ...data, province: e.target.value })}
+                className={`w-full pl-9 pr-8 py-2.5 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] appearance-none transition-all cursor-pointer ${
+                  errorObj.province ? "border-red-500 ring-1 ring-red-500" : ""
+                }`}
+              >
+                <option value="">-- เลือกจังหวัด --</option>
+                {THAI_PROVINCES.map((prov) => (
+                  <option key={prov} value={prov}>
+                    {prov}
+                  </option>
+                ))}
+              </select>
+              <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-zinc-400 text-xs">
+                ▼
+              </span>
+            </div>
+            {errorObj.province && (
+              <p className="text-red-500 text-[11px] mt-1 font-medium">{errorObj.province}</p>
+            )}
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
               ชื่อลูกค้า / บริษัท <span className="text-red-500">*</span>
