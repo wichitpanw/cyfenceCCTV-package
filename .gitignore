@@ -1,0 +1,16 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Temporary agent scratch files
+scratch*
+public/PLACEHOLDER.txt
+
+# Internal workspace files
+.antigravity/
+metadata.json
