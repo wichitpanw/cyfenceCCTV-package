@@ -35,6 +35,8 @@ const DEFAULT_CUSTOMER_INFO: CustomerInfo = {
   latitude: "",
   longitude: "",
   surveyorName: "",
+  surveyorPhone: "",
+  surveyorDepartment: "",
   surveyDate: new Date().toISOString().split("T")[0],
   province: "",
 };
@@ -315,6 +317,18 @@ export default function App() {
     });
   };
 
+  // Shorthand: show an informational alert (single OK button)
+  const showAlert = (title: string, message: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {},
+      confirmText: "✅ ตกลง",
+      cancelText: "",
+    });
+  };
+
   // Load project history on mount (Hybrid Cloud & Local Storage)
   const loadSavedProjects = async () => {
     if (isSupabaseConfigured) {
@@ -359,6 +373,8 @@ export default function App() {
                 latitude: row.latitude || "",
                 longitude: row.longitude || "",
                 surveyorName: row.surveyor_name || "",
+                surveyorPhone: row.surveyor_phone || "",
+                surveyorDepartment: row.surveyor_department || "",
                 surveyDate: row.survey_date || "",
                 province: row.province || "",
               },
@@ -568,6 +584,8 @@ export default function App() {
           latitude: customerInfo.latitude,
           longitude: customerInfo.longitude,
           surveyor_name: customerInfo.surveyorName,
+          surveyor_phone: customerInfo.surveyorPhone || "",
+          surveyor_department: customerInfo.surveyorDepartment || "",
           survey_date: customerInfo.surveyDate,
           province: customerInfo.province || "",
           camera_count: requirements.cameraCount,
@@ -594,7 +612,7 @@ export default function App() {
 
         if (projError) {
           console.error("Supabase project upsert error:", projError.message);
-          alert("❌ บันทึกข้อมูลหลักไม่ได้: " + projError.message);
+          showAlert("❌ บันทึกไม่สำเร็จ", "ไม่สามารถบันทึกข้อมูลหลักได้: " + projError.message);
           return;
         }
 
@@ -654,7 +672,7 @@ export default function App() {
 
     // Always back up to LocalStorage (offline-first!)
     localStorage.setItem("cctv_surveys_data", JSON.stringify(updatedList));
-    alert("✅ บันทึกโครงการเรียบร้อยแล้วค่ะ");
+    showAlert("✅ บันทึกสำเร็จ", "บันทึกโครงการ เรียบร้อยแล้วค่ะ ✨");
   };
 
   // Delete a project from list and database/LocalStorage
@@ -678,7 +696,7 @@ export default function App() {
 
             if (error) {
               console.error("Supabase Delete Error:", error.message);
-              alert("❌ ไม่สามารถลบข้อมูลบนระบบคลาวด์ได้: " + error.message);
+              showAlert("❌ ลบไม่สำเร็จ", "ไม่สามารถลบข้อมูลบนระบบคลาวด์ได้: " + error.message);
             }
           } catch (err) {
             console.error("Supabase Delete Exception:", err);
@@ -984,40 +1002,53 @@ export default function App() {
       {/* Central Apple-style Glassmorphic Confirmation Modal */}
       <AnimatePresence>
         {confirmModal.isOpen && (
-          <div className="fixed inset-0 bg-zinc-950/40 backdrop-blur-md flex items-center justify-center p-4 z-[9999] select-none font-sans">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] select-none font-sans">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-zinc-200/50 space-y-4"
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="bg-white rounded-2xl max-w-xs w-full shadow-2xl overflow-hidden border border-zinc-100"
             >
-              <div className="text-center space-y-2">
-                <h4 className="text-sm font-extrabold text-zinc-900 tracking-tight leading-snug">
-                  {confirmModal.title}
+              {/* Content area */}
+              <div className="px-6 pt-7 pb-5 text-center space-y-2">
+                <div className="text-2xl mb-3 leading-none">
+                  {confirmModal.title.match(/[\u{1F000}-\u{1FFFF}]|[\u2600-\u27FF]/u)?.[0] || "💬"}
+                </div>
+                <h4 className="text-sm font-bold text-zinc-900 leading-snug">
+                  {confirmModal.title.replace(/^[\u{1F000}-\u{1FFFF}]|^[\u2600-\u27FF]\s*/u, "").trim()}
                 </h4>
-                <p className="text-[11px] text-zinc-500 leading-relaxed">
+                <p className="text-[11.5px] text-zinc-500 leading-relaxed">
                   {confirmModal.message}
                 </p>
               </div>
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
-                    confirmModal.onCancel?.();
-                  }}
-                  className="grow py-2.5 font-bold text-xs bg-zinc-100 hover:bg-zinc-150 active:bg-zinc-200 text-zinc-655 rounded-xl transition-all cursor-pointer border border-zinc-250/30"
-                >
-                  {confirmModal.cancelText || "ยกเลิก"}
-                </button>
+              {/* Divider */}
+              <div className="h-px bg-zinc-100" />
+              {/* Action buttons */}
+              <div className={`flex ${confirmModal.cancelText === "" ? "" : "divide-x divide-zinc-100"}`}>
+                {confirmModal.cancelText !== "" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                      confirmModal.onCancel?.();
+                    }}
+                    className="flex-1 py-3.5 text-xs font-semibold text-zinc-500 hover:bg-zinc-50 active:bg-zinc-100 transition-colors cursor-pointer"
+                  >
+                    {confirmModal.cancelText || "ยกเลิก"}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => {
                     setConfirmModal(prev => ({ ...prev, isOpen: false }));
                     confirmModal.onConfirm();
                   }}
-                  className="grow py-2.5 font-bold text-xs bg-zinc-900 hover:bg-zinc-850 active:bg-black text-white rounded-xl transition-all cursor-pointer shadow-xs"
+                  className={`flex-1 py-3.5 text-xs font-bold transition-colors cursor-pointer ${
+                    confirmModal.title.includes("❌") || confirmModal.title.includes("🗑️")
+                      ? "text-red-500 hover:bg-red-50 active:bg-red-100"
+                      : "text-[#0071e3] hover:bg-blue-50 active:bg-blue-100"
+                  }`}
                 >
                   {confirmModal.confirmText || "ยืนยัน"}
                 </button>

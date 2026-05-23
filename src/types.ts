@@ -35,7 +35,9 @@ export interface CustomerInfo {
   address: string;
   latitude: string;
   longitude: string;
-  surveyorName: string; // Staff in charge
+  surveyorName: string;       // Staff in charge
+  surveyorPhone?: string;     // Surveyor phone number
+  surveyorDepartment?: string; // Surveyor department/unit
   surveyDate: string;
   province?: string; // Selected province for filtering
 }

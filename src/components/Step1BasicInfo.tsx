@@ -44,11 +44,11 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
           });
         },
         (error) => {
-          alert("ไม่สามารถดึงข้อมูลพิกัดได้: " + error.message);
+          console.warn("GPS error:", error.message);
         }
       );
     } else {
-      alert("เบราว์เซอร์ของคุณไม่รองรับการดึงพิกัด GPS");
+      console.warn("Geolocation not supported");
     }
   };
 
@@ -342,10 +342,10 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
       <div className="border-t border-zinc-100 pt-6"></div>
 
       {/* Surveyor responsibility details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
-            พนักงานผู้รับผิดชอบระบบ / ผู้สำรวจหน้างาน <span className="text-red-500">*</span>
+            พนักงานผู้รับผิดชอบ / ผู้สำรวจ <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -354,7 +354,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
             <input
               id="surveyor-name-input"
               type="text"
-              placeholder="กรอกชื่อ-นามสกุล ของพนักงาน"
+              placeholder="ชื่อ-นามสกุล พนักงาน"
               value={data.surveyorName}
               onChange={(e) => onChange({ ...data, surveyorName: e.target.value })}
               className={`w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all ${
@@ -367,6 +367,47 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
           )}
         </div>
 
+        <div>
+          <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+            เบอร์โทรพนักงาน
+          </label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+              <Phone className="h-4 w-4" />
+            </span>
+            <input
+              id="surveyor-phone-input"
+              type="text"
+              placeholder="เช่น 081-234-5678"
+              value={data.surveyorPhone || ""}
+              onChange={(e) => onChange({ ...data, surveyorPhone: e.target.value })}
+              className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+            ส่วนงาน / แผนก
+          </label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+              <Building className="h-4 w-4" />
+            </span>
+            <input
+              id="surveyor-department-input"
+              type="text"
+              placeholder="เช่น ฝ่ายขาย / วิศวกรรม"
+              value={data.surveyorDepartment || ""}
+              onChange={(e) => onChange({ ...data, surveyorDepartment: e.target.value })}
+              className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-0">
+        <div />
         <div>
           <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
             วันที่สำรวจ / สรุปความต้องการ

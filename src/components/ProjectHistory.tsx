@@ -46,12 +46,8 @@ export default function ProjectHistory({
         <div className="flex justify-between items-center pb-2 border-b border-zinc-100">
           <div className="flex items-center gap-1.5">
             <FolderKanban className="w-4 h-4 text-[#0071e3]" />
-            <h3 className="font-semibold text-[11px] text-zinc-800 uppercase tracking-wide font-sans flex items-center gap-1.5">
+            <h3 className="font-semibold text-[11px] text-zinc-800 uppercase tracking-wide font-sans">
               ประวัติงานสำรวจและแบบบันทึก
-              <span 
-                title={isCloudSyncActive ? "เชื่อมต่อ Supabase Cloud สำเร็จ" : "โหมดออฟไลน์ LocalStorage"} 
-                className={`w-1.5 h-1.5 rounded-full inline-block ${isCloudSyncActive ? "bg-emerald-500 animate-pulse" : "bg-zinc-400"}`}
-              ></span>
             </h3>
           </div>
           <button
@@ -137,6 +133,26 @@ export default function ProjectHistory({
                   <strong className="block text-xs text-zinc-800 font-semibold mt-1 whitespace-normal break-words leading-snug">
                     {proj.customerInfo.customerName || "ไม่ระบุชื่อบริษัท"}
                   </strong>
+
+                  {/* Surveyor info */}
+                  {proj.customerInfo.surveyorName && (
+                    <div className="mt-1.5 flex items-center gap-1.5 text-[9.5px] text-zinc-500">
+                      <div className="w-4 h-4 rounded-full bg-[#0071e3]/10 flex items-center justify-center shrink-0">
+                        <span className="text-[#0071e3] font-bold text-[7px] uppercase">
+                          {proj.customerInfo.surveyorName.substring(0, 2)}
+                        </span>
+                      </div>
+                      <span className="truncate font-medium text-zinc-600">{proj.customerInfo.surveyorName}</span>
+                      {proj.customerInfo.surveyorPhone && (
+                        <span className="shrink-0 text-zinc-400">· {proj.customerInfo.surveyorPhone}</span>
+                      )}
+                    </div>
+                  )}
+                  {proj.customerInfo.surveyorDepartment && (
+                    <div className="mt-0.5 text-[9px] text-zinc-400 pl-5.5">
+                      {proj.customerInfo.surveyorDepartment}
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-between text-[10px] text-zinc-400 mt-2.5 pt-2.5 border-t border-zinc-100/50">
                     <span className="flex flex-wrap items-center gap-1.5 font-mono">
