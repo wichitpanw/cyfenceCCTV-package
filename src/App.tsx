@@ -874,12 +874,20 @@ export default function App() {
                 const isPassed = stepUnit.number < step;
                 const isCurrent = stepUnit.number === step;
                 const isSurveyIgnored = (stepUnit.number === 4) && !hasSurveyReport;
+                const isClickable = (isPassed || isCurrent) && activeProjectId;
 
                 return (
                   <div
                     key={stepUnit.number}
-                    className={`flex items-center gap-1.5 text-xs font-medium ${
+                    onClick={() => {
+                      if (isClickable && !isCurrent) setStep(stepUnit.number);
+                    }}
+                    className={`flex items-center gap-1.5 text-xs font-medium transition-all ${
                       isSurveyIgnored ? "opacity-25 line-through" : ""
+                    } ${
+                      isClickable && !isCurrent
+                        ? "cursor-pointer group"
+                        : "cursor-default"
                     }`}
                   >
                     <div
@@ -887,18 +895,18 @@ export default function App() {
                         isCurrent
                           ? "bg-[#0071e3] text-white"
                           : isPassed
-                          ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                          ? "bg-emerald-50 text-emerald-600 border border-emerald-200 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500"
                           : "bg-zinc-100 text-zinc-400 border border-zinc-200/50"
                       }`}
                     >
                       {isPassed ? "✓" : stepUnit.number}
                     </div>
                     <span
-                      className={`text-[11px] ${
+                      className={`text-[11px] transition-colors ${
                         isCurrent
                           ? "text-[#0071e3] font-semibold"
                           : isPassed
-                          ? "text-zinc-650"
+                          ? "text-zinc-650 group-hover:text-[#0071e3] group-hover:underline underline-offset-2"
                           : "text-zinc-400 font-normal"
                       }`}
                     >

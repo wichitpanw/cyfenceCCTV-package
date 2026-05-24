@@ -197,180 +197,151 @@ export default function Step6Pricing({
 
   // ---- PDF PRINT ----
   const handlePrintPDF = () => {
-    const today = new Date().toLocaleDateString("th-TH", {
-      year: "numeric", month: "long", day: "numeric"
-    });
-    const quotationNo = `QT-${Date.now().toString().slice(-8)}`;
-    const catLabel = (cat: string) =>
-      cat === "hardware" ? "ฮาร์ดแวร์" :
-      cat === "accessory" ? "อุปกรณ์เสริม" :
-      cat === "labor" ? "ค่าแรง" : "อื่นๆ";
+    const printWin = window.open("", "_blank", "width=860,height=1100");
+    if (printWin) {
+      const today = new Date().toLocaleDateString("th-TH", {
+        year: "numeric", month: "long", day: "numeric"
+      });
+      const quotationNo = `SR-${Date.now().toString().slice(-8)}`;
+      const catLabel = (cat: string) =>
+        cat === "hardware" ? "ฮาร์ดแวร์" :
+        cat === "accessory" ? "อุปกรณ์เสริม" :
+        cat === "labor" ? "ค่าแรง" : "อื่นๆ";
 
-    const rowsHtml = pricingItems.map((item, idx) => `
-      <tr class="${idx % 2 === 0 ? "row-even" : "row-odd"}">
-        <td class="num">${idx + 1}</td>
-        <td class="name">${item.name}</td>
-        <td class="center">${catLabel(item.category)}</td>
-        <td class="center">${item.quantity.toLocaleString("th-TH")}</td>
-        <td class="center">${item.unit}</td>
-        <td class="right">${item.unitPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
-        <td class="right bold">${(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
-      </tr>
-    `).join("");
+      const rowsHtml = pricingItems.map((item, idx) => `
+        <tr class="${idx % 2 === 0 ? "row-even" : "row-odd"}">
+          <td class="num">${idx + 1}</td>
+          <td class="name">${item.name}</td>
+          <td class="center">${catLabel(item.category)}</td>
+          <td class="center bold">${item.quantity.toLocaleString("th-TH")}</td>
+          <td class="center">${item.unit}</td>
+          <td class="right">${item.unitPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
+          <td class="right bold">${(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
+        </tr>
+      `).join("");
 
-    const htmlContent = `<!DOCTYPE html>
+      const htmlContent = `<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>ใบเสนอราคา - ${customerInfo?.customerName || customerName}</title>
+  <title>เอกสารสำรวจกล้อง - ${customerInfo?.customerName || customerName}</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    @page { size: A4; margin: 18mm 14mm; }
-    body { font-family: 'Sarabun', 'TH Sarabun New', 'Angsana New', sans-serif; font-size: 12pt; color: #111; background: #fff; }
-    .page { max-width: 100%; }
+    @page { size: A4; margin: 16mm 14mm; }
+    body { font-family: 'Noto Sans Thai', 'TH Sarabun New', sans-serif; font-size: 11pt; color: #111; background: #fff; }
 
-    /* Header */
-    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 14px; border-bottom: 2.5px solid #0071e3; margin-bottom: 16px; }
-    .company-name { font-size: 18pt; font-weight: 900; color: #0071e3; letter-spacing: -0.5px; }
-    .company-sub { font-size: 9pt; color: #555; margin-top: 2px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #0071e3; margin-bottom: 14px; }
+    .company-name { font-size: 17pt; font-weight: 800; color: #0071e3; }
+    .company-sub { font-size: 8.5pt; color: #555; margin-top: 2px; }
     .doc-info { text-align: right; }
-    .doc-title { font-size: 15pt; font-weight: 800; color: #111; }
-    .doc-no { font-size: 9pt; color: #666; margin-top: 3px; }
-    .doc-date { font-size: 9pt; color: #666; }
+    .doc-title { font-size: 14pt; font-weight: 700; color: #111; }
+    .doc-no { font-size: 8.5pt; color: #666; margin-top: 2px; }
+    .doc-date { font-size: 8.5pt; color: #666; }
 
-    /* Info boxes */
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .info-box { border: 1px solid #ddd; border-radius: 8px; padding: 10px 14px; background: #fafafa; }
-    .info-box-title { font-size: 8pt; font-weight: 700; color: #0071e3; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .info-row { font-size: 10pt; color: #333; margin-bottom: 3px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .info-box { border: 1px solid #ddd; border-radius: 6px; padding: 9px 12px; background: #fafafa; }
+    .info-box-title { font-size: 7.5pt; font-weight: 700; color: #0071e3; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
+    .info-row { font-size: 9.5pt; color: #333; margin-bottom: 2px; }
     .info-row span { font-weight: 600; color: #111; }
 
-    /* Table */
-    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 10pt; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 9.5pt; }
     thead tr { background: #0071e3; color: #fff; }
-    thead th { padding: 8px 10px; text-align: left; font-weight: 700; font-size: 9pt; }
+    thead th { padding: 7px 9px; text-align: left; font-weight: 700; font-size: 8.5pt; }
     thead th.center { text-align: center; }
     thead th.right { text-align: right; }
     .row-even { background: #fff; }
     .row-odd { background: #f8f9fc; }
-    tbody td { padding: 7px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
-    td.num { text-align: center; color: #888; font-size: 9pt; width: 28px; }
-    td.name { line-height: 1.4; }
-    td.center { text-align: center; width: 70px; }
-    td.right { text-align: right; width: 90px; }
-    td.bold { font-weight: 700; }
+    tbody td { padding: 6px 9px; border-bottom: 1px solid #eee; vertical-align: top; line-height: 1.45; }
+    td.num { text-align: center; color: #888; font-size: 8pt; width: 24px; }
+    td.center { text-align: center; width: 64px; }
+    td.right { text-align: right; width: 85px; }
+    td.bold { font-weight: 600; }
 
-    /* Summary */
-    .summary-wrap { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-    .summary { width: 320px; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
-    .summary-row { display: flex; justify-content: space-between; padding: 8px 14px; font-size: 10.5pt; }
+    .summary-wrap { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+    .summary { width: 290px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+    .summary-row { display: flex; justify-content: space-between; padding: 7px 12px; font-size: 10pt; }
     .summary-row:nth-child(odd) { background: #f8f9fc; }
-    .summary-row.total { background: #0071e3; color: #fff; font-size: 13pt; font-weight: 900; }
-    .summary-row.total .amt { font-size: 14pt; }
+    .summary-row.total { background: #0071e3; color: #fff; font-size: 12pt; font-weight: 800; }
 
-    /* Footer */
-    .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 24px; }
-    .sign-box { border-top: 1px dashed #aaa; padding-top: 8px; text-align: center; font-size: 9.5pt; color: #555; }
-    .sign-box .name { font-weight: 700; color: #111; margin-top: 4px; }
-    .sign-space { height: 40px; }
-    .footer-note { margin-top: 20px; font-size: 8.5pt; color: #888; border-top: 1px solid #eee; padding-top: 10px; text-align: center; }
-    .badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 8pt; font-weight: 700; }
-    .badge-hw { background: #e8f0fe; color: #1a56db; }
-    .badge-acc { background: #f0fdf4; color: #166534; }
-    .badge-lab { background: #fff7ed; color: #9a3412; }
-    .badge-etc { background: #f4f4f5; color: #555; }
+    .remark-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 6px; padding: 10px 14px; margin-top: 8px; }
+    .remark-title { font-size: 8pt; font-weight: 700; color: #92400e; margin-bottom: 4px; }
+    .remark-text { font-size: 8.5pt; color: #78350f; line-height: 1.6; }
+    .footer { margin-top: 14px; font-size: 7.5pt; color: #999; border-top: 1px solid #eee; padding-top: 8px; text-align: center; }
   </style>
 </head>
 <body>
-<div class="page">
-
-  <!-- Header -->
   <div class="header">
     <div>
       <div class="company-name">■ NT Cyfence</div>
       <div class="company-sub">เครือข่ายโทรคมนาคมแห่งชาติ | NT Cyfence Security Solutions</div>
     </div>
     <div class="doc-info">
-      <div class="doc-title">ใบเสนอราคา</div>
+      <div class="doc-title">เอกสารสำรวจระบบกล้องวงจรปิด</div>
       <div class="doc-no">เลขที่: <strong>${quotationNo}</strong></div>
-      <div class="doc-date">วันที่: ${today}</div>
+      <div class="doc-date">วันที่สำรวจ: ${today}</div>
     </div>
   </div>
 
-  <!-- Client Info -->
   <div class="info-grid">
     <div class="info-box">
-      <div class="info-box-title">ข้อมูลลูกค้า / ผู้ว่าจ้าง</div>
-      <div class="info-row">ชื่อบริษัท/หน่วยงาน: <span>${customerInfo?.customerName || customerName || "-"}</span></div>
+      <div class="info-box-title">ข้อมูลหน่วยงาน / ลูกค้า</div>
+      <div class="info-row">ชื่อหน่วยงาน: <span>${customerInfo?.customerName || customerName || "-"}</span></div>
       <div class="info-row">ชื่อโครงการ: <span>${customerInfo?.projectName || "-"}</span></div>
       <div class="info-row">ผู้ติดต่อ: <span>${customerInfo?.contactPerson || "-"}</span></div>
       <div class="info-row">เบอร์โทร: <span>${customerInfo?.contactPhone || "-"}</span></div>
       <div class="info-row">จังหวัด: <span>${customerInfo?.province || "-"}</span></div>
+      <div class="info-row">ที่อยู่: <span style="font-size:8.5pt">${customerInfo?.address || "-"}</span></div>
     </div>
     <div class="info-box">
-      <div class="info-box-title">ข้อมูลโครงการและผู้สำรวจ</div>
+      <div class="info-box-title">สเปกระบบและผู้สำรวจ</div>
       <div class="info-row">วันที่สำรวจ: <span>${customerInfo?.surveyDate || "-"}</span></div>
       <div class="info-row">ผู้สำรวจ: <span>${customerInfo?.surveyorName || "-"}</span></div>
       ${customerInfo?.surveyorDepartment ? `<div class="info-row">ส่วนงาน: <span>${customerInfo.surveyorDepartment}</span></div>` : ""}
-      ${customerInfo?.surveyorPhone ? `<div class="info-row">เบอร์โทร: <span>${customerInfo.surveyorPhone}</span></div>` : ""}
-      <div class="info-row">สเปกกล้อง: <span>${requirements?.cameraBrand || "Hikvision"} | NVR ${requirements?.nvrChannels || "-"}CH</span></div>
+      ${customerInfo?.surveyorPhone ? `<div class="info-row">เบอร์โทรผู้สำรวจ: <span>${customerInfo.surveyorPhone}</span></div>` : ""}
+      <div class="info-row">สเปกกล้อง: <span>${requirements?.cameraBrand || "Hikvision"}</span></div>
+      <div class="info-row">เครื่อง NVR: <span>${requirements?.nvrBrand || "-"} ${requirements?.nvrChannels || "-"}CH</span></div>
+      <div class="info-row">หน่วยความจำ: <span>${requirements?.storagePackage || "-"}</span></div>
     </div>
   </div>
 
-  <!-- Items Table -->
   <table>
     <thead>
       <tr>
-        <th style="width:28px">#</th>
+        <th style="width:24px">#</th>
         <th>รายการอุปกรณ์และงานบริการ</th>
-        <th class="center" style="width:72px">ประเภท</th>
-        <th class="center" style="width:60px">จำนวน</th>
-        <th class="center" style="width:52px">หน่วย</th>
-        <th class="right" style="width:95px">ราคา/หน่วย (฿)</th>
-        <th class="right" style="width:100px">ราคารวม (฿)</th>
+        <th class="center" style="width:64px">ประเภท</th>
+        <th class="center" style="width:52px">จำนวน</th>
+        <th class="center" style="width:48px">หน่วย</th>
+        <th class="right" style="width:90px">ราคา/หน่วย (฿)</th>
+        <th class="right" style="width:95px">ราคารวม (฿)</th>
       </tr>
     </thead>
     <tbody>${rowsHtml}</tbody>
   </table>
 
-  <!-- Summary -->
   <div class="summary-wrap">
     <div class="summary">
-      <div class="summary-row"><span>ราคารวมก่อนส่วนลด</span><span>฿${calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-      ${discount > 0 ? `<div class="summary-row"><span>ส่วนลดพิเศษ</span><span style="color:#e3001e">-฿${discount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>` : ""}
-      <div class="summary-row"><span>ยอดหลังหักส่วนลด</span><span>฿${calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-      ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม 7%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>` : ""}
-      <div class="summary-row total"><span>รวมทั้งสิ้น</span><span class="amt">฿${calGrandTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+      <div class="summary-row"><span>ราคารวมสุทธิ์ (CAPEX)</span><span>฿${calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+      ${discount > 0 ? `<div class="summary-row"><span>ส่วนลด</span><span style="color:#dc2626">-฿${discount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>` : ""}
+      ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม ${vatRate}%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>` : ""}
+      <div class="summary-row total"><span>รวมทั้งสิ้น</span><span>฿${calGrandTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
     </div>
   </div>
 
-  <!-- Signature Section -->
-  <div class="sign-grid">
-    <div class="sign-box">
-      <div class="sign-space"></div>
-      <div>ลงชื่อผู้ว่าจ้าง / ผู้มีอำนาจอนุมัติ</div>
-      <div class="name">(${customerInfo?.contactPerson || "ชื่อผู้ว่าจ้าง"})</div>
-      <div style="font-size:9pt;color:#888;margin-top:3px">วันที่: ________________</div>
-    </div>
-    <div class="sign-box">
-      <div class="sign-space"></div>
-      <div>ลงชื่อผู้เสนอราคา / NT Cyfence</div>
-      <div class="name">(${customerInfo?.surveyorName || "ชื่อผู้สำรวจ"})</div>
-      <div style="font-size:9pt;color:#888;margin-top:3px">วันที่: ________________</div>
+  <div class="remark-box">
+    <div class="remark-title">⚠️ หมายเหตุ / ข้อตกลงเบื้องต้น</div>
+    <div class="remark-text">
+      • เอกสารฉบับนี้เป็นการประมาณการเบื้องต้น ราคาอาจเปลี่ยนแปลงได้ตามสภาพหน้างานจริงและไม่รวมค่าเดินทางและค่าดำเนินการอื่นๆ<br/>
+      • สเปกอุปกรณ์สามารถปรับเปลี่ยนได้ตามความเหมาะสมเมื่อชำระเงินจริง<br/>
+      ${customerInfo?.address ? `• สถานที่ติดตั้ง: ${customerInfo.address}` : ""}
     </div>
   </div>
 
-  <div class="footer-note">
-    เอกสารฉบับนี้สร้างโดยระบบ CCTV Package โดย NT Cyfence | ใบเสนอราคาฉบับนี้เป็นเพียงการประมาณการเบื้องต้น ราคาอาจเปลี่ยนแปลงได้ตามช่วงเวลาและเงื่อนไขแอกสารจริง
-  </div>
-
-</div>
+  <div class="footer">สร้างโดย: NT Cyfence CCTV Survey System | ${today}</div>
 <script>window.onload = () => window.print();</script>
-</body>
-</html>`;
+</body></html>`;
 
-    const printWin = window.open("", "_blank", "width=850,height=1100");
-    if (printWin) {
       printWin.document.open();
       printWin.document.write(htmlContent);
       printWin.document.close();
@@ -414,17 +385,17 @@ export default function Step6Pricing({
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-zinc-700">
+          <div className="overflow-x-auto -mx-5 px-5">
+            <table className="w-full text-left text-xs text-zinc-700 min-w-[600px]">
               <thead>
                 <tr className="bg-zinc-50 text-zinc-500 uppercase font-mono text-[9px] border-b border-zinc-200">
                   <th className="py-2.5 px-3">รายการอุปกรณ์และงานบริการ</th>
                   <th className="py-2.5 px-3 w-16 text-center">ประเภท</th>
-                  <th className="py-2.5 px-3 w-20 text-center">จำนวน</th>
-                  <th className="py-2.5 px-3 w-20 text-center">หน่วย</th>
-                  <th className="py-2.5 px-3 w-28 text-right">ราคาหน่วย (฿)</th>
-                  <th className="py-2.5 px-3 w-28 text-right">ราคารวม (฿)</th>
-                  <th className="py-2.5 px-3 w-8 text-center"></th>
+                  <th className="py-2.5 px-3 w-16 text-center">จำนวน</th>
+                  <th className="py-2.5 px-3 w-16 text-center">หน่วย</th>
+                  <th className="py-2.5 px-3 w-24 text-right hidden md:table-cell">ราคาหน่วย (฿)</th>
+                  <th className="py-2.5 px-3 w-24 text-right">ราคารวม (฿)</th>
+                  <th className="py-2.5 px-2 w-8 text-center"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200">
@@ -468,7 +439,7 @@ export default function Step6Pricing({
                         className="w-12 px-1.5 py-1 border border-zinc-300 text-xs text-center rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                       />
                     </td>
-                    <td className="py-3 px-3 text-right">
+                    <td className="py-3 px-3 text-right hidden md:table-cell">
                       <input
                         type="number"
                         min={0}

@@ -3,15 +3,14 @@
 @import "tailwindcss";
 
 :root {
-  /* Apple-style system font stack — SF Pro on Apple, Segoe UI on Windows, then Noto Sans Thai for Thai */
+  /* Apple-style system font stack — SF Pro on Apple, Segoe UI on Windows */
+  /* Noto Sans Thai renders Thai glyphs when SF Pro doesn't have them */
   font-family:
     -apple-system,
     BlinkMacSystemFont,
-    "SF Pro Display",
-    "SF Pro Text",
-    "Helvetica Neue",
-    "Segoe UI",
     "Noto Sans Thai",
+    "Segoe UI",
+    "Helvetica Neue",
     Arial,
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -20,14 +19,9 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Override for Thai text — ensure Noto Sans Thai renders */
-:lang(th), [lang="th"], .font-thai {
-  font-family: "Noto Sans Thai", -apple-system, "Helvetica Neue", sans-serif;
-}
-
-/* Mono override stays as-is */
+/* Mono override */
 .font-mono {
-  font-family: "SF Mono", "Fira Mono", "JetBrains Mono", ui-monospace, monospace;
+  font-family: "SF Mono", "Fira Mono", "JetBrains Mono", ui-monospace, monospace !important;
 }
 
 body {
