@@ -385,8 +385,62 @@ export default function Step6Pricing({
             </div>
           </div>
 
-          <div className="overflow-x-auto -mx-5 px-5">
-            <table className="w-full text-left text-xs text-zinc-700 min-w-[600px]">
+          {/* === MOBILE CARD LIST (portrait) — block on mobile, hidden on md+ === */}
+          <div className="block md:hidden space-y-2">
+            {pricingItems.map((item) => (
+              <div key={item.id} className="bg-zinc-50/60 border border-zinc-200 rounded-xl p-3 space-y-2">
+                <div className="flex items-start gap-2">
+                  <span className={`mt-0.5 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase shrink-0 ${
+                    item.category === "hardware" ? "bg-blue-50 text-blue-700 border border-blue-200" :
+                    item.category === "accessory" ? "bg-green-50 text-green-700 border border-green-200" :
+                    item.category === "labor" ? "bg-orange-50 text-orange-700 border border-orange-200" :
+                    "bg-zinc-100 text-zinc-500 border border-zinc-200"
+                  }`}>
+                    {item.category === "hardware" ? "HW" : item.category === "accessory" ? "ACC" : item.category === "labor" ? "LAB" : "ETC"}
+                  </span>
+                  <textarea
+                    value={item.name}
+                    onChange={(e) => handleUpdateItemName(item.id, e.target.value)}
+                    rows={2}
+                    className="flex-1 bg-transparent font-semibold text-zinc-800 border-none focus:outline-none focus:ring-1 focus:ring-zinc-300 rounded px-1 -mx-1 resize-none leading-snug text-xs"
+                  />
+                  <button type="button" onClick={() => handleDeleteItem(item.id)} className="p-1.5 text-zinc-350 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer shrink-0">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-4 gap-1.5">
+                  <div className="space-y-0.5">
+                    <div className="font-mono text-[8px] text-zinc-400 uppercase tracking-wide">จำนวน</div>
+                    <input type="number" min={0.1} step="any" value={item.quantity}
+                      onChange={(e) => handleItemValueChange(item.id, "quantity", e.target.value)}
+                      className="w-full px-1.5 py-1.5 rounded-lg border text-center text-xs font-bold bg-white font-mono border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="font-mono text-[8px] text-zinc-400 uppercase tracking-wide">หน่วย</div>
+                    <input type="text" value={item.unit}
+                      onChange={(e) => handleUpdateItemUnit(item.id, e.target.value)}
+                      className="w-full px-1.5 py-1.5 border border-zinc-300 text-xs text-center rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="font-mono text-[8px] text-zinc-400 uppercase tracking-wide">ราคา/หน่วย</div>
+                    <input type="number" min={0} value={item.unitPrice}
+                      onChange={(e) => handleItemValueChange(item.id, "unitPrice", e.target.value)}
+                      className="w-full px-1.5 py-1.5 rounded-lg border text-right text-xs font-bold bg-white font-mono border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
+                  </div>
+                  <div className="space-y-0.5 text-right">
+                    <div className="font-mono text-[8px] text-zinc-400 uppercase tracking-wide">รวม (฿)</div>
+                    <div className="font-mono font-bold text-zinc-900 text-xs py-1.5 pr-0.5">
+                      {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* === DESKTOP TABLE — hidden on mobile, shown on md+ === */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-xs text-zinc-700">
               <thead>
                 <tr className="bg-zinc-50 text-zinc-500 uppercase font-mono text-[9px] border-b border-zinc-200">
                   <th className="py-2.5 px-3">รายการอุปกรณ์และงานบริการ</th>
