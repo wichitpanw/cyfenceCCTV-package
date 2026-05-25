@@ -351,8 +351,8 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         </div>
 
         {/* Footer Credit info */}
-        <div className="text-center mt-6 text-[9.5px] text-zinc-500 font-mono">
-          Powered by NT Cyfence Udon Thani Service Section &copy; 2026
+        <div className="text-center mt-6 text-[9.5px] text-zinc-400 font-mono">
+          Powered by Warapon Wichitpan &copy; 2026 &middot; NT Cyfence
         </div>
       </div>
     </div>
