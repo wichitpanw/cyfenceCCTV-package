@@ -641,15 +641,7 @@ export default function Step4SurveyReport({
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#30d158] border border-white shadow-xs"></span>
-                    <span className="font-semibold text-zinc-600">Bullet (🟢 ภายนอก/ถนน)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#bf5af2] border border-white shadow-xs"></span>
-                    <span className="font-semibold text-zinc-600">PTZ (🟣 ก้มเงยหมุนซูม)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#0071e3] border border-white shadow-xs"></span>
-                    <span className="font-semibold text-zinc-600">Dome (🔵 ภายในอาคาร)</span>
+                    <span className="font-semibold text-zinc-600">Bullet (🟢 กล้องทรงกระบอก)</span>
                   </div>
                 </div>
               </div>

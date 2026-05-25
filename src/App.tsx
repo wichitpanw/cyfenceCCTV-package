@@ -372,10 +372,42 @@ export default function App() {
     return DEFAULT_MASTER_COSTS;
   });
 
+  const [tempCosts, setTempCosts] = useState<MasterCostDb>(DEFAULT_MASTER_COSTS);
   const [isCostsModalOpen, setIsCostsModalOpen] = useState<boolean>(false);
   const [adminPinPurpose, setAdminPinPurpose] = useState<"settings" | "costs" | "pricing_admin" | null>(null);
   const [isAdminVerified, setIsAdminVerified] = useState<boolean>(false);
 
+  // Sync tempCosts when opening the costs modal
+  useEffect(() => {
+    if (isCostsModalOpen) {
+      setTempCosts(masterCosts);
+    }
+  }, [isCostsModalOpen, masterCosts]);
+
+  // Load master costs from Supabase on mount if configured
+  useEffect(() => {
+    const loadCostsFromSupabase = async () => {
+      if (!isSupabaseConfigured) return;
+      try {
+        const { data, error } = await supabase
+          .from("cctv_master_costs")
+          .select("costs")
+          .eq("id", "default")
+          .single();
+        if (data && data.costs) {
+          console.log("Loaded master costs from Supabase:", data.costs);
+          setMasterCosts(data.costs);
+        } else if (error && error.code !== "PGRST116") {
+          console.warn("Could not fetch master costs from Supabase (this is normal if the table doesn't exist yet):", error.message);
+        }
+      } catch (err) {
+        console.error("Failed to load master costs from Supabase:", err);
+      }
+    };
+    loadCostsFromSupabase();
+  }, []);
+
+  // Save master costs to local storage whenever it changes
   useEffect(() => {
     localStorage.setItem("CCTV_MASTER_COSTS", JSON.stringify(masterCosts));
   }, [masterCosts]);
@@ -676,10 +708,10 @@ export default function App() {
         {
           id: "pt-3",
           name: "ทางเข้าหมู่บ้านหนองนาคำ หมู่ 2",
-          type: "PTZ",
+          type: "Bullet",
           poleType: "เสา 6 เมตร",
           hasSupportArm: true,
-          notes: "กล้อง PTZ ตรวจสอบป้ายทะเบียนรถเข้า-ออกชุมชน ปรับหมุนซูมระยะไกล",
+          notes: "กล้องทรงกระบอก Bullet ตรวจสอบป้ายทะเบียนรถเข้า-ออกชุมชน ส่องภาพคมชัดความละเอียดสูง",
           x: 45,
           y: 65,
           focalAngle: 60,
@@ -1103,7 +1135,7 @@ export default function App() {
               title="แก้ไขราคาต้นทุนกลาง (Master Cost Database)"
             >
               <Coins className="w-3.5 h-3.5 text-amber-500" />
-              <span className="text-[10px] font-bold text-zinc-700 hidden sm:inline">ราคาต้นทุน</span>
+              <span className="text-[10px] font-bold text-zinc-700 hidden sm:inline">สำหรับผู้ดูแลระบบ</span>
             </button>
             {/* Admin Settings Button (Gear Icon) */}
             <button
@@ -1786,14 +1818,38 @@ export default function App() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       const updated = {
                         ...tempCosts,
                         lastUpdated: new Date().toISOString()
                       };
                       setMasterCosts(updated);
+                      
+                      // Also save to Supabase if configured
+                      if (isSupabaseConfigured) {
+                        try {
+                          const { error } = await supabase
+                            .from("cctv_master_costs")
+                            .upsert({
+                              id: "default",
+                              costs: updated,
+                              updated_at: new Date().toISOString()
+                            });
+                          if (error) {
+                            console.error("Failed to save master costs to Supabase:", error.message);
+                            alert("💾 บันทึกในเบราว์เซอร์สำเร็จ แต่ไม่สามารถซิงค์ขึ้น Supabase ได้ค่ะ:\n" + error.message);
+                          } else {
+                            alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จและซิงค์ขึ้นระบบ Cloud Supabase เรียบร้อยแล้วค่ะ!");
+                          }
+                        } catch (err: any) {
+                          console.error("Failed to save master costs to Supabase:", err);
+                          alert("💾 บันทึกในเบราว์เซอร์สำเร็จ แต่ไม่สามารถซิงค์ขึ้น Supabase ได้ค่ะ");
+                        }
+                      } else {
+                        alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จเรียบร้อยแล้วค่ะ! (โหมดบันทึกในเครื่อง)");
+                      }
+                      
                       setIsCostsModalOpen(false);
-                      alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จเรียบร้อยแล้วค่ะ!");
                     }}
                     className="px-5 py-2 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer"
                   >
