@@ -2,28 +2,67 @@ import React, { useEffect, useState } from "react";
 import { Users, Shield, User, UserCheck, AlertCircle, Search, RefreshCw, MapPin } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
-const THAI_PROVINCES = [
-  "อุดรธานี",
-  "ขอนแก่น",
-  "หนองคาย",
-  "เลย",
-  "สกลนคร",
-  "หนองบัวลำภู",
-  "บึงกาฬ",
-  "นครพนม",
-  "กาฬสินธุ์",
-  "มหาสารคาม",
-  "ร้อยเอ็ด",
-  "มุกดาหาร",
-  "ยโสธร",
-  "อำนาจเจริญ",
-  "อุบลราชธานี",
-  "ศรีสะเกษ",
-  "สุรินทร์",
-  "บุรีรัมย์",
-  "นครราชสีมา",
-  "ชัยภูมิ"
-];
+interface EditableGroupCellProps {
+  userId: string;
+  initialValue: string;
+  onSave: (userId: string, newValue: string) => Promise<void>;
+}
+
+function EditableGroupCell({ userId, initialValue, onSave }: EditableGroupCellProps) {
+  const [value, setValue] = useState(initialValue);
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  const handleBlur = async () => {
+    setIsEditing(false);
+    if (value.trim() !== initialValue.trim()) {
+      setLoading(true);
+      try {
+        await onSave(userId, value.trim());
+      } catch (e) {
+        console.error("Save failed:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.currentTarget.blur();
+    } else if (e.key === "Escape") {
+      setValue(initialValue);
+      setIsEditing(false);
+    }
+  };
+
+  return (
+    <div className="relative flex items-center w-full max-w-[140px]">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onFocus={() => setIsEditing(true)}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        placeholder="ระบุกลุ่ม/ส่วนงาน..."
+        className={`w-full px-2.5 py-1 bg-white border border-zinc-250 rounded-lg text-[10.5px] font-semibold text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3] transition-all shadow-2xs ${
+          isEditing ? "border-[#0071e3] ring-1 ring-[#0071e3]/30" : "hover:border-zinc-350 cursor-text"
+        }`}
+        disabled={loading}
+      />
+      {loading && (
+        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] animate-pulse">
+          ⏳
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function UserManagement() {
   const [users, setUsers] = useState<any[]>([]);
@@ -251,22 +290,17 @@ export default function UserManagement() {
             </select>
           </div>
 
-          {/* Province Select */}
+          {/* Group/Department Input */}
           <div className="space-y-1 flex flex-col justify-between">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">จังหวัดประจำการ</label>
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">กลุ่ม / ส่วนงานประจำการ</label>
             <div className="flex gap-2 items-center">
-              <select
+              <input
+                type="text"
+                placeholder="เช่น อุดรธานี, ฝ่ายเทคนิค, superadmin"
                 value={newProvince}
                 onChange={(e) => setNewProvince(e.target.value)}
-                className="grow px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-bold text-zinc-700 shadow-2xs cursor-pointer"
-              >
-                <option value="">-- เลือกจังหวัด --</option>
-                {THAI_PROVINCES.map((prov) => (
-                  <option key={prov} value={prov}>
-                    {prov}
-                  </option>
-                ))}
-              </select>
+                className="grow px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-semibold text-zinc-800 shadow-2xs"
+              />
               <button
                 type="submit"
                 disabled={isCreating}
@@ -286,7 +320,7 @@ export default function UserManagement() {
         </span>
         <input
           type="text"
-          placeholder="ค้นหาตามรายชื่อ อีเมล ระดับสิทธิ์ หรือจังหวัด..."
+          placeholder="ค้นหาตามรายชื่อ อีเมล ระดับสิทธิ์ หรือกลุ่มงาน..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-9 pr-3 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] text-xs font-medium text-zinc-800 transition-all shadow-2xs"
@@ -301,7 +335,7 @@ export default function UserManagement() {
               <tr className="bg-zinc-50 border-b border-zinc-150 text-[10px] font-bold text-zinc-500 uppercase tracking-wide">
                 <th className="px-4 py-3">รายละเอียดผู้ใช้งาน</th>
                 <th className="px-4 py-3">UUID บัญชี</th>
-                <th className="px-4 py-3">จังหวัดกลุ่มงาน</th>
+                <th className="px-4 py-3">กลุ่ม / ส่วนงาน</th>
                 <th className="px-4 py-3">ระดับสิทธิ์ (Role)</th>
                 <th className="px-4 py-3 text-right">ปรับระดับสิทธิ์</th>
               </tr>
@@ -332,18 +366,11 @@ export default function UserManagement() {
                         {u.id}
                       </td>
                       <td className="px-4 py-3.5">
-                        <select
-                          value={u.province || ""}
-                          onChange={(e) => handleProvinceChange(u.id, e.target.value)}
-                          className="px-2 py-1 bg-white border border-zinc-250 rounded-lg text-[10.5px] font-bold text-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#0071e3] hover:border-zinc-350 cursor-pointer shadow-2xs"
-                        >
-                          <option value="">-- เลือกจังหวัด --</option>
-                          {THAI_PROVINCES.map((prov) => (
-                            <option key={prov} value={prov}>
-                              {prov}
-                            </option>
-                          ))}
-                        </select>
+                        <EditableGroupCell
+                          userId={u.id}
+                          initialValue={u.province || ""}
+                          onSave={handleProvinceChange}
+                        />
                       </td>
                       <td className="px-4 py-3.5">
                         <span className={`px-2.5 py-0.8 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wide ${roleBadgeStyle}`}>
