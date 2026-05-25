@@ -45,22 +45,22 @@ export default function ProjectHistory({
     <div className="bg-white p-4 rounded-2xl border border-zinc-200/75 h-auto flex flex-col justify-between" id="project-history-panel">
       <div className="space-y-4">
         {/* Header and Add button */}
-        <div className="flex justify-between items-center pb-2 border-b border-zinc-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-zinc-100 gap-2">
           <div className="flex items-center gap-1.5">
-            <FolderKanban className="w-4 h-4 text-[#0071e3]" />
-            <h3 className="font-semibold text-[11px] text-zinc-800 uppercase tracking-wide font-sans">
+            <FolderKanban className="w-4 h-4 text-[#0071e3] shrink-0" />
+            <h3 className="font-semibold text-[11px] text-zinc-800 uppercase tracking-wide font-sans leading-none">
               ประวัติงานสำรวจและแบบบันทึก
             </h3>
           </div>
           <button
             type="button"
             onClick={onNewProject}
-            className="p-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-medium transition-all flex flex-col items-center gap-0.5 cursor-pointer leading-tight"
+            className="p-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-medium transition-all flex flex-col items-center gap-0.5 cursor-pointer leading-tight shrink-0 whitespace-nowrap self-start sm:self-center shadow-xs"
             title={costLastUpdated ? `ราคาต้นทุนล่าสุด: ${costLastUpdated}` : undefined}
           >
             <div className="inline-flex items-center gap-1">
-              <PlusCircle className="w-3.5 h-3.5" />
-              เปิดไฟล์งานใหม่
+              <PlusCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>เปิดไฟล์งานใหม่</span>
             </div>
             {costLastUpdated && (
               <span className="text-[7px] text-zinc-400 font-normal">
