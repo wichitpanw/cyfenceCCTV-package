@@ -592,7 +592,7 @@ export default function Step4SurveyReport({
                 <MapCenterController lat={panLat} lng={panLng} />
 
                 {/* Control Center Reference Point */}
-                <Marker
+                 <Marker
                   position={[centerLat, centerLng]}
                   icon={createControlCenterIcon()}
                 />
@@ -617,7 +617,7 @@ export default function Step4SurveyReport({
                       eventHandlers={{
                         click: (e) => {
                           L.DomEvent.stopPropagation(e);
-                          setSelectedPointId(pt.id);
+                          setSelectedPointId(isSelected ? null : pt.id);
                         },
                         dragend: (e) => {
                           const marker = e.target;
@@ -635,6 +635,25 @@ export default function Step4SurveyReport({
                 })}
               </MapContainer>
 
+              {/* Map Legend Overlay (Top Right) */}
+              <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl border border-zinc-200 text-[10px] text-zinc-700 shadow-sm flex flex-col gap-1.5 z-[400] select-none pointer-events-none w-48">
+                <span className="font-bold text-zinc-800 text-[9px] uppercase tracking-wider font-mono">ประเภทกล้องตามสีสัญลักษณ์</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#30d158] border border-white shadow-xs"></span>
+                    <span className="font-semibold text-zinc-600">Bullet (🟢 ภายนอก/ถนน)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#bf5af2] border border-white shadow-xs"></span>
+                    <span className="font-semibold text-zinc-600">PTZ (🟣 ก้มเงยหมุนซูม)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#0071e3] border border-white shadow-xs"></span>
+                    <span className="font-semibold text-zinc-600">Dome (🔵 ภายในอาคาร)</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Instructions Help Tag overlay */}
               <div className="absolute bottom-3 left-3 bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800 text-[10px] text-zinc-300 pointer-events-none flex items-center gap-1 z-[400]">
                 <Info className="w-3.5 h-3.5 text-[#0071e3]" />
@@ -651,7 +670,7 @@ export default function Step4SurveyReport({
                 <button
                   key={pt.id}
                   type="button"
-                  onClick={() => setSelectedPointId(pt.id)}
+                  onClick={() => setSelectedPointId(isSelected ? null : pt.id)}
                   className={`p-2 rounded-xl text-left border flex flex-col justify-between h-16 text-xs select-none transition-all cursor-pointer ${
                     isSelected
                       ? "bg-zinc-50 border-zinc-900 font-semibold"

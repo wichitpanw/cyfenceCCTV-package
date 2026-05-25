@@ -9,6 +9,7 @@ interface ProjectHistoryProps {
   onNewProject: () => void;
   currentProjectId: string | null;
   isCloudSyncActive?: boolean;
+  costLastUpdated?: string;
 }
 
 export default function ProjectHistory({
@@ -17,7 +18,8 @@ export default function ProjectHistory({
   onDeleteProject,
   onNewProject,
   currentProjectId,
-  isCloudSyncActive = false
+  isCloudSyncActive = false,
+  costLastUpdated
 }: ProjectHistoryProps) {
   const [search, setSearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("all");
@@ -53,10 +55,18 @@ export default function ProjectHistory({
           <button
             type="button"
             onClick={onNewProject}
-            className="p-1 px-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-medium transition-all inline-flex items-center gap-1 cursor-pointer"
+            className="p-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-medium transition-all flex flex-col items-center gap-0.5 cursor-pointer leading-tight"
+            title={costLastUpdated ? `ราคาต้นทุนล่าสุด: ${costLastUpdated}` : undefined}
           >
-            <PlusCircle className="w-3.5 h-3.5" />
-            เปิดไฟล์งานใหม่
+            <div className="inline-flex items-center gap-1">
+              <PlusCircle className="w-3.5 h-3.5" />
+              เปิดไฟล์งานใหม่
+            </div>
+            {costLastUpdated && (
+              <span className="text-[7px] text-zinc-400 font-normal">
+                ราคา ณ {costLastUpdated}
+              </span>
+            )}
           </button>
         </div>
 

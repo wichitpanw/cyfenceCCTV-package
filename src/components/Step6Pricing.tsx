@@ -34,6 +34,8 @@ interface Step6Props {
   ) => void;
   onGoToStep1?: () => void;
   cameraPoints?: any[];
+  isAdminVerified?: boolean;
+  onVerifyAdmin?: () => void;
 }
 
 export default function Step6Pricing({
@@ -50,10 +52,13 @@ export default function Step6Pricing({
   requirements,
   showConfirm,
   onGoToStep1,
-  cameraPoints
+  cameraPoints,
+  isAdminVerified = false,
+  onVerifyAdmin
 }: Step6Props) {
   const [successSaved, setSuccessSaved] = useState(false);
   const [isVatEnabled, setIsVatEnabled] = useState(vatRate > 0);
+  const [showCostsAdmin, setShowCostsAdmin] = useState(false);
 
   // Calculate sum totals
   const calSubtotal = pricingItems.reduce((acc, curr) => acc + (curr.quantity * curr.unitPrice), 0);
@@ -224,8 +229,6 @@ export default function Step6Pricing({
           <td class="center">${catLabel(item.category)}</td>
           <td class="center bold">${item.quantity.toLocaleString("th-TH")}</td>
           <td class="center">${item.unit}</td>
-          <td class="right">${item.unitPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
-          <td class="right bold">${(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
         </tr>
       `).join("");
 
@@ -263,12 +266,12 @@ export default function Step6Pricing({
     .row-odd { background: #f8f9fc; }
     tbody td { padding: 6px 9px; border-bottom: 1px solid #eee; vertical-align: top; line-height: 1.45; }
     td.num { text-align: center; color: #888; font-size: 8pt; width: 24px; }
-    td.center { text-align: center; width: 64px; }
-    td.right { text-align: right; width: 85px; }
+    td.center { text-align: center; width: 110px; }
+    td.name { text-align: left; }
     td.bold { font-weight: 600; }
 
     .summary-wrap { display: flex; justify-content: flex-end; margin-bottom: 16px; }
-    .summary { width: 290px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+    .summary { width: 380px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
     .summary-row { display: flex; justify-content: space-between; padding: 7px 12px; font-size: 10pt; }
     .summary-row:nth-child(odd) { background: #f8f9fc; }
     .summary-row.total { background: #0071e3; color: #fff; font-size: 12pt; font-weight: 800; }
@@ -317,13 +320,11 @@ export default function Step6Pricing({
   <table>
     <thead>
       <tr>
-        <th style="width:24px">#</th>
+        <th style="width:30px">#</th>
         <th>รายการอุปกรณ์และงานบริการ</th>
-        <th class="center" style="width:64px">ประเภท</th>
-        <th class="center" style="width:52px">จำนวน</th>
-        <th class="center" style="width:48px">หน่วย</th>
-        <th class="right" style="width:90px">ราคา/หน่วย (฿)</th>
-        <th class="right" style="width:95px">ราคารวม (฿)</th>
+        <th class="center" style="width:110px">ประเภทส่งมอบ</th>
+        <th class="center" style="width:80px">จำนวน</th>
+        <th class="center" style="width:80px">หน่วย</th>
       </tr>
     </thead>
     <tbody>${rowsHtml}</tbody>
@@ -375,10 +376,31 @@ export default function Step6Pricing({
               <p className="text-[11px] text-zinc-400">แก้ไขจำนวน ราคาหน่วย หรือลบ/เพิ่มตัวเลือกในใบประเมิน</p>
             </div>
             <div className="flex gap-2">
+              {!isAdminVerified ? (
+                <button
+                  type="button"
+                  onClick={onVerifyAdmin}
+                  className="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <span>🔐</span> แสดงต้นทุนอุปกรณ์
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowCostsAdmin(!showCostsAdmin)}
+                  className={`px-2.5 py-1.5 text-[10px] font-semibold rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                    showCostsAdmin
+                      ? "bg-amber-50 border-amber-300 text-amber-800"
+                      : "bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-300"
+                  }`}
+                >
+                  <span>{showCostsAdmin ? "👁️" : "🙈"}</span> {showCostsAdmin ? "ซ่อนต้นทุนอุปกรณ์" : "แสดงต้นทุนอุปกรณ์ (Admin)"}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => handleAddNewItem("other")}
-                className="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
+                className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold rounded-lg transition-colors cursor-pointer"
               >
                 + เพิ่มรายการส่งมอบอื่นๆ
               </button>
@@ -408,31 +430,35 @@ export default function Step6Pricing({
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <div className="grid grid-cols-4 gap-1.5">
+                <div className={`grid gap-1.5 ${showCostsAdmin && isAdminVerified ? "grid-cols-4" : "grid-cols-2"}`}>
                   <div className="space-y-0.5">
-                    <div className="font-mono text-[8px] text-zinc-400 uppercase tracking-wide">จำนวน</div>
+                    <div className="font-mono text-[8px] text-zinc-400 tracking-wide uppercase">จำนวน</div>
                     <input type="number" min={0.1} step="any" value={item.quantity}
                       onChange={(e) => handleItemValueChange(item.id, "quantity", e.target.value)}
                       className="w-full px-1.5 py-1.5 rounded-lg border text-center text-xs font-bold bg-white font-mono border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
                   </div>
                   <div className="space-y-0.5">
-                    <div className="font-mono text-[8px] text-zinc-400 uppercase tracking-wide">หน่วย</div>
+                    <div className="font-mono text-[8px] text-zinc-400 tracking-wide uppercase">หน่วย</div>
                     <input type="text" value={item.unit}
                       onChange={(e) => handleUpdateItemUnit(item.id, e.target.value)}
                       className="w-full px-1.5 py-1.5 border border-zinc-300 text-xs text-center rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
                   </div>
-                  <div className="space-y-0.5">
-                    <div className="font-mono text-[8px] text-zinc-400 uppercase tracking-wide">ราคา/หน่วย</div>
-                    <input type="number" min={0} value={item.unitPrice}
-                      onChange={(e) => handleItemValueChange(item.id, "unitPrice", e.target.value)}
-                      className="w-full px-1.5 py-1.5 rounded-lg border text-right text-xs font-bold bg-white font-mono border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
-                  </div>
-                  <div className="space-y-0.5 text-right">
-                    <div className="font-mono text-[8px] text-zinc-400 uppercase tracking-wide">รวม (฿)</div>
-                    <div className="font-mono font-bold text-zinc-900 text-xs py-1.5 pr-0.5">
-                      {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
+                  {showCostsAdmin && isAdminVerified && (
+                    <>
+                      <div className="space-y-0.5">
+                        <div className="font-mono text-[8px] text-zinc-400 tracking-wide uppercase">ราคา/หน่วย</div>
+                        <input type="number" min={0} value={item.unitPrice}
+                          onChange={(e) => handleItemValueChange(item.id, "unitPrice", e.target.value)}
+                          className="w-full px-1.5 py-1.5 rounded-lg border text-right text-xs font-bold bg-white font-mono border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
+                      </div>
+                      <div className="space-y-0.5 text-right">
+                        <div className="font-mono text-[8px] text-zinc-400 tracking-wide uppercase">รวม (฿)</div>
+                        <div className="font-mono font-bold text-zinc-900 text-xs py-1.5 pr-0.5">
+                          {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -447,8 +473,12 @@ export default function Step6Pricing({
                   <th className="py-2.5 px-3 w-16 text-center">ประเภท</th>
                   <th className="py-2.5 px-3 w-16 text-center">จำนวน</th>
                   <th className="py-2.5 px-3 w-16 text-center">หน่วย</th>
-                  <th className="py-2.5 px-3 w-24 text-right hidden md:table-cell">ราคาหน่วย (฿)</th>
-                  <th className="py-2.5 px-3 w-24 text-right">ราคารวม (฿)</th>
+                  {showCostsAdmin && isAdminVerified && (
+                    <>
+                      <th className="py-2.5 px-3 w-24 text-right hidden md:table-cell">ราคาหน่วย (฿)</th>
+                      <th className="py-2.5 px-3 w-24 text-right">ราคารวม (฿)</th>
+                    </>
+                  )}
                   <th className="py-2.5 px-2 w-8 text-center"></th>
                 </tr>
               </thead>
@@ -493,18 +523,22 @@ export default function Step6Pricing({
                         className="w-12 px-1.5 py-1 border border-zinc-300 text-xs text-center rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                       />
                     </td>
-                    <td className="py-3 px-3 text-right hidden md:table-cell">
-                      <input
-                        type="number"
-                        min={0}
-                        value={item.unitPrice}
-                        onChange={(e) => handleItemValueChange(item.id, "unitPrice", e.target.value)}
-                        className="w-24 px-1.5 py-1 rounded-lg border text-right font-bold bg-zinc-50 font-mono text-zinc-800 border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
-                      />
-                    </td>
-                    <td className="py-3 px-3 text-right font-mono font-bold text-zinc-900">
-                      {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                    </td>
+                    {showCostsAdmin && isAdminVerified && (
+                      <>
+                        <td className="py-3 px-3 text-right hidden md:table-cell">
+                          <input
+                            type="number"
+                            min={0}
+                            value={item.unitPrice}
+                            onChange={(e) => handleItemValueChange(item.id, "unitPrice", e.target.value)}
+                            className="w-24 px-1.5 py-1 rounded-lg border text-right font-bold bg-zinc-50 font-mono text-zinc-800 border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                          />
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono font-bold text-zinc-900">
+                          {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                        </td>
+                      </>
+                    )}
                     <td className="py-3 px-2 text-center">
                       <button
                         type="button"

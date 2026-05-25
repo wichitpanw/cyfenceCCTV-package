@@ -78,3 +78,32 @@ export interface ProjectSurvey {
   createdAt: string;
   status: "draft" | "completed";
 }
+
+export interface MasterCostDb {
+  camBullet: number;
+  camDome: number;
+  camPtz: number;
+  camFisheye: number;
+  nvr4ch: number;
+  nvr8ch: number;
+  nvr16ch: number;
+  nvr32ch: number;
+  nvr64ch: number;
+  hdd4tb: number;
+  hdd8tb: number;
+  pole3m: number;
+  pole4m: number;
+  pole6m: number;
+  poleGalvanized: number;
+  supportArm: number;
+  lanCable: number;
+  conduit: number;
+  poe4port: number;
+  poe8port: number;
+  poe16port: number;
+  poe24port: number;
+  laborCamera: number;
+  laborPole: number;
+  lastUpdated: string;
+}
+

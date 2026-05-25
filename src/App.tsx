@@ -16,7 +16,7 @@ import {
   Home
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { ProjectSurvey, CustomerInfo, TechRequirements, CameraPoint, PricingItem } from "./types";
+import { ProjectSurvey, CustomerInfo, TechRequirements, CameraPoint, PricingItem, MasterCostDb } from "./types";
 import Step1BasicInfo from "./components/Step1BasicInfo";
 import Step2CameraRequirements from "./components/Step2CameraRequirements";
 import Step4SurveyReport from "./components/Step4SurveyReport";
@@ -50,11 +50,40 @@ const DEFAULT_REQUIREMENTS: TechRequirements = {
   otherRequirements: "",
 };
 
+const DEFAULT_MASTER_COSTS: MasterCostDb = {
+  camBullet: 1850,
+  camDome: 1650,
+  camPtz: 5900,
+  camFisheye: 4200,
+  nvr4ch: 3200,
+  nvr8ch: 4500,
+  nvr16ch: 6800,
+  nvr32ch: 11900,
+  nvr64ch: 24900,
+  hdd4tb: 4200,
+  hdd8tb: 8500,
+  pole3m: 2500,
+  pole4m: 3500,
+  pole6m: 5500,
+  poleGalvanized: 4800,
+  supportArm: 850,
+  lanCable: 35,
+  conduit: 65,
+  poe4port: 1800,
+  poe8port: 3200,
+  poe16port: 5800,
+  poe24port: 9500,
+  laborCamera: 1200,
+  laborPole: 1500,
+  lastUpdated: new Date("2026-05-25T11:33:00+07:00").toISOString(),
+};
+
 // Help helper for autoBOM items
 function generatePricingItems(
   requirements: TechRequirements,
   hasSurvey: boolean,
-  cameraPoints: CameraPoint[]
+  cameraPoints: CameraPoint[],
+  costs: MasterCostDb
 ): PricingItem[] {
   const brand = requirements.cameraBrand || "Hikvision";
   const items: PricingItem[] = [];
@@ -86,7 +115,7 @@ function generatePricingItems(
         name: `กล้องความปลอดภัยสูงทรงกระบอก Bullet CCTV IP 4MP (${brand})`,
         quantity: bullets,
         unit: "ตัว",
-        unitPrice: 1850,
+        unitPrice: costs.camBullet,
         category: "hardware"
       });
     }
@@ -96,7 +125,7 @@ function generatePricingItems(
         name: `กล้องครอบฝ้าเพดานภายใน Dome CCTV IP 4MP (${brand})`,
         quantity: domes,
         unit: "ตัว",
-        unitPrice: 1650,
+        unitPrice: costs.camDome,
         category: "hardware"
       });
     }
@@ -106,7 +135,7 @@ function generatePricingItems(
         name: `กล้องหมุนรอบซูมระยะไกล PTZ Speed Dome Dual Lens (${brand})`,
         quantity: ptzs,
         unit: "ตัว",
-        unitPrice: 5900,
+        unitPrice: costs.camPtz,
         category: "hardware"
       });
     }
@@ -116,7 +145,7 @@ function generatePricingItems(
         name: `กล้องจานบินมุมกว้างพาโนรามา Fisheye CCTV 360° (${brand})`,
         quantity: fisheyes,
         unit: "ตัว",
-        unitPrice: 4200,
+        unitPrice: costs.camFisheye,
         category: "hardware"
       });
     }
@@ -126,18 +155,18 @@ function generatePricingItems(
       name: `กล้องวงจรปิดกระบอกเอนกประสงค์ Bullet IP Camera 4MP (${brand})`,
       quantity: requirements.cameraCount,
       unit: "ตัว",
-      unitPrice: 1800,
+      unitPrice: costs.camBullet,
       category: "hardware"
     });
   }
 
   // 2. NVR
-  let nvrUnitPrice = 3500;
-  if (requirements.nvrChannels <= 4) nvrUnitPrice = 3200;
-  else if (requirements.nvrChannels <= 8) nvrUnitPrice = 4500;
-  else if (requirements.nvrChannels <= 16) nvrUnitPrice = 6800;
-  else if (requirements.nvrChannels <= 32) nvrUnitPrice = 11900;
-  else nvrUnitPrice = 24900;
+  let nvrUnitPrice = costs.nvr4ch;
+  if (requirements.nvrChannels <= 4) nvrUnitPrice = costs.nvr4ch;
+  else if (requirements.nvrChannels <= 8) nvrUnitPrice = costs.nvr8ch;
+  else if (requirements.nvrChannels <= 16) nvrUnitPrice = costs.nvr16ch;
+  else if (requirements.nvrChannels <= 32) nvrUnitPrice = costs.nvr32ch;
+  else nvrUnitPrice = costs.nvr64ch;
 
   items.push({
     id: "bom-nvr",
@@ -149,28 +178,28 @@ function generatePricingItems(
   });
 
   // 3. Storage HDD
-  let hddPrice = 4200;
+  let hddPrice = costs.hdd4tb;
   let hddQuantity = 1;
   let hddName = "ฮาร์ดดิสก์สำหรับบันทึกภาพกล้องวงจรปิด 4TB";
 
   if (requirements.nvrChannels <= 4) {
-    hddPrice = 4200;
+    hddPrice = costs.hdd4tb;
     hddQuantity = 1;
     hddName = "ฮาร์ดดิสก์ 4TB";
   } else if (requirements.nvrChannels <= 8) {
-    hddPrice = 8500;
+    hddPrice = costs.hdd8tb;
     hddQuantity = 1;
     hddName = "ฮาร์ดดิสก์ 8TB";
   } else if (requirements.nvrChannels <= 16) {
-    hddPrice = 8500;
+    hddPrice = costs.hdd8tb;
     hddQuantity = 2;
     hddName = "ฮาร์ดดิสก์ 8TB x 2 ลูก";
   } else if (requirements.nvrChannels <= 32) {
-    hddPrice = 8500;
+    hddPrice = costs.hdd8tb;
     hddQuantity = 4;
     hddName = "ฮาร์ดดิสก์ 8TB x 4 ลูก";
   } else {
-    hddPrice = 8500;
+    hddPrice = costs.hdd8tb;
     hddQuantity = 8;
     hddName = "ฮาร์ดดิสก์ 8TB x 8 ลูก";
   }
@@ -198,10 +227,10 @@ function generatePricingItems(
     });
 
     Object.entries(poleTypesCount).forEach(([poleType, count]) => {
-      let price = 2500;
-      if (poleType.includes("4 เมตร")) price = 3500;
-      else if (poleType.includes("6 เมตร")) price = 5500;
-      else if (poleType.includes("กัลวาไนซ์")) price = 4800;
+      let price = costs.pole3m;
+      if (poleType.includes("4 เมตร")) price = costs.pole4m;
+      else if (poleType.includes("6 เมตร")) price = costs.pole6m;
+      else if (poleType.includes("กัลวาไนซ์")) price = costs.poleGalvanized;
 
       items.push({
         id: `bom-pole-${poleType}`,
@@ -219,7 +248,7 @@ function generatePricingItems(
         name: "แขนรองรับกล้องยื่นเสริมเหล็กลดมุมอับ (Support Arm Bracket Standard)",
         quantity: supportArms,
         unit: "ชุด",
-        unitPrice: 850,
+        unitPrice: costs.supportArm,
         category: "accessory"
       });
     }
@@ -243,7 +272,7 @@ function generatePricingItems(
     name: "สายสัญญาณ LINK CAT6 Outdoor Double Jacket ชิลด์กันน้ำและสัญญาณรบกวน",
     quantity: rawCableMeters,
     unit: "เมตร",
-    unitPrice: 35,
+    unitPrice: costs.lanCable,
     category: "accessory"
   });
 
@@ -252,18 +281,24 @@ function generatePricingItems(
     name: "ท่อร้อยสายสัญญาณ UPVC ตราช้าง สีขาว กันไฟลาม กันรังสียูวีดัดโค้งขนาด 20mm",
     quantity: Math.ceil(rawCableMeters / 3.0), // 3 meter per pipe
     unit: "ท่อ",
-    unitPrice: 65,
+    unitPrice: costs.conduit,
     category: "accessory"
   });
 
   // 6. PoE Switch/Power
   const poePorts = camCount <= 4 ? 4 : camCount <= 8 ? 8 : camCount <= 16 ? 16 : 24;
+  let poeUnitPrice = costs.poe4port;
+  if (camCount <= 4) poeUnitPrice = costs.poe4port;
+  else if (camCount <= 8) poeUnitPrice = costs.poe8port;
+  else if (camCount <= 16) poeUnitPrice = costs.poe16port;
+  else poeUnitPrice = costs.poe24port;
+
   items.push({
     id: "bom-poe",
     name: `สวิตช์จ่ายไฟผ่านสายแลน PoE Switch Giga Speed เกรดอุสาหกรรม (${poePorts} Ports)`,
     quantity: Math.max(1, Math.ceil(camCount / poePorts)),
     unit: "เครื่อง",
-    unitPrice: camCount <= 4 ? 1800 : camCount <= 8 ? 3200 : camCount <= 16 ? 5800 : 9500,
+    unitPrice: poeUnitPrice,
     category: "hardware"
   });
 
@@ -273,7 +308,7 @@ function generatePricingItems(
     name: "ค่าบริการติดตั้งกล้อง เซ็ตระบบบันทึก และบันทึกบัญชีออนไลน์ผ่านคลาวด์",
     quantity: camCount,
     unit: "จุด",
-    unitPrice: 1200,
+    unitPrice: costs.laborCamera,
     category: "labor"
   });
 
@@ -285,7 +320,7 @@ function generatePricingItems(
         name: "ค่าแรงงานทหารช่าง ปูนบ่อเสา และปรับระดับดินโครงยึดเสาระบบกล้องหน้างาน",
         quantity: surveyorsPoles,
         unit: "จุด",
-        unitPrice: 1500,
+        unitPrice: costs.laborPole,
         category: "labor"
       });
     }
@@ -324,6 +359,27 @@ export default function App() {
     onConfirm: () => {}
   });
 
+  // Master Cost Database states
+  const [masterCosts, setMasterCosts] = useState<MasterCostDb>(() => {
+    const saved = localStorage.getItem("CCTV_MASTER_COSTS");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return DEFAULT_MASTER_COSTS;
+  });
+
+  const [isCostsModalOpen, setIsCostsModalOpen] = useState<boolean>(false);
+  const [adminPinPurpose, setAdminPinPurpose] = useState<"settings" | "costs" | "pricing_admin" | null>(null);
+  const [isAdminVerified, setIsAdminVerified] = useState<boolean>(false);
+
+  useEffect(() => {
+    localStorage.setItem("CCTV_MASTER_COSTS", JSON.stringify(masterCosts));
+  }, [masterCosts]);
+
   // Admin Settings states
   const [isAdminPinModalOpen, setIsAdminPinModalOpen] = useState<boolean>(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
@@ -334,9 +390,16 @@ export default function App() {
     if (e) e.preventDefault();
     if (adminPinInput === "8888") {
       setIsAdminPinModalOpen(false);
-      setIsAdminModalOpen(true);
       setAdminPinInput("");
       setAdminPinError("");
+      setIsAdminVerified(true);
+      if (adminPinPurpose === "costs") {
+        setIsCostsModalOpen(true);
+      } else if (adminPinPurpose === "pricing_admin") {
+        // Just sets verification state to reveal cost columns in Step 6
+      } else {
+        setIsAdminModalOpen(true);
+      }
     } else {
       setAdminPinError("รหัส PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้งค่ะ");
     }
@@ -534,7 +597,7 @@ export default function App() {
 
     if (step === 4 || step === 5) {
       // Re-generate BOM dynamically to reflect latest edits if they don't exist yet or need updates
-      const regenerated = generatePricingItems(requirements, hasSurveyReport, cameraPoints);
+      const regenerated = generatePricingItems(requirements, hasSurveyReport, cameraPoints, masterCosts);
       
       // We carry over unitPrice if they correspond to matches we already customized!
       const customizedMatched = regenerated.map(item => {
@@ -669,7 +732,7 @@ export default function App() {
       setCameraPoints(points);
       setRequirements(req);
       
-      const regenerated = generatePricingItems(req, true, points);
+      const regenerated = generatePricingItems(req, true, points, masterCosts);
       setPricingItems(regenerated);
       setDiscount(0);
       setVatRate(7);
@@ -924,6 +987,17 @@ export default function App() {
     { number: 5, label: "สรุปงวดราคา" },
   ];
 
+  const formattedCostTimestamp = masterCosts.lastUpdated ? (() => {
+    try {
+      const d = new Date(masterCosts.lastUpdated);
+      const dateStr = d.toLocaleDateString("th-TH", { day: "2-digit", month: "2-digit", year: "numeric" });
+      const timeStr = d.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false });
+      return `${dateStr} ${timeStr} น.`;
+    } catch (e) {
+      return "";
+    }
+  })() : "";
+
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col font-sans" id="applet-primary-layout">
       
@@ -1016,12 +1090,28 @@ export default function App() {
                 <span className="text-[11px] font-semibold text-zinc-800">{customerInfo.surveyorName || "ผู้สำรวจระบบ"}</span>
               </div>
             </div>
+            {/* Master Cost Database Button (Coins Icon) */}
+            <button
+              type="button"
+              onClick={() => {
+                setAdminPinInput("");
+                setAdminPinError("");
+                setAdminPinPurpose("costs");
+                setIsAdminPinModalOpen(true);
+              }}
+              className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-650 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5"
+              title="แก้ไขราคาต้นทุนกลาง (Master Cost Database)"
+            >
+              <Coins className="w-3.5 h-3.5 text-amber-500" />
+              <span className="text-[10px] font-bold text-zinc-700 hidden sm:inline">ราคาต้นทุน</span>
+            </button>
             {/* Admin Settings Button (Gear Icon) */}
             <button
               type="button"
               onClick={() => {
                 setAdminPinInput("");
                 setAdminPinError("");
+                setAdminPinPurpose("settings");
                 setIsAdminPinModalOpen(true);
               }}
               className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-600 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center"
@@ -1050,6 +1140,7 @@ export default function App() {
             onNewProject={handleNewProject}
             currentProjectId={activeProjectId}
             isCloudSyncActive={isSupabaseConfigured}
+            costLastUpdated={formattedCostTimestamp}
           />
         </section>
 
@@ -1190,6 +1281,13 @@ export default function App() {
                     showConfirm={showConfirm}
                     onGoToStep1={() => setStep(1)}
                     cameraPoints={cameraPoints}
+                    isAdminVerified={isAdminVerified}
+                    onVerifyAdmin={() => {
+                      setAdminPinInput("");
+                      setAdminPinError("");
+                      setAdminPinPurpose("pricing_admin");
+                      setIsAdminPinModalOpen(true);
+                    }}
                   />
                 )}
               </motion.div>
@@ -1421,6 +1519,287 @@ export default function App() {
                 >
                   ปิดหน้าต่าง
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Master Cost Database Modal */}
+      <AnimatePresence>
+        {isCostsModalOpen && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-[9999] font-sans">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              transition={{ duration: 0.18 }}
+              className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-zinc-150 bg-zinc-50/50 flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-2">
+                  <Coins className="w-4.5 h-4.5 text-amber-500" />
+                  <div>
+                    <span className="text-xs font-extrabold text-zinc-900 block uppercase tracking-wider font-mono">
+                      ราคาต้นทุนอุปกรณ์และบริการกลาง (Master Cost Database)
+                    </span>
+                    <span className="text-[9.5px] text-zinc-400 font-sans block mt-0.5 leading-none">
+                      แก้ไขราคามาตรฐานต้นทุนสำหรับคำนวณโครงการถัดไป (ไม่มีผลย้อนหลังกับใบเสนอราคาที่เซฟแล้ว)
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCostsModalOpen(false)}
+                  className="w-7 h-7 rounded-xl flex items-center justify-center text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors cursor-pointer text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Scrollable Content Form */}
+              <div className="overflow-y-auto p-6 space-y-6 max-h-[70vh] scrollbar-thin">
+                
+                {/* Section 1: IP Cameras */}
+                <div className="space-y-3.5">
+                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                    <span>📷</span> กล้องวงจรปิด IP Cameras
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">กล้องทรงกระบอก Bullet (บาท)</label>
+                      <input type="number" min={0} value={tempCosts.camBullet}
+                        onChange={(e) => setTempCosts(p => ({ ...p, camBullet: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">กล้องครอบฝ้า Dome (บาท)</label>
+                      <input type="number" min={0} value={tempCosts.camDome}
+                        onChange={(e) => setTempCosts(p => ({ ...p, camDome: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">กล้องหมุน PTZ Speed Dome (บาท)</label>
+                      <input type="number" min={0} value={tempCosts.camPtz}
+                        onChange={(e) => setTempCosts(p => ({ ...p, camPtz: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">กล้องจานบิน Fisheye 360° (บาท)</label>
+                      <input type="number" min={0} value={tempCosts.camFisheye}
+                        onChange={(e) => setTempCosts(p => ({ ...p, camFisheye: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Recorders NVR */}
+                <div className="space-y-3.5">
+                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                    <span>🗄️</span> เครื่องบันทึกภาพ NVR
+                  </h5>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 4CH</label>
+                      <input type="number" min={0} value={tempCosts.nvr4ch}
+                        onChange={(e) => setTempCosts(p => ({ ...p, nvr4ch: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 8CH</label>
+                      <input type="number" min={0} value={tempCosts.nvr8ch}
+                        onChange={(e) => setTempCosts(p => ({ ...p, nvr8ch: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 16CH</label>
+                      <input type="number" min={0} value={tempCosts.nvr16ch}
+                        onChange={(e) => setTempCosts(p => ({ ...p, nvr16ch: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 32CH</label>
+                      <input type="number" min={0} value={tempCosts.nvr32ch}
+                        onChange={(e) => setTempCosts(p => ({ ...p, nvr32ch: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 64CH</label>
+                      <input type="number" min={0} value={tempCosts.nvr64ch}
+                        onChange={(e) => setTempCosts(p => ({ ...p, nvr64ch: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: HDD Storage */}
+                <div className="space-y-3.5">
+                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                    <span>💾</span> ฮาร์ดดิสก์สะสมภาพ
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">HDD ขนาด 4TB (บาท)</label>
+                      <input type="number" min={0} value={tempCosts.hdd4tb}
+                        onChange={(e) => setTempCosts(p => ({ ...p, hdd4tb: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">HDD ขนาด 8TB (บาท)</label>
+                      <input type="number" min={0} value={tempCosts.hdd8tb}
+                        onChange={(e) => setTempCosts(p => ({ ...p, hdd8tb: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 4: Poles & Support Arms */}
+                <div className="space-y-3.5">
+                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                    <span>🗼</span> เสาเหล็กยึดกล้องและอุปกรณ์เสริม
+                  </h5>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">เสา 3 เมตร</label>
+                      <input type="number" min={0} value={tempCosts.pole3m}
+                        onChange={(e) => setTempCosts(p => ({ ...p, pole3m: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">เสา 4 เมตร</label>
+                      <input type="number" min={0} value={tempCosts.pole4m}
+                        onChange={(e) => setTempCosts(p => ({ ...p, pole4m: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">เสา 6 เมตร</label>
+                      <input type="number" min={0} value={tempCosts.pole6m}
+                        onChange={(e) => setTempCosts(p => ({ ...p, pole6m: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">เสากัลวาไนซ์</label>
+                      <input type="number" min={0} value={tempCosts.poleGalvanized}
+                        onChange={(e) => setTempCosts(p => ({ ...p, poleGalvanized: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">แขนยื่น Support</label>
+                      <input type="number" min={0} value={tempCosts.supportArm}
+                        onChange={(e) => setTempCosts(p => ({ ...p, supportArm: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 5: Cables, Pipes & PoE Switches */}
+                <div className="space-y-3.5">
+                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                    <span>🔌</span> อุปกรณ์เชื่อมต่อและ Switch PoE
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">สายสัญญาณแลน LAN CAT6 (บาทต่อเมตร)</label>
+                      <input type="number" min={0} value={tempCosts.lanCable}
+                        onChange={(e) => setTempCosts(p => ({ ...p, lanCable: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">ท่อร้อยสายสัญญาณ uPVC (บาทต่อท่อ 3 ม.)</label>
+                      <input type="number" min={0} value={tempCosts.conduit}
+                        onChange={(e) => setTempCosts(p => ({ ...p, conduit: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">Switch PoE 4P</label>
+                      <input type="number" min={0} value={tempCosts.poe4port}
+                        onChange={(e) => setTempCosts(p => ({ ...p, poe4port: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">Switch PoE 8P</label>
+                      <input type="number" min={0} value={tempCosts.poe8port}
+                        onChange={(e) => setTempCosts(p => ({ ...p, poe8port: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">Switch PoE 16P</label>
+                      <input type="number" min={0} value={tempCosts.poe16port}
+                        onChange={(e) => setTempCosts(p => ({ ...p, poe16port: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">Switch PoE 24P</label>
+                      <input type="number" min={0} value={tempCosts.poe24port}
+                        onChange={(e) => setTempCosts(p => ({ ...p, poe24port: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 6: Labor Fees */}
+                <div className="space-y-3.5 pb-4">
+                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                    <span>🛠️</span> ค่าบริการงานติดตั้งและเทปูน
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">ค่าบริการแรงงานติดตั้งกล้อง (บาทต่อจุด)</label>
+                      <input type="number" min={0} value={tempCosts.laborCamera}
+                        onChange={(e) => setTempCosts(p => ({ ...p, laborCamera: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">ค่าแรงปูนบ่อและเสาเข็มโครงยึด (บาทต่อจุดเสา)</label>
+                      <input type="number" min={0} value={tempCosts.laborPole}
+                        onChange={(e) => setTempCosts(p => ({ ...p, laborPole: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Footer Actions */}
+              <div className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-150 flex justify-between items-center shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm("🔄 คุณต้องการคืนค่าคู่มือราคาต้นทุนมาตรฐานของโรงงาน (Factory Defaults) ใช่หรือไม่?")) {
+                      setTempCosts(DEFAULT_MASTER_COSTS);
+                    }
+                  }}
+                  className="px-3.5 py-2 bg-red-50 hover:bg-red-100 active:bg-red-150 text-red-600 border border-red-200 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  คืนค่าเริ่มต้นโรงงาน
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsCostsModalOpen(false)}
+                    className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-600 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  >
+                    ยกเลิก
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = {
+                        ...tempCosts,
+                        lastUpdated: new Date().toISOString()
+                      };
+                      setMasterCosts(updated);
+                      setIsCostsModalOpen(false);
+                      alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จเรียบร้อยแล้วค่ะ!");
+                    }}
+                    className="px-5 py-2 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer"
+                  >
+                    บันทึกต้นทุนใหม่
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
