@@ -3,7 +3,7 @@ import { Lock, Mail, User, Eye, EyeOff, ShieldAlert, CheckCircle2, Loader2, Land
 import { supabase } from "../supabaseClient";
 
 interface LoginScreenProps {
-  onAuthSuccess: () => void;
+  onLoginSuccess: (user: any, profile: any) => void;
 }
 
 const THAI_PROVINCES = [
@@ -29,7 +29,7 @@ const THAI_PROVINCES = [
   "ชัยภูมิ"
 ];
 
-export default function LoginScreen({ onAuthSuccess }: LoginScreenProps) {
+export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,8 +46,8 @@ export default function LoginScreen({ onAuthSuccess }: LoginScreenProps) {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      setErrorMsg("กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วนค่ะ");
+    if (!email) {
+      setErrorMsg("กรุณากรอกที่อยู่อีเมลของคุณด้วยค่ะ");
       return;
     }
 
@@ -56,21 +56,48 @@ export default function LoginScreen({ onAuthSuccess }: LoginScreenProps) {
     setSuccessMsg("");
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
+      // ตรวจสอบที่อยู่อีเมลจากตาราง profiles โดยตรง (แบบไม่ต้องกรอกรหัสผ่าน)
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("email", email.trim().toLowerCase())
+        .maybeSingle();
 
-      if (error) {
-        setErrorMsg(translateAuthError(error.message));
-      } else if (data.session) {
-        setSuccessMsg("เข้าสู่ระบบสำเร็จ กำลังพาคุณไปหน้าถัดไป...");
+      if (profileError) {
+        setErrorMsg("เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์ผู้ใช้งาน: " + profileError.message);
+      } else if (!profile) {
+        setErrorMsg("❌ ไม่พบที่อยู่อีเมลนี้ในระบบความปลอดภัยค่ะ กรุณาติดต่อผู้ดูแลระบบ (Super Admin) เพื่อขอเพิ่มสิทธิ์เข้าใช้งาน");
+      } else {
+        setSuccessMsg("🎉 ยืนยันสิทธิ์เข้าใช้งานสำเร็จเรียบร้อยค่ะ!");
+        
+        // Mock user session object
+        const mockUser = {
+          id: profile.id,
+          email: email.trim().toLowerCase(),
+          role: profile.role
+        };
+        
+        const sessionPayload = {
+          user: mockUser,
+          profile: {
+            id: profile.id,
+            role: profile.role,
+            displayName: profile.display_name,
+            email: email.trim().toLowerCase(),
+            province: profile.province,
+            updatedAt: profile.updated_at
+          }
+        };
+
+        // เซฟลง localStorage เพื่อให้ผู้ใช้งานล็อกอินค้างไว้ได้เมื่อรีเฟรชหน้าเบราว์เซอร์
+        localStorage.setItem("CCTV_USER_SESSION", JSON.stringify(sessionPayload));
+
         setTimeout(() => {
-          onAuthSuccess();
+          onLoginSuccess(mockUser, sessionPayload.profile);
         }, 800);
       }
     } catch (err: any) {
-      setErrorMsg("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้งค่ะ");
+      setErrorMsg("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้งค่ะ");
     } finally {
       setLoading(false);
     }
@@ -253,30 +280,7 @@ export default function LoginScreen({ onAuthSuccess }: LoginScreenProps) {
               </div>
             </div>
 
-            {/* Password Input */}
-            <div className="space-y-1">
-              <label className="block text-[10px] font-semibold text-zinc-650 uppercase">รหัสผ่าน (Password)</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                  <Lock className="w-4 h-4" />
-                </span>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  placeholder="••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-10 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-medium text-zinc-800 transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-700 cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
+
 
             {/* Notifications */}
             {errorMsg && (

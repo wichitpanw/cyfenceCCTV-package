@@ -32,6 +32,55 @@ export default function UserManagement() {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  // States สำหรับสร้างผู้ใช้ใหม่
+  const [newEmail, setNewEmail] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newRole, setNewRole] = useState<"superadmin" | "admin" | "head_user" | "user">("user");
+  const [newProvince, setNewProvince] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmail || !newName) {
+      setErrorMsg("กรุณากรอกอีเมลและชื่อผู้ใช้งานใหม่ให้ครบถ้วนค่ะ");
+      return;
+    }
+    
+    setIsCreating(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+    
+    try {
+      const generatedId = crypto.randomUUID();
+      const { error } = await supabase
+        .from("profiles")
+        .insert({
+          id: generatedId,
+          email: newEmail.trim().toLowerCase(),
+          display_name: newName.trim(),
+          role: newRole,
+          province: newProvince,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        setErrorMsg("ไม่สามารถสร้างบัญชีได้: " + error.message);
+      } else {
+        setSuccessMsg(`💾 สร้างบัญชีผู้ใช้ [${newEmail}] สำเร็จเรียบร้อยแล้วค่ะ!`);
+        setNewEmail("");
+        setNewName("");
+        setNewRole("user");
+        setNewProvince("");
+        fetchUsersList();
+        setTimeout(() => setSuccessMsg(""), 4000);
+      }
+    } catch (err: any) {
+      setErrorMsg("เกิดข้อผิดพลาดในการสร้างผู้ใช้งานใหม่");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const fetchUsersList = async () => {
     setLoading(true);
     setErrorMsg("");
@@ -153,6 +202,83 @@ export default function UserManagement() {
         </div>
       )}
 
+      {/* ฟอร์มเพิ่มผู้ใช้ใหม่ (Password-less Account Creation) */}
+      <form onSubmit={handleCreateUser} className="bg-zinc-50 border border-zinc-200/60 p-4 rounded-2xl space-y-3 shadow-2xs">
+        <h5 className="text-[10px] font-black text-indigo-950 uppercase tracking-wider font-mono flex items-center gap-1.5 leading-none">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 block animate-pulse"></span>
+          ➕ เพิ่มบัญชีผู้ใช้งานระบบรายใหม่ (Password-less Account)
+        </h5>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          {/* Email Input */}
+          <div className="space-y-1">
+            <label className="block text-[9px] font-bold text-zinc-500 uppercase">อีเมลผู้ใช้ (Email)</label>
+            <input
+              type="email"
+              required
+              placeholder="username@ntplc.co.th"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-mono text-zinc-800 shadow-2xs"
+            />
+          </div>
+
+          {/* Name Input */}
+          <div className="space-y-1">
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">ชื่อ-นามสกุลจริง</label>
+            <input
+              type="text"
+              required
+              placeholder="เช่น สมชาย ใจดี"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-medium text-zinc-800 shadow-2xs"
+            />
+          </div>
+
+          {/* Role Select */}
+          <div className="space-y-1">
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">ระดับสิทธิ์ (Role)</label>
+            <select
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value as any)}
+              className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-bold text-zinc-700 shadow-2xs cursor-pointer"
+            >
+              <option value="user">👤 USER (ช่างทั่วไป)</option>
+              <option value="head_user">👥 HEAD USER (หัวหน้าภาค)</option>
+              <option value="admin">🛡️ ADMIN (ผู้ดูแลต้นทุน)</option>
+              <option value="superadmin">👑 SUPER ADMIN (สูงสุด)</option>
+            </select>
+          </div>
+
+          {/* Province Select */}
+          <div className="space-y-1 flex flex-col justify-between">
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">จังหวัดประจำการ</label>
+            <div className="flex gap-2 items-center">
+              <select
+                value={newProvince}
+                onChange={(e) => setNewProvince(e.target.value)}
+                className="grow px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-bold text-zinc-700 shadow-2xs cursor-pointer"
+              >
+                <option value="">-- เลือกจังหวัด --</option>
+                {THAI_PROVINCES.map((prov) => (
+                  <option key={prov} value={prov}>
+                    {prov}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                disabled={isCreating}
+                className="px-4 py-1.5 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 disabled:bg-zinc-400 text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-2xs shrink-0"
+              >
+                {isCreating ? "กำลังเพิ่ม..." : "เพิ่มบัญชี"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+
       {/* Search Input Filter */}
       <div className="relative">
         <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
@@ -197,7 +323,8 @@ export default function UserManagement() {
                           </div>
                           <div>
                             <span className="font-bold text-zinc-800 block">{u.display_name || "ไม่ระบุชื่อ"}</span>
-                            <span className="text-[9.5px] text-zinc-400 block font-mono">อัปเดตเมื่อ: {new Date(u.updated_at).toLocaleString("th-TH")}</span>
+                            {u.email && <span className="text-[9.5px] text-indigo-650 font-mono block leading-none my-0.5">{u.email}</span>}
+                            <span className="text-[9px] text-zinc-400 block font-sans">อัปเดตเมื่อ: {new Date(u.updated_at).toLocaleString("th-TH")}</span>
                           </div>
                         </div>
                       </td>

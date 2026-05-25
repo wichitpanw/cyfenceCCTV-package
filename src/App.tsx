@@ -392,6 +392,17 @@ export default function App() {
     const checkUserSession = async () => {
       setAuthLoading(true);
       try {
+        // 1. ตรวจสอบเซสชันผู้ใช้แบบ Password-less (LocalStorage) ก่อน
+        const savedSession = localStorage.getItem("CCTV_USER_SESSION");
+        if (savedSession) {
+          const parsed = JSON.parse(savedSession);
+          setCurrentUser(parsed.user);
+          setUserProfile(parsed.profile);
+          setAuthLoading(false);
+          return;
+        }
+
+        // 2. ดึงข้อมูลจาก Supabase Auth ปกติ (Fallback)
         const { data: { session } } = await supabase.auth.getSession();
         if (session && session.user) {
           setCurrentUser(session.user);
@@ -1157,8 +1168,9 @@ export default function App() {
   if (isSupabaseConfigured && !currentUser) {
     return (
       <LoginScreen 
-        onAuthSuccess={() => {
-          // Auth changed callback
+        onLoginSuccess={(user, profile) => {
+          setCurrentUser(user);
+          setUserProfile(profile);
         }} 
       />
     );
@@ -1249,13 +1261,32 @@ export default function App() {
             {/* Surveyor Badge */}
             <div className="flex items-center gap-2 bg-zinc-100/80 px-2.5 py-1 rounded-lg border border-zinc-200/40">
               <div className="w-6 h-6 rounded-full bg-[#0071e3] text-center flex items-center justify-center font-bold text-white uppercase text-[10px]">
-                {customerInfo.surveyorName?.substring(0, 2) || "SV"}
+                {userProfile?.displayName?.substring(0, 2) || "SV"}
               </div>
               <div className="text-left leading-none">
-                <span className="block text-zinc-400 text-[9px] uppercase font-semibold">Surveyor</span>
-                <span className="text-[11px] font-semibold text-zinc-800">{customerInfo.surveyorName || "ผู้สำรวจระบบ"}</span>
+                <span className="block text-zinc-450 text-[8px] uppercase font-extrabold tracking-wider">{userProfile?.role || "user"}</span>
+                <span className="text-[11px] font-bold text-zinc-800">{userProfile?.displayName || "ผู้ใช้งาน"}</span>
               </div>
             </div>
+
+            {/* Log Out Button */}
+            <button
+              type="button"
+              onClick={async () => {
+                if (confirm("🚪 คุณต้องการออกจากระบบใช่หรือไม่?")) {
+                  localStorage.removeItem("CCTV_USER_SESSION");
+                  await supabase.auth.signOut();
+                  setCurrentUser(null);
+                  setUserProfile(null);
+                  window.location.reload();
+                }
+              }}
+              className="p-2 rounded-lg bg-red-50 hover:bg-red-100 active:bg-red-150 text-red-650 transition-all border border-red-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5 shadow-2xs"
+              title="ออกจากระบบ (Log Out)"
+            >
+              <LogOut className="w-3.5 h-3.5 text-red-500" />
+              <span className="text-[10px] font-bold text-red-700 hidden sm:inline">ออกจากระบบ</span>
+            </button>
             {/* User Management Button (Users Icon) - superadmin only */}
             {userProfile?.role === "superadmin" && (
               <button
