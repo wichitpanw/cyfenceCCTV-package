@@ -16,14 +16,18 @@ import {
   Home
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { ProjectSurvey, CustomerInfo, TechRequirements, CameraPoint, PricingItem, MasterCostDb } from "./types";
+import { ProjectSurvey, CustomerInfo, TechRequirements, CameraPoint, PricingItem, MasterCostDb, UserProfile } from "./types";
 import Step1BasicInfo from "./components/Step1BasicInfo";
 import Step2CameraRequirements from "./components/Step2CameraRequirements";
 import Step4SurveyReport from "./components/Step4SurveyReport";
 import Step5Summary from "./components/Step5Summary";
 import Step6Pricing from "./components/Step6Pricing";
 import ProjectHistory from "./components/ProjectHistory";
+import LoginScreen from "./components/LoginScreen";
+import UserManagement from "./components/UserManagement";
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
+import { User } from "@supabase/supabase-js";
+import { LogOut, Users } from "lucide-react";
 
 // Primary default layout values
 const DEFAULT_CUSTOMER_INFO: CustomerInfo = {
@@ -333,6 +337,12 @@ export default function App() {
   const [step, setStep] = useState<number>(1);
   const [projectsList, setProjectsList] = useState<ProjectSurvey[]>([]);
   
+  // Authentication & RBAC states
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
+  const [isUserMgmtOpen, setIsUserMgmtOpen] = useState<boolean>(false);
+
   // Active Project Data state
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>(DEFAULT_CUSTOMER_INFO);
@@ -376,6 +386,89 @@ export default function App() {
   const [isCostsModalOpen, setIsCostsModalOpen] = useState<boolean>(false);
   const [adminPinPurpose, setAdminPinPurpose] = useState<"settings" | "costs" | "pricing_admin" | null>(null);
   const [isAdminVerified, setIsAdminVerified] = useState<boolean>(false);
+
+  // Load user session and monitor changes
+  useEffect(() => {
+    const checkUserSession = async () => {
+      setAuthLoading(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && session.user) {
+          setCurrentUser(session.user);
+          await loadUserProfile(session.user.id, session.user.email || "");
+        } else {
+          setCurrentUser(null);
+          setUserProfile(null);
+          setAuthLoading(false);
+        }
+      } catch (err) {
+        console.error("Auth init failed:", err);
+        setAuthLoading(false);
+      }
+    };
+
+    checkUserSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session && session.user) {
+        setCurrentUser(session.user);
+        await loadUserProfile(session.user.id, session.user.email || "");
+      } else {
+        setCurrentUser(null);
+        setUserProfile(null);
+        setAuthLoading(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const loadUserProfile = async (userId: string, email: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (data) {
+        setUserProfile({
+          id: data.id,
+          role: data.role || "user",
+          displayName: data.display_name || "ผู้ใช้",
+          email: email,
+          province: data.province || "",
+          updatedAt: data.updated_at
+        });
+      } else {
+        // Fallback profile if row is not created yet
+        const defaultProf: UserProfile = {
+          id: userId,
+          role: "user",
+          displayName: email.split("@")[0],
+          email: email,
+          province: "",
+          updatedAt: new Date().toISOString()
+        };
+        setUserProfile(defaultProf);
+        
+        // Auto-create profile row if missing
+        await supabase.from("profiles").upsert({
+          id: userId,
+          role: "user",
+          display_name: defaultProf.displayName,
+          province: "",
+          updated_at: new Date().toISOString()
+        });
+      }
+    } catch (err) {
+      console.error("Load user profile failed:", err);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
 
   // Sync tempCosts when opening the costs modal
   useEffect(() => {
@@ -479,9 +572,20 @@ export default function App() {
     if (isSupabaseConfigured) {
       try {
         // Fetch projects with related camera_points and pricing_items
-        const { data: projectsData, error: projectsError } = await supabase
-          .from("projects")
-          .select("*")
+        let query = supabase.from("projects").select("*");
+        if (currentUser && userProfile) {
+          if (userProfile.role === "head_user") {
+            if (userProfile.province) {
+              query = query.or(`created_by.eq.${currentUser.id},province.eq.${userProfile.province}`);
+            } else {
+              query = query.eq("created_by", currentUser.id);
+            }
+          } else if (userProfile.role === "user") {
+            query = query.eq("created_by", currentUser.id);
+          }
+          // superadmin และ admin มองเห็นงานได้ทั้งหมด
+        }
+        const { data: projectsData, error: projectsError } = await query
           .order("created_at", { ascending: false });
 
         if (projectsError) {
@@ -599,7 +703,7 @@ export default function App() {
 
   useEffect(() => {
     loadSavedProjects();
-  }, []);
+  }, [userProfile]);
 
   useEffect(() => {
     if (step === 3) {
@@ -883,6 +987,7 @@ export default function App() {
           discount,
           vat_rate: vatRate,
           status: "draft",
+          created_by: currentUser?.id || null
         };
 
         const { error: projError } = await supabase
@@ -1130,35 +1235,55 @@ export default function App() {
                 <span className="text-[11px] font-semibold text-zinc-800">{customerInfo.surveyorName || "ผู้สำรวจระบบ"}</span>
               </div>
             </div>
-            {/* Master Cost Database Button (Coins Icon) */}
-            <button
-              type="button"
-              onClick={() => {
-                setAdminPinInput("");
-                setAdminPinError("");
-                setAdminPinPurpose("costs");
-                setIsAdminPinModalOpen(true);
-              }}
-              className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-650 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5"
-              title="แก้ไขราคาต้นทุนกลาง (Master Cost Database)"
-            >
-              <Coins className="w-3.5 h-3.5 text-amber-500" />
-              <span className="text-[10px] font-bold text-zinc-700 hidden sm:inline">สำหรับผู้ดูแลระบบ</span>
-            </button>
-            {/* Admin Settings Button (Gear Icon) */}
-            <button
-              type="button"
-              onClick={() => {
-                setAdminPinInput("");
-                setAdminPinError("");
-                setAdminPinPurpose("settings");
-                setIsAdminPinModalOpen(true);
-              }}
-              className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-600 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center"
-              title="สำหรับผู้ดูแลระบบ (Admin Panel)"
-            >
-              <Settings className="w-4 h-4 text-zinc-650" />
-            </button>
+            {/* User Management Button (Users Icon) - superadmin only */}
+            {userProfile?.role === "superadmin" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsUserMgmtOpen(true);
+                }}
+                className="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-150 text-indigo-650 transition-all border border-indigo-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5 shadow-2xs"
+                title="จัดการสิทธิ์ผู้ใช้งาน (User Management)"
+              >
+                <Users className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="text-[10px] font-bold text-indigo-700 hidden sm:inline">จัดการสิทธิ์</span>
+              </button>
+            )}
+            
+            {/* Master Cost Database Button (Coins Icon) - superadmin or admin */}
+            {(userProfile?.role === "superadmin" || userProfile?.role === "admin") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminPinInput("");
+                  setAdminPinError("");
+                  setAdminPinPurpose("costs");
+                  setIsAdminPinModalOpen(true);
+                }}
+                className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-650 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5"
+                title="แก้ไขราคาต้นทุนกลาง (Master Cost Database)"
+              >
+                <Coins className="w-3.5 h-3.5 text-amber-500" />
+                <span className="text-[10px] font-bold text-zinc-700 hidden sm:inline">สำหรับผู้ดูแลระบบ</span>
+              </button>
+            )}
+
+            {/* Admin Settings Button (Gear Icon) - superadmin or admin */}
+            {(userProfile?.role === "superadmin" || userProfile?.role === "admin") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminPinInput("");
+                  setAdminPinError("");
+                  setAdminPinPurpose("settings");
+                  setIsAdminPinModalOpen(true);
+                }}
+                className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-650 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center"
+                title="สำหรับผู้ดูแลระบบ (Admin Panel)"
+              >
+                <Settings className="w-4 h-4 text-zinc-650" />
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -1321,8 +1446,8 @@ export default function App() {
                     showConfirm={showConfirm}
                     onGoToStep1={() => setStep(1)}
                     cameraPoints={cameraPoints}
-                    isAdminVerified={isAdminVerified}
-                    onVerifyAdmin={() => {
+                    isAdminVerified={userProfile?.role === "admin" || userProfile?.role === "superadmin"}
+                    onVerifyAdmin={(userProfile?.role === "user" || userProfile?.role === "head_user") ? undefined : () => {
                       setAdminPinInput("");
                       setAdminPinError("");
                       setAdminPinPurpose("pricing_admin");
@@ -1864,6 +1989,59 @@ export default function App() {
                     บันทึกต้นทุนใหม่
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* superAdmin User Management Modal */}
+      <AnimatePresence>
+        {isUserMgmtOpen && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-[9999] font-sans">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              transition={{ duration: 0.18 }}
+              className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-zinc-150 bg-zinc-50/50 flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-indigo-650" />
+                  <div>
+                    <span className="text-xs font-extrabold text-zinc-900 block uppercase tracking-wider font-mono">
+                      ระบบจัดการผู้ใช้งานและสิทธิ์ความปลอดภัย (User Auth Control Center)
+                    </span>
+                    <span className="text-[9.5px] text-zinc-400 font-sans block mt-0.5 leading-none">
+                      ( superAdmin Only ) แก้ไขสิทธิ์การเข้าถึงข้อมูลต้นทุนและจัดกลุ่มจังหวัดของพนักงานสำรวจทั้งหมด
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsUserMgmtOpen(false)}
+                  className="w-7 h-7 rounded-xl flex items-center justify-center text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors cursor-pointer text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto p-6 max-h-[70vh] scrollbar-thin">
+                <UserManagement />
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-3.5 bg-zinc-50/50 border-t border-zinc-100 flex justify-end shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsUserMgmtOpen(false)}
+                  className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+                >
+                  ปิดหน้าต่างจัดการ
+                </button>
               </div>
             </motion.div>
           </div>

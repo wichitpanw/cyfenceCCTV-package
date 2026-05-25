@@ -376,15 +376,8 @@ export default function Step6Pricing({
               <p className="text-[11px] text-zinc-400">แก้ไขจำนวน ราคาหน่วย หรือลบ/เพิ่มตัวเลือกในใบประเมิน</p>
             </div>
             <div className="flex gap-2">
-              {!isAdminVerified ? (
-                <button
-                  type="button"
-                  onClick={onVerifyAdmin}
-                  className="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer flex items-center gap-1"
-                >
-                  <span>🔐</span> แสดงต้นทุนอุปกรณ์
-                </button>
-              ) : (
+              {/* If verified as admin/superadmin, show toggle costs button */}
+              {isAdminVerified && (
                 <button
                   type="button"
                   onClick={() => setShowCostsAdmin(!showCostsAdmin)}
@@ -395,6 +388,16 @@ export default function Step6Pricing({
                   }`}
                 >
                   <span>{showCostsAdmin ? "👁️" : "🙈"}</span> {showCostsAdmin ? "ซ่อนต้นทุนอุปกรณ์" : "แสดงต้นทุนอุปกรณ์ (Admin)"}
+                </button>
+              )}
+              {/* If not verified, but unlock callback is provided, show unlock button */}
+              {!isAdminVerified && onVerifyAdmin && (
+                <button
+                  type="button"
+                  onClick={onVerifyAdmin}
+                  className="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <span>🔐</span> แสดงต้นทุนอุปกรณ์
                 </button>
               )}
               <button

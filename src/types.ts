@@ -66,6 +66,15 @@ export interface PricingItem {
   category: "hardware" | "accessory" | "labor" | "other";
 }
 
+export interface UserProfile {
+  id: string;
+  role: "superadmin" | "admin" | "head_user" | "user";
+  displayName: string;
+  email: string;
+  province?: string;
+  updatedAt: string;
+}
+
 export interface ProjectSurvey {
   id: string;
   customerInfo: CustomerInfo;
@@ -77,6 +86,7 @@ export interface ProjectSurvey {
   vatRate: number; // normally 7
   createdAt: string;
   status: "draft" | "completed";
+  createdBy?: string; // UUID of the user who created it
 }
 
 export interface MasterCostDb {
