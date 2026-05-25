@@ -392,13 +392,21 @@ export default function App() {
         const { data, error } = await supabase
           .from("cctv_master_costs")
           .select("costs")
-          .eq("id", "default")
-          .single();
-        if (data && data.costs) {
-          console.log("Loaded master costs from Supabase:", data.costs);
-          setMasterCosts(data.costs);
-        } else if (error && error.code !== "PGRST116") {
-          console.warn("Could not fetch master costs from Supabase (this is normal if the table doesn't exist yet):", error.message);
+          .eq("id", "default");
+        
+        if (data && data.length > 0 && data[0].costs) {
+          console.log("Loaded master costs from Supabase:", data[0].costs);
+          setMasterCosts(data[0].costs);
+        } else {
+          console.log("No master costs record found on Supabase. Table is empty. Initializing...");
+          // Gracefully initialize the row with masterCosts (either from localStorage or defaults)
+          await supabase
+            .from("cctv_master_costs")
+            .upsert({
+              id: "default",
+              costs: masterCosts,
+              updated_at: new Date().toISOString()
+            });
         }
       } catch (err) {
         console.error("Failed to load master costs from Supabase:", err);
