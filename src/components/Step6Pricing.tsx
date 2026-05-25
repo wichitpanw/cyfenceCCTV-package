@@ -350,22 +350,6 @@ export default function Step6Pricing({
 
   return (
     <div className="space-y-6" id="pricing-step-container">
-      {/* Informative alert explaining customizable pricing */}
-      <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-start gap-3">
-        <div className="w-9 h-9 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
-          <Coins className="w-4 h-4 text-zinc-700" />
-        </div>
-        <div>
-          <h4 className="font-semibold text-xs text-zinc-800 font-sans">
-            💰 ปรับปรุงราคาขายและส่วนลด (Editable Price Sheet)
-          </h4>
-          <p className="text-[11px] text-zinc-500 leading-relaxed mt-0.5">
-            สเปกปริมาณอุปกรณ์เสริมถูกคำนวณตามแผนผังสำรวจ ท่านสามารถปรับแก้ไขตัวเลขราคาต่อหน่วย (Unit Price) หรือเพิ่ม/ลดรายการอุปกรณ์ได้โดยตรง 
-            ระบบจะอัปเดตราคาพรีวิวแบบเรียลไทม์พร้อมสรุปภาษีมูลค่าเพิ่ม 7% ให้คุณกุมข้อมูลส่งผู้จัดการโครงการต่อได้ทันทีค่ะ
-          </p>
-        </div>
-      </div>
-
       <div className="space-y-6">
         {/* MAIN PANEL (Full Width): Main pricing items list grid */}
         <div className="w-full bg-white border border-zinc-200 rounded-2xl p-5 shadow-2xs space-y-4">

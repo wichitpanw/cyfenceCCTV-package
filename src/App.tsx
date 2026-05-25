@@ -300,6 +300,24 @@ export default function App() {
     onConfirm: () => {}
   });
 
+  // Admin Settings states
+  const [isAdminPinModalOpen, setIsAdminPinModalOpen] = useState<boolean>(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
+  const [adminPinInput, setAdminPinInput] = useState<string>("");
+  const [adminPinError, setAdminPinError] = useState<string>("");
+
+  const handleVerifyAdminPin = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (adminPinInput === "8888") {
+      setIsAdminPinModalOpen(false);
+      setIsAdminModalOpen(true);
+      setAdminPinInput("");
+      setAdminPinError("");
+    } else {
+      setAdminPinError("รหัส PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้งค่ะ");
+    }
+  };
+
   const showConfirm = (
     title: string,
     message: string,
@@ -840,6 +858,19 @@ export default function App() {
                 <span className="text-[11px] font-semibold text-zinc-800">{customerInfo.surveyorName || "ผู้สำรวจระบบ"}</span>
               </div>
             </div>
+            {/* Admin Settings Button (Gear Icon) */}
+            <button
+              type="button"
+              onClick={() => {
+                setAdminPinInput("");
+                setAdminPinError("");
+                setIsAdminPinModalOpen(true);
+              }}
+              className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-600 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center"
+              title="สำหรับผู้ดูแลระบบ (Admin Panel)"
+            >
+              <Settings className="w-4 h-4 text-zinc-650" />
+            </button>
           </div>
         </div>
       </header>
@@ -1061,6 +1092,168 @@ export default function App() {
                   }`}
                 >
                   {confirmModal.confirmText || "ยืนยัน"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Admin PIN Verification Modal */}
+      <AnimatePresence>
+        {isAdminPinModalOpen && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] font-sans">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-zinc-100 p-6 space-y-4"
+            >
+              <div className="text-center space-y-2">
+                <div className="text-3xl">🔒</div>
+                <h4 className="text-sm font-bold text-zinc-950">
+                  ยืนยันสิทธิ์ผู้ดูแลระบบ
+                </h4>
+                <p className="text-[11px] text-zinc-500">
+                  ระบุรหัส PIN ของผู้ดูแลระบบเพื่อเข้าสู่หน้าต่างการตั้งค่า
+                </p>
+              </div>
+
+              <form onSubmit={handleVerifyAdminPin} className="space-y-3">
+                <div>
+                  <input
+                    type="password"
+                    maxLength={4}
+                    value={adminPinInput}
+                    onChange={(e) => {
+                      setAdminPinInput(e.target.value.replace(/\D/g, ""));
+                      setAdminPinError("");
+                    }}
+                    className="w-full text-center tracking-[1.5em] text-lg font-mono py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white"
+                    placeholder="••••"
+                    autoFocus
+                  />
+                  {adminPinError && (
+                    <p className="text-[10px] text-red-500 text-center mt-1.5 font-medium">
+                      ⚠️ {adminPinError}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex gap-2.5 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAdminPinModalOpen(false);
+                      setAdminPinInput("");
+                      setAdminPinError("");
+                    }}
+                    className="flex-1 py-2 text-xs font-semibold text-zinc-500 bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 rounded-xl transition-all cursor-pointer"
+                  >
+                    ยกเลิก
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-2 text-xs font-bold text-white bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 rounded-xl shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                  >
+                    ยืนยัน
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Admin Panel Modal */}
+      <AnimatePresence>
+        {isAdminModalOpen && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] font-sans">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-zinc-100 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-zinc-700" />
+                  <span className="text-xs font-bold text-zinc-800">
+                    หน้าต่างควบคุมสำหรับผู้ดูแลระบบ (Admin Panel)
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAdminModalOpen(false)}
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-zinc-400 hover:bg-zinc-100 hover:text-zinc-650 transition-colors cursor-pointer text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                <div className="space-y-3">
+                  <span className="text-[10px] font-bold text-zinc-400 block uppercase font-mono tracking-wider">
+                    DATABASE CONNECTION / การเชื่อมต่อระบบคลาวด์
+                  </span>
+
+                  {isSupabaseConfigured ? (
+                    <div className="bg-emerald-50/50 border border-emerald-200 p-4 rounded-xl space-y-3">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 animate-pulse">
+                          ✓
+                        </div>
+                        <div className="text-xs">
+                          <span className="block font-bold text-emerald-800">
+                            เชื่อมต่อคลาวด์ Supabase สำเร็จ!
+                          </span>
+                          <span className="block text-[10.5px] text-emerald-600/90 leading-relaxed mt-0.5">
+                            ข้อมูลโครงการของคุณถูกสำรองและซิงก์ออนไลน์เรียลไทม์แล้วค่ะ
+                          </span>
+                        </div>
+                      </div>
+                      <div className="bg-white/80 p-2.5 rounded-lg border border-emerald-100 text-[10px] space-y-1 font-mono text-zinc-650 break-all">
+                        <div className="font-semibold text-zinc-400 uppercase text-[8px] tracking-wider">REST Endpoint URL</div>
+                        <div>https://tkcpmtqvdakgxjcwmzdw.supabase.co/rest/v1/</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-2">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-zinc-400 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                          !
+                        </div>
+                        <div className="text-xs">
+                          <span className="block font-bold text-zinc-800">
+                            ทำงานในโหมด Offline (LocalStorage)
+                          </span>
+                          <span className="block text-[10.5px] text-zinc-500 leading-relaxed mt-0.5">
+                            ยังไม่ได้เชื่อมต่อกับระบบฐานข้อมูลคลาวด์ ข้อมูลจะถูกจัดเก็บในหน่วยความจำของอุปกรณ์นี้อย่างปลอดภัย
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-amber-50/50 border border-amber-200/60 p-3.5 rounded-xl text-[10.5px] text-amber-800 leading-relaxed space-y-1">
+                  <div className="font-bold">💡 ข้อแนะนำเพิ่มเติมสำหรับผู้ดูแล</div>
+                  <div>ในหน้านี้ ผู้ดูแลสามารถตรวจสอบสถานะการเชื่อมต่อฐานข้อมูลปลายทาง หากพบปัญหาเกี่ยวกับโครงสร้าง ตาราง หรือข้อมูลการเชื่อมต่อ สามารถประสานงานกับทีมผู้พัฒนาระบบเพื่อดูแลรักษาเซิร์ฟเวอร์ต่อไปได้ค่ะ</div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-3.5 bg-zinc-50/50 border-t border-zinc-100 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsAdminModalOpen(false)}
+                  className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+                >
+                  ปิดหน้าต่าง
                 </button>
               </div>
             </motion.div>

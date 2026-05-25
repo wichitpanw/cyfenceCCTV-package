@@ -178,17 +178,6 @@ export default function ProjectHistory({
           )}
         </div>
       </div>
-
-      <div className="mt-4 p-3 bg-zinc-50 border border-zinc-150 rounded-xl text-[10px] text-zinc-500 leading-normal flex items-start gap-2">
-        <span className="text-sm select-none shrink-0">{isCloudSyncActive ? "☁️" : "💾"}</span>
-        <div>
-          {isCloudSyncActive ? (
-            <span>เชื่อมต่อคลาวด์ <strong>Supabase</strong> สำเร็จ! ข้อมูลโครงการของคุณถูกสำรองและซิงก์ออนไลน์เรียลไทม์แล้วค่ะ</span>
-          ) : (
-            <span>ข้อมูลโครงการและแบบร่างทั้งหมดจัดเก็บอย่างปลอดภัยบนอุปกรณ์นี้ผ่าน LocalStorage</span>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
