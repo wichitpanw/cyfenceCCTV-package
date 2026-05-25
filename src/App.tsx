@@ -61,10 +61,24 @@ function generatePricingItems(
 
   // 1. Cameras
   if (hasSurvey && cameraPoints.length > 0) {
-    const domes = cameraPoints.filter(p => p.type === "Dome").length;
-    const bullets = cameraPoints.filter(p => p.type === "Bullet").length;
-    const ptzs = cameraPoints.filter(p => p.type === "PTZ" || p.type === "Speed Dome").length;
-    const fisheyes = cameraPoints.filter(p => p.type === "Fisheye").length;
+    let domes = 0;
+    let bullets = 0;
+    let ptzs = 0;
+    let fisheyes = 0;
+
+    cameraPoints.forEach(p => {
+      let ptCams = 1;
+      if (p.selectedSet === "Set 1") ptCams = 1;
+      else if (p.selectedSet === "Set 2") ptCams = 2;
+      else if (p.selectedSet === "Set 3") ptCams = 3;
+      else if (p.selectedSet === "Set 4") ptCams = 4;
+
+      if (p.type === "Dome") domes += ptCams;
+      else if (p.type === "Bullet") bullets += ptCams;
+      else if (p.type === "PTZ" || p.type === "Speed Dome") ptzs += ptCams;
+      else if (p.type === "Fisheye") fisheyes += ptCams;
+      else bullets += ptCams;
+    });
 
     if (bullets > 0) {
       items.push({
@@ -212,7 +226,17 @@ function generatePricingItems(
   }
 
   // 5. Cables and pipes
-  const camCount = hasSurvey ? cameraPoints.length : requirements.cameraCount;
+  let camCount = requirements.cameraCount;
+  if (hasSurvey && cameraPoints.length > 0) {
+    camCount = cameraPoints.reduce((sum, pt) => {
+      let ptCams = 1;
+      if (pt.selectedSet === "Set 1") ptCams = 1;
+      else if (pt.selectedSet === "Set 2") ptCams = 2;
+      else if (pt.selectedSet === "Set 3") ptCams = 3;
+      else if (pt.selectedSet === "Set 4") ptCams = 4;
+      return sum + ptCams;
+    }, 0);
+  }
   const rawCableMeters = camCount * 35; // average 35 meters per camera
   items.push({
     id: "bom-cable-lan",
@@ -474,12 +498,18 @@ export default function App() {
     loadSavedProjects();
   }, []);
 
-  // Sync state when step changes (specifically regenerating pricing items on entering summary or pricing)
   useEffect(() => {
     if (step === 3) {
       // Step 3 is now System Specs (originally Step 2)
       // Automatically calculate recommended NVR channels based on camera count
-      const count = cameraPoints.length;
+      const count = cameraPoints.reduce((sum, pt) => {
+        let ptCams = 1;
+        if (pt.selectedSet === "Set 1") ptCams = 1;
+        else if (pt.selectedSet === "Set 2") ptCams = 2;
+        else if (pt.selectedSet === "Set 3") ptCams = 3;
+        else if (pt.selectedSet === "Set 4") ptCams = 4;
+        return sum + ptCams;
+      }, 0);
       let recCh = 8;
       if (count <= 4) recCh = 4;
       else if (count <= 8) recCh = 8;
@@ -991,7 +1021,14 @@ export default function App() {
                     onChange={setRequirements}
                     onNext={handleNextStep}
                     onPrev={handlePrevStep}
-                    cameraCount={cameraPoints.length}
+                    cameraCount={cameraPoints.reduce((sum, pt) => {
+                      let ptCams = 1;
+                      if (pt.selectedSet === "Set 1") ptCams = 1;
+                      else if (pt.selectedSet === "Set 2") ptCams = 2;
+                      else if (pt.selectedSet === "Set 3") ptCams = 3;
+                      else if (pt.selectedSet === "Set 4") ptCams = 4;
+                      return sum + ptCams;
+                    }, 0)}
                     cameraPoints={cameraPoints}
                   />
                 )}

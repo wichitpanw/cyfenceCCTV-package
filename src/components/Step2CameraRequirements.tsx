@@ -101,7 +101,7 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
           <div className="space-y-1 grow">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-sm font-semibold text-zinc-800">
-                💾 สเปกขนาดความจุฮาร์ดดิสก์สะสมภาพ
+                💾 ขนาดความจุฮาร์ดดิสก์
               </h3>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
             <span className="text-sm font-bold text-zinc-850 mt-1 block">{data.nvrChannels} ช่องสัญญาณ (Channels)</span>
           </div>
           <div className="bg-white p-3.5 rounded-xl border border-zinc-150">
-            <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-wider font-mono">โควตาความจุบังคับตามเกณฑ์มาตรฐานราชการ</span>
+            <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-wider font-mono">รวมขนาดความจุที่ต้องใช้</span>
             <span className="text-sm font-bold text-[#0071e3] mt-1 block">
               {data.nvrChannels <= 4 ? "4TB" : data.nvrChannels <= 8 ? "8TB" : data.nvrChannels <= 16 ? "16TB (8TB x 2 ลูก)" : data.nvrChannels <= 32 ? "32TB (8TB x 4 ลูก)" : "64TB (8TB x 8 ลูก)"}
             </span>
