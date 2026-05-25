@@ -27,7 +27,7 @@ import LoginScreen from "./components/LoginScreen";
 import UserManagement from "./components/UserManagement";
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
 import { User } from "@supabase/supabase-js";
-import { LogOut, Users } from "lucide-react";
+import { LogOut, Users, Loader2 } from "lucide-react";
 
 // Primary default layout values
 const DEFAULT_CUSTOMER_INFO: CustomerInfo = {
@@ -1142,6 +1142,27 @@ export default function App() {
       return "";
     }
   })() : "";
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f7] flex flex-col items-center justify-center font-sans">
+        <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
+          <Loader2 className="w-6 h-6 text-indigo-650 animate-spin" />
+        </div>
+        <span className="text-xs font-bold text-zinc-500 mt-4 animate-pulse">กำลังเตรียมระบบความปลอดภัย...</span>
+      </div>
+    );
+  }
+
+  if (isSupabaseConfigured && !currentUser) {
+    return (
+      <LoginScreen 
+        onAuthSuccess={() => {
+          // Auth changed callback
+        }} 
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col font-sans" id="applet-primary-layout">
