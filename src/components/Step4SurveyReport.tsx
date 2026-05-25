@@ -59,6 +59,7 @@ export default function Step4SurveyReport({
 }: Step4Props) {
   const stdLimit = requirements?.standardCableLimit ?? 25;
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"main" | "options" | "location">("main");
 
   // Local state for manual coordinate inputs to prevent React cursor state bugs on floats
   const [localLat, setLocalLat] = useState<string>("");
@@ -697,395 +698,469 @@ export default function Step4SurveyReport({
                 </button>
               </div>
 
+              {/* Segmented Tabs (Apple Style) */}
+              <div className="flex bg-zinc-100 p-0.5 rounded-xl border border-zinc-200/50 select-none">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("main")}
+                  className={`flex-1 py-1.5 text-center text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                    activeTab === "main"
+                      ? "bg-white text-zinc-900 shadow-2xs border border-zinc-200/10"
+                      : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  📦 อุปกรณ์หลัก
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("options")}
+                  className={`flex-1 py-1.5 text-center text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                    activeTab === "options"
+                      ? "bg-white text-zinc-900 shadow-2xs border border-zinc-200/10"
+                      : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  🔌 อุปกรณ์เสริม
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("location")}
+                  className={`flex-1 py-1.5 text-center text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                    activeTab === "location"
+                      ? "bg-white text-zinc-900 shadow-2xs border border-zinc-200/10"
+                      : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  📍 พิกัด & รูปถ่าย
+                </button>
+              </div>
+
               {/* Form Input fields */}
               <div className="space-y-4 text-xs">
-                <div>
-                  <label className="block text-zinc-550 font-semibold mb-1 uppercase tracking-wide">
-                    ชื่อเรียกจุดสำรวจนี้
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedPoint.name}
-                    onChange={(e) => handleUpdatePointField(selectedPoint.id, "name", e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] text-zinc-800"
-                    placeholder="เช่น ทางเข้าตู้คอนเทนเนอร์, เสาไฟสปอร์ตไลท์หลัก"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-zinc-555 font-bold mb-1 uppercase tracking-wide flex items-center gap-1.5 text-xs text-[#0071e3]">
-                    📦 ชุดอุปกรณ์ติดตั้งปลายทาง (Installation Set)
-                  </label>
-                  <select
-                    value={selectedPoint.selectedSet || "Set 1"}
-                    onChange={(e) => {
-                      const val = e.target.value as "Set 1" | "Set 2" | "Set 3" | "Set 4";
-                      
-                      let updates: Partial<CameraPoint> = {
-                        selectedSet: val
-                      };
-
-                      if (val === "Set 1") {
-                        updates = {
-                          ...updates,
-                          hasOutdoorCabinet: true,
-                          hasGroundRod: true,
-                          hasPowerMeter: true,
-                          hasSdCard: true,
-                          hasCabinetUps: true,
-                          hasPoeSwitch: true,
-                          hasSupportArm: true,
-                          lanCableLength: 25,
-                          poleType: selectedPoint.poleType === "None" ? "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)" : selectedPoint.poleType
-                        };
-                      } else if (val === "Set 2") {
-                        updates = {
-                          ...updates,
-                          hasOutdoorCabinet: true,
-                          hasGroundRod: true,
-                          hasPowerMeter: true,
-                          hasSdCard: true,
-                          hasCabinetUps: true,
-                          hasPoeSwitch: true,
-                          hasSupportArm: true,
-                          lanCableLength: 50,
-                          poleType: selectedPoint.poleType === "None" ? "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)" : selectedPoint.poleType
-                        };
-                      } else if (val === "Set 3") {
-                        updates = {
-                          ...updates,
-                          hasOutdoorCabinet: true,
-                          hasGroundRod: true,
-                          hasPowerMeter: true,
-                          hasSdCard: true,
-                          hasCabinetUps: true,
-                          hasPoeSwitch: true,
-                          hasSupportArm: true,
-                          lanCableLength: 75,
-                          poleType: selectedPoint.poleType === "None" ? "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)" : selectedPoint.poleType
-                        };
-                      } else if (val === "Set 4") {
-                        updates = {
-                          ...updates,
-                          hasOutdoorCabinet: true,
-                          hasGroundRod: true,
-                          hasPowerMeter: true,
-                          hasSdCard: true,
-                          hasCabinetUps: true,
-                          hasPoeSwitch: true,
-                          hasSupportArm: true,
-                          lanCableLength: 100,
-                          poleType: selectedPoint.poleType === "None" ? "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)" : selectedPoint.poleType
-                        };
-                      } else {
-                        // None
-                        updates = {
-                          ...updates,
-                          hasOutdoorCabinet: false,
-                          hasGroundRod: false,
-                          hasPowerMeter: false,
-                          hasSdCard: false,
-                          hasCabinetUps: false,
-                          hasPoeSwitch: false,
-                          hasSupportArm: false,
-                          lanCableLength: 25,
-                          poleType: "None"
-                        };
-                      }
-                      
-                      handleUpdatePointFields(selectedPoint.id, updates);
-                    }}
-                    className="w-full px-3 py-2 border-2 border-[#0071e3]/30 bg-white hover:border-[#0071e3] transition-colors rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
-                  >
-                    <option value="Set 1">📦 Set 1 (กล้อง 1 ตัว)</option>
-                    <option value="Set 2">📦 Set 2 (กล้อง 2 ตัว)</option>
-                    <option value="Set 3">📦 Set 3 (กล้อง 3 ตัว)</option>
-                    <option value="Set 4">📦 Set 4 (กล้อง 4 ตัว)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
-                    ประเภทกล้อง (Housing)
-                  </label>
-                  <select
-                    value={selectedPoint.type}
-                    disabled
-                    className="w-full px-3 py-2 border border-zinc-200 bg-zinc-100 rounded-lg text-xs font-medium focus:outline-none text-zinc-500 cursor-not-allowed"
-                  >
-                    <option value="Bullet">Bullet (กล้องทรงกระบอกกันน้ำภายนอก)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
-                    การติดตั้งเสาเหล็กกล้อง
-                  </label>
-                  <select
-                    value={selectedPoint.poleType}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      // Help auto-tick outdoor options on pole selections for engineering safety
-                      if (val === "เสาปูน 8 เมตร" || val === "เสาเหล็กกัลวาไนซ์ 4 เมตร" || val === "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)") {
-                        handleUpdatePointFields(selectedPoint.id, { 
-                          poleType: val,
-                          hasOutdoorCabinet: true,
-                          hasGroundRod: true,
-                          hasCabinetUps: true,
-                          hasPoeSwitch: true,
-                          hasSdCard: true
-                        });
-                      } else {
-                        handleUpdatePointFields(selectedPoint.id, { poleType: val });
-                      }
-                    }}
-                    className="w-full px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg text-xs font-medium focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3]"
-                  >
-                    <option value="None">ไม่มี (ติดตั้งยึดเข้ากับกำแพงหรือผนังอาคารโดยตรง)</option>
-                    <option value="เสาไฟฟ้า (ยึดสายรัดสแตนเลส)">เสาไฟฟ้าของการไฟฟ้า (ยึดติดโดยสายรัดสแตนเลส & ค้ำจุน)</option>
-                    <option value="เสาเหล็กกัลวาไนซ์ 4 เมตร">เสาเหล็กกัลวาไนซ์ สูง 4 เมตร (+ฐานรากและการปักเสา)</option>
-                    <option value="เสาปูน 8 เมตร">เสาปูนมาตรฐาน สูง 8 เมตร (+ฐานรากและการปักเสาโยธา)</option>
-                  </select>
-                </div>
-
-                {/* Support arm checkbox */}
-                <div className="flex items-start gap-3 bg-zinc-50 p-3.5 rounded-xl border border-zinc-200">
-                  <input
-                    id="support-arm-check"
-                    type="checkbox"
-                    checked={selectedPoint.hasSupportArm}
-                    onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasSupportArm", e.target.checked)}
-                    className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer shrink-0"
-                  />
-                  <div className="text-left select-none">
-                    <label htmlFor="support-arm-check" className="block text-xs font-bold text-zinc-700 cursor-pointer">
-                      ต้องการแขนจับยึดกล้องยื่นออก (Wall Support Bracket)
-                    </label>
-                    <span className="text-[10px] text-zinc-455 block mt-1 leading-relaxed">
-                      เหมาะสำหรับติดตั้งห้อยหัวกล้องยื่นจากแนวเสาหรือกำแพง (ความยาวไม่น้อยกว่า 1 เมตร)
-                    </span>
-                  </div>
-                </div>
-
-                {/* ADVANCED INSTALLATION SPECS (Apple Widget style for professional layout) */}
-                <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200 space-y-4">
-                  <span className="text-[10px] font-bold text-zinc-550 block uppercase font-mono tracking-wider">
-                    ⚙️ ข้อมูลการเดินสายและฐานอุปกรณ์ปลายทาง
-                  </span>
-                  
-                  {/* LAN Cable length input with standard 25m cap */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between items-center">
-                      <label className="text-zinc-550 block text-[9px] uppercase font-bold">ระยะสาย LAN เดินท่อเฟล็กซ์ (เมตร)</label>
-                      {selectedPoint.lanCableLength !== undefined && selectedPoint.lanCableLength > 25 && (
-                        <span className="text-[8px] bg-amber-50 text-amber-600 font-bold px-1.5 py-0.5 rounded font-mono shadow-3xs">
-                          เกินมาตรฐาน +{selectedPoint.lanCableLength - 25} เมตร
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
+                {activeTab === "main" && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-zinc-550 font-semibold mb-1 uppercase tracking-wide">
+                        ชื่อเรียกจุดสำรวจนี้
+                      </label>
                       <input
-                        type="number"
-                        min={1}
-                        value={selectedPoint.lanCableLength !== undefined ? selectedPoint.lanCableLength : 25}
+                        type="text"
+                        value={selectedPoint.name}
+                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "name", e.target.value)}
+                        className="w-full px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] text-zinc-800"
+                        placeholder="เช่น ทางเข้าตู้คอนเทนเนอร์, เสาไฟสปอร์ตไลท์หลัก"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-zinc-555 font-bold mb-1 uppercase tracking-wide flex items-center gap-1.5 text-xs text-[#0071e3]">
+                        📦 ชุดอุปกรณ์ติดตั้งปลายทาง (Installation Set)
+                      </label>
+                      <select
+                        value={selectedPoint.selectedSet || "Set 1"}
                         onChange={(e) => {
-                          const val = parseInt(e.target.value);
-                          handleUpdatePointField(selectedPoint.id, "lanCableLength", isNaN(val) ? 25 : val);
+                          const val = e.target.value as "Set 1" | "Set 2" | "Set 3" | "Set 4";
+                          
+                          let updates: Partial<CameraPoint> = {
+                            selectedSet: val
+                          };
+
+                          if (val === "Set 1") {
+                            updates = {
+                              ...updates,
+                              hasOutdoorCabinet: true,
+                              hasGroundRod: true,
+                              hasPowerMeter: true,
+                              hasSdCard: true,
+                              hasCabinetUps: true,
+                              hasPoeSwitch: true,
+                              hasSupportArm: true,
+                              lanCableLength: 25,
+                              poleType: selectedPoint.poleType === "None" ? "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)" : selectedPoint.poleType
+                            };
+                          } else if (val === "Set 2") {
+                            updates = {
+                              ...updates,
+                              hasOutdoorCabinet: true,
+                              hasGroundRod: true,
+                              hasPowerMeter: true,
+                              hasSdCard: true,
+                              hasCabinetUps: true,
+                              hasPoeSwitch: true,
+                              hasSupportArm: true,
+                              lanCableLength: 50,
+                              poleType: selectedPoint.poleType === "None" ? "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)" : selectedPoint.poleType
+                            };
+                          } else if (val === "Set 3") {
+                            updates = {
+                              ...updates,
+                              hasOutdoorCabinet: true,
+                              hasGroundRod: true,
+                              hasPowerMeter: true,
+                              hasSdCard: true,
+                              hasCabinetUps: true,
+                              hasPoeSwitch: true,
+                              hasSupportArm: true,
+                              lanCableLength: 75,
+                              poleType: selectedPoint.poleType === "None" ? "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)" : selectedPoint.poleType
+                            };
+                          } else if (val === "Set 4") {
+                            updates = {
+                              ...updates,
+                              hasOutdoorCabinet: true,
+                              hasGroundRod: true,
+                              hasPowerMeter: true,
+                              hasSdCard: true,
+                              hasCabinetUps: true,
+                              hasPoeSwitch: true,
+                              hasSupportArm: true,
+                              lanCableLength: 100,
+                              poleType: selectedPoint.poleType === "None" ? "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)" : selectedPoint.poleType
+                            };
+                          } else {
+                            // None
+                            updates = {
+                              ...updates,
+                              hasOutdoorCabinet: false,
+                              hasGroundRod: false,
+                              hasPowerMeter: false,
+                              hasSdCard: false,
+                              hasCabinetUps: false,
+                              hasPoeSwitch: false,
+                              hasSupportArm: false,
+                              lanCableLength: 25,
+                              poleType: "None"
+                            };
+                          }
+                          
+                          handleUpdatePointFields(selectedPoint.id, updates);
                         }}
-                        className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
-                        placeholder="ดีฟอลต์ 25 เมตร"
-                      />
-                      <span className="text-zinc-400 text-xs flex items-center justify-center font-semibold bg-zinc-200/55 px-2.5 rounded-lg border border-zinc-200/40 select-none">ม.</span>
-                    </div>
-                    <span className="block text-[8px] text-zinc-400 leading-normal">
-                      *ระยะเดินสายสัญญาณ LAN ในท่อเฟล็กซ์อ่อนภายนอก ฟรีมาตรฐาน 25 เมตรแรก/ตัว หากเกินจะมีการคำนวณราคาเพิ่มต่อเมตรตามจริง
-                    </span>
-                  </div>
-
-                  {/* Advanced checkboxes list */}
-                  <div className="space-y-2.5 pt-2.5 border-t border-zinc-200/50">
-                    {/* Outdoor cabinet */}
-                    <div className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        id="outdoor-cabinet-check"
-                        type="checkbox"
-                        checked={!!selectedPoint.hasOutdoorCabinet}
-                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasOutdoorCabinet", e.target.checked)}
-                        className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
-                      />
-                      <div className="text-left select-none">
-                        <label htmlFor="outdoor-cabinet-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
-                          ติดตั้งตู้ Outdoor Cabinet ปลายทาง
-                        </label>
-                        <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
-                          ตู้พักอุปกรณ์ภายนอกอาคาร พร้อมพัดลมระบายอากาศ 2 ตัว, รางปลั๊กไฟ และ Circuit Breaker
-                        </span>
-                      </div>
+                        className="w-full px-3 py-2 border-2 border-[#0071e3]/30 bg-white hover:border-[#0071e3] transition-colors rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                      >
+                        <option value="Set 1">📦 Set 1 (กล้อง 1 ตัว)</option>
+                        <option value="Set 2">📦 Set 2 (กล้อง 2 ตัว)</option>
+                        <option value="Set 3">📦 Set 3 (กล้อง 3 ตัว)</option>
+                        <option value="Set 4">📦 Set 4 (กล้อง 4 ตัว)</option>
+                      </select>
                     </div>
 
-                    {/* Ground rod */}
-                    <div className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        id="ground-rod-check"
-                        type="checkbox"
-                        checked={!!selectedPoint.hasGroundRod}
-                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasGroundRod", e.target.checked)}
-                        className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
-                      />
-                      <div className="text-left select-none">
-                        <label htmlFor="ground-rod-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
-                          ติดตั้งชุด Ground Rod (ขุดเจาะบ่อกราวด์)
-                        </label>
-                        <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
-                          ติดตั้งแท่งทองแดง Ground Rod ป้องกันกระแสไฟฟ้ารั่วและฟ้าผ่าสำหรับจุดติดตั้งเสานอกอาคาร
-                        </span>
-                      </div>
+                    <div>
+                      <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
+                        ประเภทกล้อง (Housing)
+                      </label>
+                      <select
+                        value={selectedPoint.type}
+                        disabled
+                        className="w-full px-3 py-2 border border-zinc-200 bg-zinc-100 rounded-lg text-xs font-medium focus:outline-none text-zinc-500 cursor-not-allowed"
+                      >
+                        <option value="Bullet">Bullet (กล้องทรงกระบอกกันน้ำภายนอก)</option>
+                      </select>
                     </div>
 
-                    {/* Power meter & THW */}
-                    <div className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        id="power-meter-check"
-                        type="checkbox"
-                        checked={!!selectedPoint.hasPowerMeter}
-                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasPowerMeter", e.target.checked)}
-                        className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
-                      />
-                      <div className="text-left select-none">
-                        <label htmlFor="power-meter-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
-                          ขอติดตั้งมิเตอร์ไฟฟ้า & ลากสาย THW 16 sq.mm. 50 เมตร
-                        </label>
-                        <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
-                          ลากสายไฟฟ้าเมน THW IEC 16 sq.mm. ระยะสาย 50 เมตร ปลายทาง พร้อมยื่นคำขอติดตั้งมิเตอร์ไฟหน้างาน
-                        </span>
-                      </div>
+                    <div>
+                      <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
+                        การติดตั้งเสาเหล็กกล้อง
+                      </label>
+                      <select
+                        value={selectedPoint.poleType}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          // Help auto-tick outdoor options on pole selections for engineering safety
+                          if (val === "เสาปูน 8 เมตร" || val === "เสาเหล็กกัลวาไนซ์ 4 เมตร" || val === "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)") {
+                            handleUpdatePointFields(selectedPoint.id, { 
+                              poleType: val,
+                              hasOutdoorCabinet: true,
+                              hasGroundRod: true,
+                              hasCabinetUps: true,
+                              hasPoeSwitch: true,
+                              hasSdCard: true
+                            });
+                          } else {
+                            handleUpdatePointFields(selectedPoint.id, { poleType: val });
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg text-xs font-medium focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3]"
+                      >
+                        <option value="None">ไม่มี (ติดตั้งยึดเข้ากับกำแพงหรือผนังอาคารโดยตรง)</option>
+                        <option value="เสาไฟฟ้า (ยึดสายรัดสแตนเลส)">เสาไฟฟ้าของการไฟฟ้า (ยึดติดโดยสายรัดสแตนเลส & ค้ำจุน)</option>
+                        <option value="เสาเหล็กกัลวาไนซ์ 4 เมตร">เสาเหล็กกัลวาไนซ์ สูง 4 เมตร (+ฐานรากและการปักเสา)</option>
+                        <option value="เสาปูน 8 เมตร">เสาปูนมาตรฐาน สูง 8 เมตร (+ฐานรากและการปักเสาโยธา)</option>
+                      </select>
                     </div>
 
-                    {/* Switch POE Ruijie */}
-                    <div className="flex items-start gap-2.5 cursor-pointer">
+                    {/* Support arm checkbox */}
+                    <div className="flex items-start gap-3 bg-zinc-50 p-3.5 rounded-xl border border-zinc-200">
                       <input
-                        id="poe-switch-check"
+                        id="support-arm-check"
                         type="checkbox"
-                        checked={!!selectedPoint.hasPoeSwitch}
-                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasPoeSwitch", e.target.checked)}
-                        className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                        checked={selectedPoint.hasSupportArm}
+                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasSupportArm", e.target.checked)}
+                        className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer shrink-0"
                       />
                       <div className="text-left select-none">
-                        <label htmlFor="poe-switch-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
-                          ติดตั้ง Switch POE 4 Port Industrial Grade
+                        <label htmlFor="support-arm-check" className="block text-xs font-bold text-zinc-700 cursor-pointer">
+                          ต้องการแขนจับยึดกล้องยื่นออก (Wall Support Bracket)
                         </label>
-                        <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
-                          สวิตช์จ่ายไฟผ่านสายแลนเกรดอุตสาหกรรมในตู้ปลายทาง เพื่อกระจายเน็ตเวิร์ก
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* UPS 800 VA (Outdoor) */}
-                    <div className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        id="cabinet-ups-check"
-                        type="checkbox"
-                        checked={!!selectedPoint.hasCabinetUps}
-                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasCabinetUps", e.target.checked)}
-                        className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
-                      />
-                      <div className="text-left select-none">
-                        <label htmlFor="cabinet-ups-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
-                          ติดตั้งเครื่องสำรองไฟ UPS 800 VA ปลายทาง
-                        </label>
-                        <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
-                          เครื่องสำรองไฟขนาด 800 VA ป้องกันกล้องดับและอุปกรณ์พังเมื่อไฟตก/ดับภายนอกอาคาร
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* SD Card 128G */}
-                    <div className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        id="sdcard-check"
-                        type="checkbox"
-                        checked={!!selectedPoint.hasSdCard}
-                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasSdCard", e.target.checked)}
-                        className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
-                      />
-                      <div className="text-left select-none">
-                        <label htmlFor="sdcard-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
-                          ติดตั้ง Micro SD Card 128GB ในตัวกล้อง
-                        </label>
-                        <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
-                          เมมโมรี่การ์ด 128GB เพื่อบันทึกภาพสำรองในตัวกล้องโดยตรง (Edge Recording)
+                        <span className="text-[10px] text-zinc-455 block mt-1 leading-relaxed">
+                          เหมาะสำหรับติดตั้งห้อยหัวกล้องยื่นจากแนวเสาหรือกำแพง (ความยาวไม่น้อยกว่า 1 เมตร)
                         </span>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Coordinate Info Box (Interactive Text-inputs with map panning) */}
-                <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200 space-y-2">
-                  <span className="text-[10px] font-bold text-zinc-555 block uppercase font-mono tracking-wider">
-                    📍 ป้อนพิกัดภูมิศาสตร์เฉพาะจุด (แก้ไขเด้งหาตำแหน่งทันที)
-                  </span>
-                  <div className="grid grid-cols-2 gap-2 text-[10px]">
-                    <div className="space-y-1">
-                      <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Latitude (ละติจูด)</label>
-                      <input
-                        type="text"
-                        value={localLat}
-                        onChange={(e) => handleLatManualChange(e.target.value)}
-                        className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
-                        placeholder="เช่น 13.6872"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Longitude (ลองจิจูด)</label>
-                      <input
-                        type="text"
-                        value={localLng}
-                        onChange={(e) => handleLngManualChange(e.target.value)}
-                        className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
-                        placeholder="เช่น 100.6057"
-                      />
+                {activeTab === "options" && (
+                  <div className="space-y-4 animate-fadeIn">
+                    {/* ADVANCED INSTALLATION SPECS (Apple Widget style for professional layout) */}
+                    <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200 space-y-4">
+                      <span className="text-[10px] font-bold text-zinc-550 block uppercase font-mono tracking-wider">
+                        ⚙️ ข้อมูลการเดินสายและฐานอุปกรณ์ปลายทาง
+                      </span>
+                      
+                      {/* LAN Cable length input with standard 25m cap */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center">
+                          <label className="text-zinc-550 block text-[9px] uppercase font-bold">ระยะสาย LAN เดินท่อเฟล็กซ์ (เมตร)</label>
+                          {selectedPoint.lanCableLength !== undefined && selectedPoint.lanCableLength > 25 && (
+                            <span className="text-[8px] bg-amber-50 text-amber-600 font-bold px-1.5 py-0.5 rounded font-mono shadow-3xs">
+                              เกินมาตรฐาน +{selectedPoint.lanCableLength - 25} เมตร
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            type="number"
+                            min={1}
+                            value={selectedPoint.lanCableLength !== undefined ? selectedPoint.lanCableLength : 25}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value);
+                              handleUpdatePointField(selectedPoint.id, "lanCableLength", isNaN(val) ? 25 : val);
+                            }}
+                            className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                            placeholder="ดีฟอลต์ 25 เมตร"
+                          />
+                          <span className="text-zinc-400 text-xs flex items-center justify-center font-semibold bg-zinc-200/55 px-2.5 rounded-lg border border-zinc-200/40 select-none">ม.</span>
+                        </div>
+                        <span className="block text-[8px] text-zinc-400 leading-normal">
+                          *ระยะเดินสายสัญญาณ LAN ในท่อเฟล็กซ์อ่อนภายนอก ฟรีมาตรฐาน 25 เมตรแรก/ตัว หากเกินจะมีการคำนวณราคาเพิ่มต่อเมตรตามจริง
+                        </span>
+                      </div>
+
+                      {/* Advanced checkboxes list */}
+                      <div className="space-y-2.5 pt-2.5 border-t border-zinc-200/50">
+                        {/* Outdoor cabinet */}
+                        <div className="flex items-start gap-2.5 cursor-pointer">
+                          <input
+                            id="outdoor-cabinet-check"
+                            type="checkbox"
+                            checked={!!selectedPoint.hasOutdoorCabinet}
+                            onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasOutdoorCabinet", e.target.checked)}
+                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                          />
+                          <div className="text-left select-none">
+                            <label htmlFor="outdoor-cabinet-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                              ติดตั้งตู้ Outdoor Cabinet ปลายทาง
+                            </label>
+                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                              ตู้พักอุปกรณ์ภายนอกอาคาร พร้อมพัดลมระบายอากาศ 2 ตัว, รางปลั๊กไฟ และ Circuit Breaker
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Ground rod */}
+                        <div className="flex items-start gap-2.5 cursor-pointer">
+                          <input
+                            id="ground-rod-check"
+                            type="checkbox"
+                            checked={!!selectedPoint.hasGroundRod}
+                            onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasGroundRod", e.target.checked)}
+                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                          />
+                          <div className="text-left select-none">
+                            <label htmlFor="ground-rod-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                              ติดตั้งชุด Ground Rod (ขุดเจาะบ่อกราวด์)
+                            </label>
+                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                              ติดตั้งแท่งทองแดง Ground Rod ป้องกันกระแสไฟฟ้ารั่วและฟ้าผ่าสำหรับจุดติดตั้งเสานอกอาคาร
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Power meter & THW */}
+                        <div className="flex items-start gap-2.5 cursor-pointer">
+                          <input
+                            id="power-meter-check"
+                            type="checkbox"
+                            checked={!!selectedPoint.hasPowerMeter}
+                            onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasPowerMeter", e.target.checked)}
+                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                          />
+                          <div className="text-left select-none">
+                            <label htmlFor="power-meter-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                              ขอติดตั้งมิเตอร์ไฟฟ้า & ลากสาย THW 16 sq.mm. 50 เมตร
+                            </label>
+                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                              ลากสายไฟฟ้าเมน THW IEC 16 sq.mm. ระยะสาย 50 เมตร ปลายทาง พร้อมยื่นคำขอติดตั้งมิเตอร์ไฟหน้างาน
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Switch POE Ruijie */}
+                        <div className="flex items-start gap-2.5 cursor-pointer">
+                          <input
+                            id="poe-switch-check"
+                            type="checkbox"
+                            checked={!!selectedPoint.hasPoeSwitch}
+                            onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasPoeSwitch", e.target.checked)}
+                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                          />
+                          <div className="text-left select-none">
+                            <label htmlFor="poe-switch-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                              ติดตั้ง Switch POE 4 Port Industrial Grade
+                            </label>
+                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                              สวิตช์จ่ายไฟผ่านสายแลนเกรดอุตสาหกรรมในตู้ปลายทาง เพื่อกระจายเน็ตเวิร์ก
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* UPS 800 VA (Outdoor) */}
+                        <div className="flex items-start gap-2.5 cursor-pointer">
+                          <input
+                            id="cabinet-ups-check"
+                            type="checkbox"
+                            checked={!!selectedPoint.hasCabinetUps}
+                            onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasCabinetUps", e.target.checked)}
+                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                          />
+                          <div className="text-left select-none">
+                            <label htmlFor="cabinet-ups-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                              ติดตั้งเครื่องสำรองไฟ UPS 800 VA ปลายทาง
+                            </label>
+                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                              เครื่องสำรองไฟขนาด 800 VA ป้องกันกล้องดับและอุปกรณ์พังเมื่อไฟตก/ดับภายนอกอาคาร
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* SD Card 128G */}
+                        <div className="flex items-start gap-2.5 cursor-pointer">
+                          <input
+                            id="sdcard-check"
+                            type="checkbox"
+                            checked={!!selectedPoint.hasSdCard}
+                            onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasSdCard", e.target.checked)}
+                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                          />
+                          <div className="text-left select-none">
+                            <label htmlFor="sdcard-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                              ติดตั้ง Micro SD Card 128GB ในตัวกล้อง
+                            </label>
+                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                              เมมโมรี่การ์ด 128GB เพื่อบันทึกภาพสำรองในตัวกล้องโดยตรง (Edge Recording)
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <span className="block text-[9px] text-zinc-400 mt-1 leading-relaxed">
-                    *พิมพ์แก้ไขทศนิยมได้โดยตรง แผนที่จะทำการร่อนหน้าจอ (Pan) ไปหาพิกัดใหม่นั้นให้ทันที
-                  </span>
-                </div>
+                )}
 
-                {/* Detailed comments */}
-                <div>
-                  <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
-                    หมายเหตุเพิ่มเติมทัศนอุปสรรค
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={selectedPoint.notes}
-                    onChange={(e) => handleUpdatePointField(selectedPoint.id, "notes", e.target.value)}
-                    className="w-full px-3 py-1.5 border border-zinc-200 bg-zinc-50 rounded-lg text-xs"
-                    placeholder="เช่น ต้องเจาะรูกำแพงคอนกรีตหนา 15 ซม., แสงสะท้อนจ้าช่วงเช้า"
-                  />
-                </div>
+                {activeTab === "location" && (
+                  <div className="space-y-4 animate-fadeIn">
+                    {/* Coordinate Info Box (Interactive Text-inputs with map panning) */}
+                    <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200 space-y-2">
+                      <span className="text-[10px] font-bold text-zinc-555 block uppercase font-mono tracking-wider">
+                        📍 ป้อนพิกัดภูมิศาสตร์เฉพาะจุด (แก้ไขเด้งหาตำแหน่งทันที)
+                      </span>
+                      <div className="grid grid-cols-2 gap-2 text-[10px]">
+                        <div className="space-y-1">
+                          <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Latitude (ละติจูด)</label>
+                          <input
+                            type="text"
+                            value={localLat}
+                            onChange={(e) => handleLatManualChange(e.target.value)}
+                            className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                            placeholder="เช่น 13.6872"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Longitude (ลองจิจูด)</label>
+                          <input
+                            type="text"
+                            value={localLng}
+                            onChange={(e) => handleLngManualChange(e.target.value)}
+                            className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                            placeholder="เช่น 100.6057"
+                          />
+                        </div>
+                      </div>
+                      <span className="block text-[9px] text-zinc-400 mt-1 leading-relaxed">
+                        *พิมพ์แก้ไขทศนิยมได้โดยตรง แผนที่จะทำการร่อนหน้าจอ (Pan) ไปหาพิกัดใหม่นั้นให้ทันที
+                      </span>
+                    </div>
 
-                {/* Photo Attachments - Direct Image Upload Dropzone only */}
-                <div className="space-y-2">
-                  <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
-                    ภาพประกอบจุดสำรวจหน้างานจริง (ภาพจากการอัปโหลดจริงเท่านั้น)
-                  </label>
-                  
-                  {/* Apple Style Direct Upload Container */}
-                  <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-zinc-50 border border-zinc-200 border-dashed hover:border-zinc-350 transition-colors flex flex-col items-center justify-center group">
-                    {selectedPoint.photoUrl ? (
-                      <>
-                        <img 
-                          src={selectedPoint.photoUrl} 
-                          alt="Survey reference" 
-                          className="w-full h-full object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                        {/* Overlay with change button */}
-                        <div className="absolute inset-x-0 bottom-0 bg-zinc-900/70 p-2 flex items-center justify-center z-20">
-                          <label className="px-3 py-1.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors">
-                            อัปโหลดเปลี่ยนรูปถ่ายจุดนี้
+                    {/* Detailed comments */}
+                    <div>
+                      <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
+                        หมายเหตุเพิ่มเติมทัศนอุปสรรค
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={selectedPoint.notes}
+                        onChange={(e) => handleUpdatePointField(selectedPoint.id, "notes", e.target.value)}
+                        className="w-full px-3 py-1.5 border border-zinc-200 bg-zinc-50 rounded-lg text-xs"
+                        placeholder="เช่น ต้องเจาะรูกำแพงคอนกรีตหนา 15 ซม., แสงสะท้อนจ้าช่วงเช้า"
+                      />
+                    </div>
+
+                    {/* Photo Attachments - Direct Image Upload Dropzone only */}
+                    <div className="space-y-2">
+                      <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
+                        ภาพประกอบจุดสำรวจหน้างานจริง (ภาพจากการอัปโหลดจริงเท่านั้น)
+                      </label>
+                      
+                      {/* Apple Style Direct Upload Container */}
+                      <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-zinc-50 border border-zinc-200 border-dashed hover:border-zinc-350 transition-colors flex flex-col items-center justify-center group">
+                        {selectedPoint.photoUrl ? (
+                          <>
+                            <img 
+                              src={selectedPoint.photoUrl} 
+                              alt="Survey reference" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                            {/* Overlay with change button */}
+                            <div className="absolute inset-x-0 bottom-0 bg-zinc-900/70 p-2 flex items-center justify-center z-20">
+                              <label className="px-3 py-1.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors">
+                                อัปโหลดเปลี่ยนรูปถ่ายจุดนี้
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      const reader = new FileReader();
+                                      reader.onload = () => {
+                                        if (typeof reader.result === "string") {
+                                          handleUpdatePointField(selectedPoint.id, "photoUrl", reader.result);
+                                        }
+                                      };
+                                      reader.readAsDataURL(file);
+                                    }
+                                  }}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
+                          </>
+                        ) : (
+                          <label className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-zinc-100/50 transition-colors group/label">
+                            <ImageIcon className="w-8 h-8 text-zinc-400 group-hover/label:text-[#0071e3] transition-colors mb-2" />
+                            <span className="block text-xs font-semibold text-zinc-700">อัปโหลดภาพประกอบหน้างานจริง</span>
+                            <span className="block text-[10px] text-zinc-400 mt-1 leading-relaxed">
+                              คลิกตรงนี้เพื่อเลือกไฟล์รูปภาพจริงเฉพาะจุดติดตั้งนี้
+                            </span>
                             <input
                               type="file"
                               accept="image/*"
@@ -1104,36 +1179,11 @@ export default function Step4SurveyReport({
                               className="hidden"
                             />
                           </label>
-                        </div>
-                      </>
-                    ) : (
-                      <label className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-zinc-100/50 transition-colors group/label">
-                        <ImageIcon className="w-8 h-8 text-zinc-400 group-hover/label:text-[#0071e3] transition-colors mb-2" />
-                        <span className="block text-xs font-semibold text-zinc-700">อัปโหลดภาพประกอบหน้างานจริง</span>
-                        <span className="block text-[10px] text-zinc-400 mt-1 leading-relaxed">
-                          คลิกตรงนี้เพื่อเลือกไฟล์รูปภาพจริงเฉพาะจุดติดตั้งนี้
-                        </span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onload = () => {
-                                if (typeof reader.result === "string") {
-                                  handleUpdatePointField(selectedPoint.id, "photoUrl", reader.result);
-                                }
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                          className="hidden"
-                        />
-                      </label>
-                    )}
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           ) : (
