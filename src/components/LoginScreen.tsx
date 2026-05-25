@@ -312,47 +312,37 @@ export default function LoginScreen({ onAuthSuccess }: LoginScreenProps) {
 
           {/* Toggle Screen Actions */}
           <div className="pt-3 border-t border-zinc-100 flex justify-between items-center text-[10.5px]">
+            <span className="text-zinc-400 font-medium">
+              🔑 ติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์ใช้งาน
+            </span>
+            
             <button
               type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setErrorMsg("");
-                setSuccessMsg("");
+              onClick={async () => {
+                if (!email) {
+                  setErrorMsg("กรุณากรอกที่อยู่อีเมลของคุณด้านบนก่อนค่ะ เพื่อรับลิงก์รีเซ็ตรหัสผ่าน");
+                  return;
+                }
+                try {
+                  setLoading(true);
+                  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+                    redirectTo: window.location.origin
+                  });
+                  if (error) {
+                    setErrorMsg(error.message);
+                  } else {
+                    setSuccessMsg("ส่งลิงก์ตั้งค่ารหัสผ่านใหม่ไปยังอีเมลของคุณเรียบร้อยแล้วค่ะ!");
+                  }
+                } catch (e) {
+                  setErrorMsg("เกิดข้อผิดพลาดในการดำเนินการ");
+                } finally {
+                  setLoading(false);
+                }
               }}
-              className="text-[#0071e3] hover:underline font-bold cursor-pointer"
+              className="text-zinc-500 hover:text-zinc-800 cursor-pointer font-semibold"
             >
-              {isSignUp ? "← กลับไปเข้าสู่ระบบ" : "สมัครสมาชิกใหม่ที่นี่"}
+              ลืมรหัสผ่าน?
             </button>
-            
-            {!isSignUp && (
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!email) {
-                    setErrorMsg("กรุณากรอกที่อยู่อีเมลของคุณด้านบนก่อนค่ะ เพื่อรับลิงก์รีเซ็ตรหัสผ่าน");
-                    return;
-                  }
-                  try {
-                    setLoading(true);
-                    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-                      redirectTo: window.location.origin
-                    });
-                    if (error) {
-                      setErrorMsg(error.message);
-                    } else {
-                      setSuccessMsg("ส่งลิงก์ตั้งค่ารหัสผ่านใหม่ไปยังอีเมลของคุณเรียบร้อยแล้วค่ะ!");
-                    }
-                  } catch (e) {
-                    setErrorMsg("เกิดข้อผิดพลาดในการดำเนินการ");
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
-                className="text-zinc-500 hover:text-zinc-800 cursor-pointer"
-              >
-                ลืมรหัสผ่าน?
-              </button>
-            )}
           </div>
         </div>
 
