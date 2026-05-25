@@ -248,10 +248,10 @@ export default function UserManagement() {
           ➕ เพิ่มบัญชีผู้ใช้งานระบบรายใหม่ (Password-less Account)
         </h5>
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           {/* Email Input */}
-          <div className="space-y-1">
-            <label className="block text-[9px] font-bold text-zinc-500 uppercase">อีเมลผู้ใช้ (Email)</label>
+          <div className="space-y-1 md:col-span-3">
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">อีเมลผู้ใช้ (Email)</label>
             <input
               type="email"
               required
@@ -263,7 +263,7 @@ export default function UserManagement() {
           </div>
 
           {/* Name Input */}
-          <div className="space-y-1">
+          <div className="space-y-1 md:col-span-3">
             <label className="block text-[9px] font-bold text-zinc-550 uppercase">ชื่อ-นามสกุลจริง</label>
             <input
               type="text"
@@ -276,7 +276,7 @@ export default function UserManagement() {
           </div>
 
           {/* Role Select */}
-          <div className="space-y-1">
+          <div className="space-y-1 md:col-span-2">
             <label className="block text-[9px] font-bold text-zinc-550 uppercase">ระดับสิทธิ์ (Role)</label>
             <select
               value={newRole}
@@ -291,7 +291,7 @@ export default function UserManagement() {
           </div>
 
           {/* Group/Department Input */}
-          <div className="space-y-1 flex flex-col justify-between">
+          <div className="space-y-1 md:col-span-4">
             <label className="block text-[9px] font-bold text-zinc-550 uppercase">กลุ่ม / ส่วนงานประจำการ</label>
             <div className="flex gap-2 items-center">
               <input
