@@ -548,6 +548,134 @@ export default function App() {
     }
   }, [step, cameraPoints.length]);
 
+  const handleAutofillFullTemplate = (type: "factory" | "home" | "office" | "subdistrict") => {
+    if (type === "subdistrict") {
+      const info: CustomerInfo = {
+        customerName: "องค์การบริหารส่วนตำบลหนองนาคำ (อบต.หนองนาคำ)",
+        projectName: "โครงการติดตั้งระบบกล้องวงจรปิดเฝ้าระวังภัยจุดเสี่ยงทางร่วมทางแยกและชุมชน",
+        contactPerson: "นายสมเกียรติ พรหมดี (ปลัด อบต.)",
+        contactPhone: "042-219-876",
+        address: "155 หมู่ 2 ตำบลหนองนาคำ อำเภอเมืองอุดรธานี จังหวัดอุดรธานี 41000",
+        latitude: "17.398642",
+        longitude: "102.859345",
+        surveyorName: "วิศวกรระบบสำรวจ NT",
+        surveyDate: new Date().toISOString().split("T")[0],
+        province: "อุดรธานี",
+        surveyorPhone: "081-234-5678",
+        surveyorDepartment: "ส่วนบริการลูกค้าจังหวัดอุดรธานี (NT)",
+      };
+      
+      const points: CameraPoint[] = [
+        {
+          id: "pt-1",
+          name: "สี่แยกทางเข้า อบต. (จุดตรวจร่วม)",
+          type: "Bullet",
+          poleType: "เสา 6 เมตร",
+          hasSupportArm: true,
+          notes: "ติดตั้งบนเสาเหล็กกลม 6 เมตร บริเวณมุมสามแยกเพื่อส่องทางตรงและฝั่ง อบต. พร้อมกล่องเหล็กกันน้ำภายนอก",
+          x: 30,
+          y: 40,
+          focalAngle: 90,
+          rotation: 45,
+          lat: 17.3988,
+          lng: 102.8595,
+          lanCableLength: 120,
+          hasOutdoorCabinet: true,
+          hasGroundRod: true,
+          hasPowerMeter: true,
+          hasSdCard: true,
+          hasCabinetUps: true,
+          hasPoeSwitch: true,
+          selectedSet: "Set 2",
+        },
+        {
+          id: "pt-2",
+          name: "สามแยกหน้า รร.บ้านหนองนาคำ (จุดตรวจและทางเข้าชุมชน)",
+          type: "Bullet",
+          poleType: "เสา 6 เมตร",
+          hasSupportArm: true,
+          notes: "จุดทางแยกหลักหน้ารูปปั้นหลวงพ่อ บริเวณหน้าโรงเรียน ส่องได้ 3 ทิศทาง ซ้อนชุดกล้อง",
+          x: 70,
+          y: 35,
+          focalAngle: 120,
+          rotation: 135,
+          lat: 17.3992,
+          lng: 102.8598,
+          lanCableLength: 80,
+          hasOutdoorCabinet: true,
+          hasGroundRod: true,
+          hasPowerMeter: true,
+          hasSdCard: true,
+          hasCabinetUps: true,
+          hasPoeSwitch: true,
+          selectedSet: "Set 3",
+        },
+        {
+          id: "pt-3",
+          name: "ทางเข้าหมู่บ้านหนองนาคำ หมู่ 2",
+          type: "PTZ",
+          poleType: "เสา 6 เมตร",
+          hasSupportArm: true,
+          notes: "กล้อง PTZ ตรวจสอบป้ายทะเบียนรถเข้า-ออกชุมชน ปรับหมุนซูมระยะไกล",
+          x: 45,
+          y: 65,
+          focalAngle: 60,
+          rotation: 220,
+          lat: 17.3975,
+          lng: 102.8588,
+          lanCableLength: 150,
+          hasOutdoorCabinet: true,
+          hasGroundRod: true,
+          hasPowerMeter: true,
+          hasSdCard: true,
+          hasCabinetUps: true,
+          hasPoeSwitch: true,
+          selectedSet: "Set 1",
+        },
+        {
+          id: "pt-4",
+          name: "จุดกลับรถถนนมิตรภาพ-หนองนาคำ",
+          type: "Bullet",
+          poleType: "เสา 4 เมตร",
+          hasSupportArm: true,
+          notes: "ติดตั้งฝั่งเลนเข้าเมืองเพื่อดูรถผ่านไปมา ติดบนเสา 4 เมตร",
+          x: 20,
+          y: 75,
+          focalAngle: 90,
+          rotation: 315,
+          lat: 17.3965,
+          lng: 102.8575,
+          lanCableLength: 90,
+          hasOutdoorCabinet: true,
+          hasGroundRod: true,
+          hasPowerMeter: true,
+          hasSdCard: true,
+          hasCabinetUps: true,
+          hasPoeSwitch: true,
+          selectedSet: "Set 2",
+        },
+      ];
+
+      const req: TechRequirements = {
+        cameraCount: 8,
+        cameraBrand: "Hikvision",
+        nvrBrand: "ยี่ห้อเดียวกับกล้อง (แนะนำ)",
+        nvrChannels: 8,
+        storagePackage: "HDD 8TB (มาตรฐานราชการ 8CH)",
+        otherRequirements: "ต้องการระบบเช่า 3 ปี รวมบริการบำรุงรักษาหลังการขายแบบ On-site Service 24 ชั่วโมง",
+      };
+
+      setCustomerInfo(info);
+      setCameraPoints(points);
+      setRequirements(req);
+      
+      const regenerated = generatePricingItems(req, true, points);
+      setPricingItems(regenerated);
+      setDiscount(0);
+      setVatRate(7);
+    }
+  };
+
   // Load project Survey into main workflow inputs
   const loadProject = (proj: ProjectSurvey) => {
     setActiveProjectId(proj.id);
@@ -998,6 +1126,7 @@ export default function App() {
                     data={customerInfo}
                     onChange={setCustomerInfo}
                     onNext={handleNextStep}
+                    onAutofillFullTemplate={handleAutofillFullTemplate}
                   />
                 )}
                 

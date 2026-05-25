@@ -59,8 +59,12 @@ export default function Step6Pricing({
   const calSubtotal = pricingItems.reduce((acc, curr) => acc + (curr.quantity * curr.unitPrice), 0);
   const calDiscountAmount = discount;
   const calBeforeVat = Math.max(0, calSubtotal - calDiscountAmount);
-  const calVatAmount = isVatEnabled ? parseFloat((calBeforeVat * (vatRate / 100)).toFixed(2)) : 0;
-  const calGrandTotal = calBeforeVat + calVatAmount;
+
+  // 3-Year Leased/Rental System calculations (กำไร +40%, ดอกเบี้ย 8% ต่อปี แฟลตเรต 3 ปี)
+  const leasePrincipal = calBeforeVat * 1.40;
+  const leaseInterest = leasePrincipal * 0.08 * 3;
+  const leaseTotalAmount = leasePrincipal + leaseInterest;
+  const leaseMonthlyPayment = leaseTotalAmount / 36;
 
   // Calculate Monthly Recurring Costs (OPEX)
   const pointsList = cameraPoints || [];
@@ -105,6 +109,11 @@ export default function Step6Pricing({
   ].find(t => t.speed >= speed) || { speed: 500, price: 3180 };
 
   const totalMonthlyPrice = totalFieldLinksPrice + centerTier.price;
+
+  // Grand Monthly calculations
+  const grandMonthlyBeforeVat = leaseMonthlyPayment + totalMonthlyPrice;
+  const calVatAmount = isVatEnabled ? parseFloat((grandMonthlyBeforeVat * (vatRate / 100)).toFixed(2)) : 0;
+  const grandMonthlyTotal = grandMonthlyBeforeVat + calVatAmount;
 
   // Edit Unit Price or Quantity
   const handleItemValueChange = (id: string, field: "unitPrice" | "quantity", valStr: string) => {
@@ -321,11 +330,18 @@ export default function Step6Pricing({
   </table>
 
   <div class="summary-wrap">
-    <div class="summary">
-      <div class="summary-row"><span>ราคารวมสุทธิ์ (CAPEX)</span><span>฿${calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-      ${discount > 0 ? `<div class="summary-row"><span>ส่วนลด</span><span style="color:#dc2626">-฿${discount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>` : ""}
-      ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม ${vatRate}%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>` : ""}
-      <div class="summary-row total"><span>รวมทั้งสิ้น</span><span>฿${calGrandTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+    <div class="summary" style="width: 380px;">
+      <div class="summary-row"><span>มูลค่าอุปกรณ์และบริการ (BOM Cost)</span><span>฿${calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+      ${discount > 0 ? `<div class="summary-row"><span>ส่วนลดพิเศษโครงการ</span><span style="color:#dc2626">-฿${discount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>` : ""}
+      <div class="summary-row"><span>ยอดจัดเช่าอุปกรณ์ต้นทุนสุทธิ์</span><span>฿${calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+      <div class="summary-row"><span>บวก กำไรโครงการ (+40%)</span><span>฿${(calBeforeVat * 0.4).toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+      <div class="summary-row"><span>บวก ดอกเบี้ยจัดเช่า 8% ต่อปี (3 ปี)</span><span>฿${leaseInterest.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+      <div class="summary-row"><span>รวมมูลค่าระบบจัดเช่าอุปกรณ์ (3 ปี)</span><span>฿${leaseTotalAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+      <div class="summary-row" style="font-weight: 700; color: #0071e3;"><span>ค่าเช่าระบบอุปกรณ์ต่อเดือน (36 งวด)</span><span>฿${leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
+      <div class="summary-row"><span>ค่าเช่าวงจรเครือข่ายรายเดือน (NT Links)</span><span>฿${totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
+      <div class="summary-row" style="border-top: 1px dashed #ccc; font-weight: 700;"><span>ค่าบริการรายเดือนสุทธิ์ (ก่อนภาษี)</span><span>฿${grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
+      ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม ${vatRate}%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>` : ""}
+      <div class="summary-row total"><span>ค่าเช่ารวมรายเดือนทั้งสิ้น</span><span>฿${grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
     </div>
   </div>
 
@@ -595,13 +611,13 @@ export default function Step6Pricing({
           <div className="w-full md:max-w-md shrink-0 space-y-4">
           <div className="bg-zinc-50 border border-zinc-200 rounded-3xl p-6 shadow-2xs space-y-5 select-none">
             <h4 className="text-[10px] font-bold text-zinc-500 font-mono uppercase tracking-wider">
-              PRICING PREVIEW / สรุปงบระบบ
+              PRICING PREVIEW / สรุปงบระบบ (เช่า 3 ปี)
             </h4>
 
             {/* Price values summary stack */}
             <div className="space-y-4 text-xs text-zinc-700 font-sans border-b border-zinc-200 pb-5">
               <div className="flex justify-between items-center text-zinc-650 font-medium">
-                <span>ราคารวมผลิตภัณฑ์ (Subtotal):</span>
+                <span>มูลค่าอุปกรณ์และบริการ (Subtotal):</span>
                 <span className="font-mono font-bold text-sm text-zinc-900">
                   ฿{calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                 </span>
@@ -622,9 +638,30 @@ export default function Step6Pricing({
               </div>
 
               <div className="flex justify-between items-center text-zinc-550">
-                <span>ยอดเงินหลังหักส่วนลด:</span>
+                <span>ยอดจัดเช่าอุปกรณ์ต้นทุนสุทธิ์:</span>
                 <span className="font-mono font-bold text-zinc-800">
                   ฿{calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center text-zinc-500 border-t border-zinc-200/50 pt-2">
+                <span>บวก กำไรโครงการ (+40%):</span>
+                <span className="font-mono font-semibold text-zinc-750">
+                  ฿{(calBeforeVat * 0.4).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center text-zinc-500">
+                <span>บวก ดอกเบี้ยจัดเช่า 8%/ปี (3 ปี = 24%):</span>
+                <span className="font-mono font-semibold text-zinc-750">
+                  ฿{leaseInterest.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center text-zinc-800 font-bold border-t border-zinc-200/50 pt-2">
+                <span>รวมมูลค่าระบบจัดเช่าอุปกรณ์:</span>
+                <span className="font-mono text-zinc-900">
+                  ฿{leaseTotalAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
@@ -647,9 +684,9 @@ export default function Step6Pricing({
                 </div>
                 {isVatEnabled && (
                   <div className="flex justify-between items-center border-t border-zinc-200/50 pt-1.5 mt-1.5">
-                    <span className="text-[10px] text-zinc-500">มูลค่าภาษี VAT:</span>
+                    <span className="text-[10px] text-zinc-500">มูลค่าภาษี VAT รายเดือน:</span>
                     <span className="font-mono text-zinc-700 font-semibold">
-                      ฿{calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                      ฿{calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.
                     </span>
                   </div>
                 )}
@@ -660,21 +697,31 @@ export default function Step6Pricing({
             <div className="space-y-3 border-t border-zinc-200/60 pt-3">
               <div className="space-y-1">
                 <span className="text-zinc-550 text-[9px] uppercase font-bold font-mono tracking-wider block">
-                  งบลงทุนอุปกรณ์ & ติดตั้งครั้งเดียว (CAPEX GRAND TOTAL)
+                  ค่าเช่าระบบอุปกรณ์ต่อเดือน (36 งวด)
                 </span>
-                <div className="text-2xl font-black font-mono text-zinc-900 flex items-baseline justify-between">
+                <div className="text-xl font-bold font-mono text-zinc-900 flex items-baseline justify-between">
                   <span>฿</span>
-                  <span className="text-[#0071e3]">{calGrandTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span>
+                  <span className="text-[#0071e3]">{leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2 })}<span className="text-xs text-zinc-500 font-sans font-normal">/ด.</span></span>
                 </div>
               </div>
 
               <div className="space-y-1 pt-3 border-t border-zinc-200/40">
                 <span className="text-zinc-550 text-[9px] uppercase font-bold font-mono tracking-wider block">
-                  ประมาณการค่าวงจรเช่ารายเดือน (OPEX NT LEASED LINE)
+                  ค่าเช่าวงจรเครือข่ายรายเดือน (NT LINKS OPEX)
                 </span>
                 <div className="text-xl font-bold font-mono text-zinc-900 flex items-baseline justify-between">
                   <span>฿</span>
                   <span className="text-[#0071e3]">{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}<span className="text-xs text-zinc-500 font-sans font-normal">/ด.</span></span>
+                </div>
+              </div>
+
+              <div className="space-y-1 pt-3 border-t-2 border-dashed border-zinc-250">
+                <span className="text-[#0071e3] text-[9.5px] uppercase font-bold font-mono tracking-wider block">
+                  ค่าเช่ารวมรายเดือนทั้งสิ้น (GRAND TOTAL MONTHLY)
+                </span>
+                <div className="text-2xl font-black font-mono text-zinc-900 flex items-baseline justify-between">
+                  <span>฿</span>
+                  <span className="text-[#0071e3]">{grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}<span className="text-xs text-zinc-500 font-sans font-normal">/ด.</span></span>
                 </div>
               </div>
             </div>
