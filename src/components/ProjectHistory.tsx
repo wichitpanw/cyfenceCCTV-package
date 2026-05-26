@@ -1,6 +1,54 @@
 import React, { useState } from "react";
 import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle } from "lucide-react";
-import { ProjectSurvey } from "../types";
+import { ProjectSurvey, CameraPoint } from "../types";
+
+// ฟังก์ชันคำนวณค่าใช้จ่ายรายเดือนที่ลูกค้าต้องจ่าย (เหมือนกับ Step6Pricing)
+function calcMonthlyTotal(proj: ProjectSurvey): number {
+  const subtotal = proj.pricingItems.reduce((acc, curr) => acc + curr.quantity * curr.unitPrice, 0);
+  const beforeVat = Math.max(0, subtotal - proj.discount);
+
+  // ค่าผ่อนอุปกรณ์ 3 ปี (กำไร 40% + ดอกเบี้ยแฟลต 8%/ปี)
+  const leasePrincipal = beforeVat * 1.4;
+  const leaseInterest = leasePrincipal * 0.08 * 3;
+  const leaseMonthlyPayment = (leasePrincipal + leaseInterest) / 36;
+
+  // ค่าเช่าวงจร NT Links รายเดือน
+  const pointsList: CameraPoint[] = proj.cameraPoints || [];
+  const totalFieldLinksPrice = pointsList.reduce((sum, pt) => {
+    let cams = 1;
+    if (pt.selectedSet === "Set 2") cams = 2;
+    else if (pt.selectedSet === "Set 3") cams = 3;
+    else if (pt.selectedSet === "Set 4") cams = 4;
+    const speed = cams * 5;
+    const tier = [
+      { speed: 10, price: 640 }, { speed: 20, price: 720 },
+      { speed: 30, price: 770 }, { speed: 50, price: 860 },
+      { speed: 100, price: 1150 },
+    ].find(t => t.speed >= speed) || { price: 640 };
+    return sum + tier.price;
+  }, 0);
+
+  const totalCams = pointsList.reduce((sum, pt) => {
+    if (pt.selectedSet === "Set 2") return sum + 2;
+    if (pt.selectedSet === "Set 3") return sum + 3;
+    if (pt.selectedSet === "Set 4") return sum + 4;
+    return sum + 1;
+  }, 0);
+  const speed = (totalCams > 0 ? totalCams : 1) * 5;
+  const centerTier = [
+    { speed: 10, price: 640 }, { speed: 20, price: 720 },
+    { speed: 30, price: 770 }, { speed: 50, price: 860 },
+    { speed: 100, price: 1150 }, { speed: 150, price: 1440 },
+    { speed: 200, price: 1730 }, { speed: 300, price: 2310 },
+    { speed: 400, price: 2750 }, { speed: 500, price: 3180 },
+  ].find(t => t.speed >= speed) || { price: 3180 };
+
+  const totalMonthlyPrice = totalFieldLinksPrice + centerTier.price;
+  const grandMonthlyBeforeVat = leaseMonthlyPayment + totalMonthlyPrice;
+  const vatAmount = proj.vatRate > 0 ? grandMonthlyBeforeVat * (proj.vatRate / 100) : 0;
+  return grandMonthlyBeforeVat + vatAmount;
+}
+
 
 interface ProjectHistoryProps {
   projects: ProjectSurvey[];
@@ -146,6 +194,7 @@ export default function ProjectHistory({
                 (acc, curr) => acc + curr.quantity * curr.unitPrice,
                 0
               );
+              const monthlyTotal = calcMonthlyTotal(proj);
 
               return (
                 <div
@@ -211,13 +260,26 @@ export default function ProjectHistory({
                         </span>
                       )}
                     </span>
-                    {/* แสดงราคาสรุปเฉพาะ superadmin และ admin เท่านั้น */}
+                    {/* แสดงราคาต้นทุนเฉพาะ superadmin และ admin เท่านั้น */}
                     {canSeeCost && (
                       <strong className="text-zinc-900 text-xs font-semibold">
                         ฿{subtotal.toLocaleString("th-TH")}
                       </strong>
                     )}
                   </div>
+
+                  {/* ราคารายเดือนที่ลูกค้าต้องจ่าย — แสดงให้ทุก role เห็น */}
+                  {monthlyTotal > 0 && (
+                    <div className="mt-2 flex items-center justify-between rounded-lg bg-[#0071e3]/5 border border-[#0071e3]/15 px-2.5 py-1.5">
+                      <span className="text-[9px] text-[#0071e3]/70 font-medium">
+                        💳 ลูกค้าจ่ายต่อเดือน
+                      </span>
+                      <strong className="text-[#0071e3] text-[11px] font-bold font-mono">
+                        ฿{monthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        <span className="text-[8px] font-normal text-[#0071e3]/60">/ด.</span>
+                      </strong>
+                    </div>
+                  )}
                 </div>
               );
             })
