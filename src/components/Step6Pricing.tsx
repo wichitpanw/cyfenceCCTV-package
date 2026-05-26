@@ -237,6 +237,8 @@ export default function Step6Pricing({
 <head>
   <meta charset="UTF-8">
   <title>เอกสารสำรวจกล้อง - ${customerInfo?.customerName || customerName}</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -270,7 +272,7 @@ export default function Step6Pricing({
     td.name { text-align: left; }
     td.bold { font-weight: 600; }
 
-    .summary-wrap { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+    .summary-wrap { display: flex; justify-content: flex-end; margin-bottom: 16px; page-break-inside: avoid; break-inside: avoid; }
     .summary { width: 380px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
     .summary-row { display: flex; justify-content: space-between; padding: 7px 12px; font-size: 10pt; }
     .summary-row:nth-child(odd) { background: #f8f9fc; }
@@ -334,7 +336,14 @@ export default function Step6Pricing({
     </div>
   </div>
 
-  <div class="remark-box">
+  ${cameraPoints.length > 0 ? `
+  <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 14px; margin-bottom: 14px;">
+    <div style="font-size: 10pt; font-weight: 700; color: #0071e3; margin-bottom: 6px;">🗺️ แผนผังพิกัดและจุดติดตั้งกล้องจริงโครงการ</div>
+    <div id="print-map" style="width: 100%; height: 320px; border-radius: 8px; border: 1px solid #ddd; background: #fafafa;"></div>
+  </div>
+  ` : ""}
+
+  <div class="remark-box" style="page-break-inside: avoid; break-inside: avoid;">
     <div class="remark-title">⚠️ หมายเหตุ / ข้อตกลงเบื้องต้น</div>
     <div class="remark-text">
       • เอกสารฉบับนี้เป็นการประมาณการเบื้องต้น ราคาอาจเปลี่ยนแปลงได้ตามสภาพหน้างานจริงและไม่รวมค่าเดินทางและค่าดำเนินการอื่นๆ<br/>
@@ -344,7 +353,106 @@ export default function Step6Pricing({
   </div>
 
   <div class="footer">สร้างโดย: NT Cyfence CCTV Survey System | ${today}</div>
-<script>window.onload = () => window.print();</script>
+
+<script>
+  window.onload = () => {
+    try {
+      const mapEl = document.getElementById('print-map');
+      if (mapEl) {
+        const map = L.map('print-map', { zoomControl: false, attributionControl: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        const centerLat = ${centerLat};
+        const centerLng = ${centerLng};
+        
+        // Control Center icon
+        const controlIcon = L.divIcon({
+          html: \`
+            <div style="
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background-color: #0071e3;
+              border: 2.5px solid white;
+              box-shadow: 0 2px 6px rgba(0, 113, 227, 0.4);
+              box-sizing: border-box;
+            ">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+          \`,
+          className: "",
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+        L.marker([centerLat, centerLng], { icon: controlIcon }).addTo(map);
+        
+        const points = ${JSON.stringify(cameraPoints.map(p => ({ lat: p.lat ?? centerLat, lng: p.lng ?? centerLng, type: p.type, name: p.name, count: p.selectedSet === "Set 1" ? 1 : p.selectedSet === "Set 2" ? 2 : p.selectedSet === "Set 3" ? 3 : p.selectedSet === "Set 4" ? 4 : 1 })))};
+        const bounds = L.latLngBounds([centerLat, centerLng]);
+        
+        points.forEach((pt, idx) => {
+          const colorHex = pt.type === "Dome" ? "#0071e3" : pt.type === "PTZ" ? "#bf5af2" : "#30d158";
+          const camIcon = L.divIcon({
+            html: \`
+              <div style="
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: white;
+                border: 2px solid \${colorHex};
+                box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                box-sizing: border-box;
+                position: relative;
+              ">
+                <span style="
+                  position: absolute;
+                  top: -5px;
+                  right: -5px;
+                  background-color: #1c1c1e;
+                  color: white;
+                  font-size: 6px;
+                  font-weight: 700;
+                  width: 10px;
+                  height: 10px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border: 0.5px solid white;
+                ">\${idx + 1}</span>
+                <span style="font-size: 8px; font-weight: 850; color: \${colorHex}">\${pt.count}</span>
+              </div>
+            \`,
+            className: "",
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+          });
+          L.marker([pt.lat, pt.lng], { icon: camIcon }).addTo(map);
+          bounds.extend([pt.lat, pt.lng]);
+        });
+        
+        map.fitBounds(bounds, { padding: [30, 30] });
+      }
+      
+      // Delay printing slightly to let the tiles load!
+      setTimeout(() => {
+        window.print();
+      }, 1000);
+    } catch(err) {
+      console.error(err);
+      window.print();
+    }
+  };
+</script>
 </body></html>`;
 
       printWin.document.open();
