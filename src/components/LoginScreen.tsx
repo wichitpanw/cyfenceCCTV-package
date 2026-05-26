@@ -362,39 +362,10 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             </button>
           </form>
 
-          {/* Toggle Screen Actions */}
-          <div className="pt-3 border-t border-zinc-100 flex justify-between items-center text-[10.5px]">
-            <span className="text-zinc-400 font-medium">
-              🔑 ติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์ใช้งาน
-            </span>
-            
-            <button
-              type="button"
-              onClick={async () => {
-                if (!email) {
-                  setErrorMsg("กรุณากรอกที่อยู่อีเมลของคุณด้านบนก่อนค่ะ เพื่อรับลิงก์รีเซ็ตรหัสผ่าน");
-                  return;
-                }
-                try {
-                  setLoading(true);
-                  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-                    redirectTo: window.location.origin
-                  });
-                  if (error) {
-                    setErrorMsg(error.message);
-                  } else {
-                    setSuccessMsg("ส่งลิงก์ตั้งค่ารหัสผ่านใหม่ไปยังอีเมลของคุณเรียบร้อยแล้วค่ะ!");
-                  }
-                } catch (e) {
-                  setErrorMsg("เกิดข้อผิดพลาดในการดำเนินการ");
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              className="text-zinc-500 hover:text-zinc-800 cursor-pointer font-semibold"
-            >
-              ลืมรหัสผ่าน?
-            </button>
+          {/* Support/Admin Contact Notice */}
+          <div className="pt-3 border-t border-zinc-100 text-center text-[10.5px] text-zinc-500 leading-relaxed">
+            🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน <br />
+            กรุณาติดต่อแอดมิน (คุณบีม) โทร. <a href="tel:095-662-5871" className="font-bold text-[#0071e3] hover:underline">095-662-5871</a>
           </div>
         </div>
 
