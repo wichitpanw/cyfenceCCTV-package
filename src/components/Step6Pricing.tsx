@@ -246,7 +246,7 @@ export default function Step6Pricing({
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     @page { size: A4; margin: 16mm 14mm; }
     body { font-family: 'Noto Sans Thai', 'TH Sarabun New', sans-serif; font-size: 11pt; color: #111; background: #fff; }
 
