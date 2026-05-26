@@ -705,16 +705,8 @@ export default function App() {
       }
     }
 
-    // LocalStorage Fallback (if Supabase not configured or failed)
-    const localData = localStorage.getItem("cctv_surveys_data");
-    if (localData) {
-      try {
-        const parsed = JSON.parse(localData) as ProjectSurvey[];
-        setProjectsList(parsed);
-      } catch (err) {
-        console.error("Failed to parse existing local survey history:", err);
-      }
-    }
+    // เคลียร์ประวัติใน LocalStorage ทิ้งตามความต้องการของคุณบีม เนื่องจากใช้งาน Cloud + RLS สมบูรณ์แล้ว
+    localStorage.removeItem("cctv_surveys_data");
   };
 
   useEffect(() => {
@@ -1071,8 +1063,8 @@ export default function App() {
       }
     }
 
-    // Always back up to LocalStorage (offline-first!)
-    localStorage.setItem("cctv_surveys_data", JSON.stringify(updatedList));
+    // เคลียร์ประวัติใน LocalStorage ทิ้งตามความต้องการของคุณบีม
+    localStorage.removeItem("cctv_surveys_data");
     showAlert("✅ บันทึกสำเร็จ", "บันทึกโครงการ เรียบร้อยแล้วค่ะ ✨");
   };
 
@@ -1105,7 +1097,7 @@ export default function App() {
         }
 
         // Update LocalStorage
-        localStorage.setItem("cctv_surveys_data", JSON.stringify(updated));
+        localStorage.removeItem("cctv_surveys_data");
         if (activeProjectId === id) {
           handleNewProject();
         }
