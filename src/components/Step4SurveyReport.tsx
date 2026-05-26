@@ -589,7 +589,7 @@ export default function Step4SurveyReport({
             <div 
               className={isMapExpanded 
                 ? "fixed inset-4 z-[9999] bg-white p-4 rounded-2xl border border-zinc-200 shadow-2xl flex flex-col gap-4 select-none" 
-                : "relative w-full h-[550px] md:h-[750px] rounded-xl overflow-hidden border border-zinc-200 shadow-inner group select-none z-10"
+                : "relative w-full h-[550px] md:h-[750px] rounded-xl overflow-hidden border border-zinc-200 shadow-inner group select-none z-10 flex flex-col"
               }
             >
               {isMapExpanded && (

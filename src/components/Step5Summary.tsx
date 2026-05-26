@@ -8,7 +8,9 @@ import {
   ClipboardList, 
   Layers, 
   ShieldAlert,
-  HardDrive
+  HardDrive,
+  Maximize2,
+  Minimize2
 } from "lucide-react";
 import { CustomerInfo, TechRequirements, CameraPoint, PricingItem } from "../types";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
@@ -61,6 +63,7 @@ export default function Step5Summary({
   const [selectedSummaryPointId, setSelectedSummaryPointId] = useState<string | null>(
     cameraPoints.length > 0 ? cameraPoints[0].id : null
   );
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
 
   // Compute map center from customer info
   const defaultLat = customerInfo.latitude ? parseFloat(customerInfo.latitude) : 13.7563;
@@ -369,11 +372,21 @@ export default function Step5Summary({
           <div className="flex justify-between items-center">
             <div>
               <h4 className="text-xs font-bold text-zinc-800 uppercase tracking-wider flex items-center gap-1.5 font-sans">
-                <Layers className="w-3.5 h-3.5 text-zinc-550" />
+                <Layers className="w-3.5 h-3.5 text-zinc-555" />
                 ผังจำลองจัดชุดตำแหน่งพิกัดกล้องวงจรปิดบนแผนที่จริง
               </h4>
               <p className="text-[11px] text-zinc-400">ตำแหน่งปักจุดระวางเสาจริงตามพิกัดแผนที่ละติจูด/ลองจิจูด</p>
             </div>
+            {!isMapExpanded && (
+              <button
+                type="button"
+                onClick={() => setIsMapExpanded(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-855 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>ขยายแผนที่</span>
+              </button>
+            )}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -405,60 +418,89 @@ export default function Step5Summary({
             </div>
 
             {/* Map preview - dragging and doubleClickZoom enabled for rich interactive exploration */}
-            <div className="md:col-span-3 aspect-video rounded-xl border border-zinc-200 relative overflow-hidden z-10" style={{ minHeight: "300px" }}>
-              <MapContainer 
-                center={[centerLat, centerLng]} 
-                zoom={17} 
-                dragging={true}
-                zoomControl={false}
-                scrollWheelZoom={true}
-                doubleClickZoom={true}
-                touchZoom={true}
-                style={{ width: "100%", height: "100%" }}
-                className="z-10"
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                
-                {/* Center controller pans automatically to selected camera */}
-                <MapCenterController lat={panLat} lng={panLng} />
+            <div 
+              className={isMapExpanded 
+                ? "fixed inset-4 z-[9999] bg-white p-4 rounded-2xl border border-zinc-200 shadow-2xl flex flex-col gap-4 select-none" 
+                : "md:col-span-3 aspect-video rounded-xl border border-zinc-200 relative overflow-hidden z-10 flex flex-col"
+              }
+              style={isMapExpanded ? undefined : { minHeight: "300px" }}
+            >
+              {isMapExpanded && (
+                <div className="flex items-center justify-between bg-zinc-50 border border-zinc-200 p-3 rounded-xl">
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-800 uppercase tracking-wider flex items-center gap-1.5 font-sans">
+                      <Layers className="w-3.5 h-3.5 text-zinc-555" />
+                      ผังจำลองจัดชุดตำแหน่งพิกัดกล้องวงจรปิดบนแผนที่จริง (โหมดขยายใหญ่)
+                    </h4>
+                    <p className="text-[11px] text-zinc-500">ตำแหน่งปักจุดระวางเสาจริงตามพิกัดแผนที่ละติจูด/ลองจิจูด</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsMapExpanded(false)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-850 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
+                  >
+                    <Minimize2 className="w-3.5 h-3.5" />
+                    <span>ย่อขนาด</span>
+                  </button>
+                </div>
+              )}
 
-                {/* Control Center (Monitor Site) */}
-                <Marker
-                  position={[centerLat, centerLng]}
-                  icon={createControlCenterIcon()}
-                />
-
-                {/* Markers */}
-                {cameraPoints.map((pt, idx) => {
-                  const ptLat = pt.lat !== undefined ? pt.lat : centerLat;
-                  const ptLng = pt.lng !== undefined ? pt.lng : centerLng;
-                  const isSelected = pt.id === selectedSummaryPointId;
-                  const camCount = pt.selectedSet === "Set 1" ? 1
-                                 : pt.selectedSet === "Set 2" ? 2
-                                 : pt.selectedSet === "Set 3" ? 3
-                                 : pt.selectedSet === "Set 4" ? 4
-                                 : 1;
+              <div className="flex-1 w-full relative min-h-0 rounded-xl overflow-hidden border border-zinc-200">
+                <MapContainer 
+                  key={isMapExpanded ? 'summary-expanded' : 'summary-normal'}
+                  center={[centerLat, centerLng]} 
+                  zoom={17} 
+                  dragging={true}
+                  zoomControl={false}
+                  scrollWheelZoom={true}
+                  doubleClickZoom={true}
+                  touchZoom={true}
+                  style={{ width: "100%", height: "100%" }}
+                  className="z-10"
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
                   
-                  return (
-                    <Marker
-                      key={pt.id}
-                      position={[ptLat, ptLng]}
-                      icon={createMiniCameraIcon(pt.type, idx + 1, isSelected, camCount)}
-                      eventHandlers={{
-                        click: () => {
-                          setSelectedSummaryPointId(pt.id);
-                        }
-                      }}
-                    />
-                  );
-                })}
-              </MapContainer>
+                  {/* Center controller pans automatically to selected camera */}
+                  <MapCenterController lat={panLat} lng={panLng} />
 
-              <div className="absolute top-2 right-2 bg-zinc-900/90 backdrop-blur-md rounded-lg border border-zinc-800 text-[9px] font-mono px-2 py-1 text-white uppercase tracking-wider z-[400] shadow-sm">
-                🗺️ ผังพิกัดแผนที่ (คลิกเลือกกล้องเพื่อเคลื่อนย้ายดูพิกัดได้)
+                  {/* Control Center (Monitor Site) */}
+                  <Marker
+                    position={[centerLat, centerLng]}
+                    icon={createControlCenterIcon()}
+                  />
+
+                  {/* Markers */}
+                  {cameraPoints.map((pt, idx) => {
+                    const ptLat = pt.lat !== undefined ? pt.lat : centerLat;
+                    const ptLng = pt.lng !== undefined ? pt.lng : centerLng;
+                    const isSelected = pt.id === selectedSummaryPointId;
+                    const camCount = pt.selectedSet === "Set 1" ? 1
+                                   : pt.selectedSet === "Set 2" ? 2
+                                   : pt.selectedSet === "Set 3" ? 3
+                                   : pt.selectedSet === "Set 4" ? 4
+                                   : 1;
+                    
+                    return (
+                      <Marker
+                        key={pt.id}
+                        position={[ptLat, ptLng]}
+                        icon={createMiniCameraIcon(pt.type, idx + 1, isSelected, camCount)}
+                        eventHandlers={{
+                          click: () => {
+                            setSelectedSummaryPointId(pt.id);
+                          }
+                        }}
+                      />
+                    );
+                  })}
+                </MapContainer>
+
+                <div className="absolute top-2 right-2 bg-zinc-900/90 backdrop-blur-md rounded-lg border border-zinc-800 text-[9px] font-mono px-2 py-1 text-white uppercase tracking-wider z-[400] shadow-sm">
+                  🗺️ ผังพิกัดแผนที่ (คลิกเลือกกล้องเพื่อเคลื่อนย้ายดูพิกัดได้)
+                </div>
               </div>
             </div>
           </div>
