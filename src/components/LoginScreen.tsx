@@ -1,41 +1,15 @@
 import React, { useState } from "react";
-import { Lock, Mail, User, Eye, EyeOff, ShieldAlert, CheckCircle2, Loader2, Landmark, MapPin } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, ShieldAlert, CheckCircle2, Loader2 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 interface LoginScreenProps {
   onLoginSuccess: (user: any, profile: any) => void;
 }
 
-const THAI_PROVINCES = [
-  "อุดรธานี",
-  "ขอนแก่น",
-  "หนองคาย",
-  "เลย",
-  "สกลนคร",
-  "หนองบัวลำภู",
-  "บึงกาฬ",
-  "นครพนม",
-  "กาฬสินธุ์",
-  "มหาสารคาม",
-  "ร้อยเอ็ด",
-  "มุกดาหาร",
-  "ยโสธร",
-  "อำนาจเจริญ",
-  "อุบลราชธานี",
-  "ศรีสะเกษ",
-  "สุรินทร์",
-  "บุรีรัมย์",
-  "นครราชสีมา",
-  "ชัยภูมิ"
-];
-
 export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
-  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [province, setProvince] = useState("อุดรธานี");
-  
+
   // Password Visibility Toggle
   const [showPassword, setShowPassword] = useState(false);
 
@@ -56,151 +30,62 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     setSuccessMsg("");
 
     try {
-      // 1. ลงชื่อเข้าใช้งานด้วย Email และ Password จริงผ่าน Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password: password
-      });
-
-      if (authError) {
-        setErrorMsg("❌ " + translateAuthError(authError.message));
-        setLoading(false);
-        return;
-      }
-
-      if (!authData.user) {
-        setErrorMsg("❌ ไม่สามารถลงชื่อเข้าใช้งานได้ กรุณาลองใหม่อีกครั้งค่ะ");
-        setLoading(false);
-        return;
-      }
-
-      // 2. ดึงข้อมูลโปรไฟล์ (Profile) เพิ่มเติมเพื่อดูสิทธิ์และจังหวัดกลุ่มงาน
+      // ค้นหา user จาก profiles table โดยตรงด้วย email + password
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", authData.user.id)
+        .eq("email", email.trim().toLowerCase())
+        .eq("password", password)
         .maybeSingle();
 
       if (profileError) {
-        setErrorMsg("เกิดข้อผิดพลาดในการดึงข้อมูลสิทธิ์ผู้ใช้งาน: " + profileError.message);
-      } else if (!profile) {
-        setErrorMsg("❌ ไม่พบข้อมูลโปรไฟล์ในระบบความปลอดภัยค่ะ กรุณาติดต่อผู้ดูแลระบบเพื่อสร้างข้อมูลสิทธิ์");
-      } else {
-        setSuccessMsg("🎉 เข้าสู่ระบบสำเร็จเรียบร้อยค่ะ!");
-        
-        const mockUser = {
-          id: profile.id,
-          email: email.trim().toLowerCase(),
-          role: profile.role
-        };
-        
-        const sessionPayload = {
-          user: mockUser,
-          profile: {
-            id: profile.id,
-            role: profile.role,
-            displayName: profile.display_name,
-            email: email.trim().toLowerCase(),
-            province: profile.province,
-            updatedAt: profile.updated_at
-          }
-        };
-
-        // ตั้งเวลาหมดอายุของเซสชันไว้ที่ 2 ชั่วโมง (7200000 ms)
-        const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
-
-        // เซฟลง localStorage เพื่อให้ผู้ใช้งานล็อกอินค้างไว้ได้เมื่อรีเฟรชหน้าเบราว์เซอร์
-        localStorage.setItem("CCTV_USER_SESSION", JSON.stringify(sessionPayload));
-        localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
-
-        setTimeout(() => {
-          onLoginSuccess(mockUser, sessionPayload.profile);
-        }, 800);
+        setErrorMsg("❌ เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้งค่ะ");
+        setLoading(false);
+        return;
       }
+
+      if (!profile) {
+        setErrorMsg("❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้งค่ะ");
+        setLoading(false);
+        return;
+      }
+
+      setSuccessMsg("🎉 เข้าสู่ระบบสำเร็จเรียบร้อยค่ะ!");
+
+      const mockUser = {
+        id: profile.id,
+        email: email.trim().toLowerCase(),
+        role: profile.role
+      };
+
+      const sessionPayload = {
+        user: mockUser,
+        profile: {
+          id: profile.id,
+          role: profile.role,
+          displayName: profile.display_name,
+          email: email.trim().toLowerCase(),
+          province: profile.province,
+          updatedAt: profile.updated_at
+        }
+      };
+
+      // ตั้งเวลาหมดอายุของเซสชันไว้ที่ 2 ชั่วโมง (7200000 ms)
+      const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
+
+      // เซฟลง localStorage เพื่อให้ผู้ใช้งานล็อกอินค้างไว้ได้เมื่อรีเฟรชหน้าเบราว์เซอร์
+      localStorage.setItem("CCTV_USER_SESSION", JSON.stringify(sessionPayload));
+      localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
+
+      setTimeout(() => {
+        onLoginSuccess(mockUser, sessionPayload.profile);
+      }, 800);
+
     } catch (err: any) {
       setErrorMsg("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้งค่ะ");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password || !displayName || !province) {
-      setErrorMsg("กรุณากรอกข้อมูลให้ครบถ้วนทุกช่องค่ะ");
-      return;
-    }
-
-    if (password.length < 6) {
-      setErrorMsg("รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษรค่ะ");
-      return;
-    }
-
-    setLoading(true);
-    setErrorMsg("");
-    setSuccessMsg("");
-
-    try {
-      // 1. Sign up user via Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: {
-            display_name: displayName.trim(),
-          }
-        }
-      });
-
-      if (error) {
-        setErrorMsg(translateAuthError(error.message));
-        setLoading(false);
-        return;
-      }
-
-      if (data.user) {
-        // 2. Insert profile record explicitly to profiles table (with selected province!)
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({
-            id: data.user.id,
-            display_name: displayName.trim(),
-            role: "user", // defaults to standard surveyor/user
-            province: province, // Bind to group province
-            updated_at: new Date().toISOString()
-          });
-
-        if (profileError) {
-          console.error("Failed to create profile row:", profileError.message);
-        }
-
-        setSuccessMsg("🎉 สมัครสมาชิกสำเร็จแล้ว! ระบบได้ส่งอีเมลยืนยันไปยังกล่องจดหมายของคุณแล้วค่ะ (หรือคุณสามารถทดลองเข้าสู่ระบบได้เลยขึ้นอยู่กับการตั้งค่าระบบ)");
-        setIsSignUp(false);
-        setPassword("");
-      }
-    } catch (err: any) {
-      setErrorMsg("เกิดข้อผิดพลาดขึ้นระหว่างสมัครสมาชิก กรุณาลองใหม่อีกครั้งค่ะ");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Human-friendly Thai translation for Supabase errors
-  const translateAuthError = (msg: string): string => {
-    const lower = msg.toLowerCase();
-    if (lower.includes("invalid login credentials")) {
-      return "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้งค่ะ";
-    }
-    if (lower.includes("user already exists") || lower.includes("email already in use")) {
-      return "อีเมลนี้ได้รับการลงทะเบียนในระบบเรียบร้อยแล้วค่ะ";
-    }
-    if (lower.includes("email address is invalid") || lower.includes("invalid email")) {
-      return "รูปแบบที่อยู่อีเมลไม่ถูกต้องค่ะ";
-    }
-    if (lower.includes("weak password")) {
-      return "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษรค่ะ";
-    }
-    return msg;
   };
 
   return (
@@ -228,55 +113,12 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6.5 border border-zinc-200/50 shadow-2xl space-y-5">
           <div className="text-center">
             <h2 className="text-sm font-extrabold text-zinc-900 uppercase tracking-wide">
-              {isSignUp ? "สมัครสมาชิกผู้ใช้งานใหม่" : "เข้าสู่ระบบเพื่อเริ่มใช้งาน"}
+              เข้าสู่ระบบเพื่อเริ่มใช้งาน
             </h2>
           </div>
 
-          {/* Form Actions */}
-          <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
-            
-            {/* Display Name Input (For Sign Up) */}
-            {isSignUp && (
-              <div className="space-y-1">
-                <label className="block text-[10px] font-semibold text-zinc-650 uppercase">ชื่อ-นามสกุลจริง</label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                    <User className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="text"
-                    required
-                    placeholder="เช่น สมชาย ใจดี"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-medium text-zinc-800 transition-all"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Province Group Selection (For Sign Up) */}
-            {isSignUp && (
-              <div className="space-y-1">
-                <label className="block text-[10px] font-semibold text-zinc-650 uppercase">จังหวัดปฏิบัติการหลัก</label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                    <MapPin className="w-4 h-4" />
-                  </span>
-                  <select
-                    value={province}
-                    onChange={(e) => setProvince(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-medium text-zinc-800 transition-all cursor-pointer"
-                  >
-                    {THAI_PROVINCES.map((prov) => (
-                      <option key={prov} value={prov}>
-                        {prov}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
+          {/* Form */}
+          <form onSubmit={handleSignIn} className="space-y-4">
 
             {/* Email Input */}
             <div className="space-y-1">
@@ -298,9 +140,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
             {/* Password Input */}
             <div className="space-y-1">
-              <div className="flex justify-between items-center">
-                <label className="block text-[10px] font-semibold text-zinc-650 uppercase">รหัสผ่าน (Password)</label>
-              </div>
+              <label className="block text-[10px] font-semibold text-zinc-650 uppercase">รหัสผ่าน (Password)</label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                   <Lock className="w-4 h-4" />
@@ -322,8 +162,6 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 </button>
               </div>
             </div>
-
-
 
             {/* Notifications */}
             {errorMsg && (
@@ -352,7 +190,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   <span>กำลังดำเนินการ...</span>
                 </>
               ) : (
-                <span>{isSignUp ? "สมัครสมาชิกใหม่" : "ล็อกอินเข้าสู่ระบบ"}</span>
+                <span>ล็อกอินเข้าสู่ระบบ</span>
               )}
             </button>
           </form>

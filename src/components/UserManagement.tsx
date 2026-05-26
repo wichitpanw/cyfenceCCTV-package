@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Users, Shield, User, UserCheck, AlertCircle, Search, RefreshCw, MapPin } from "lucide-react";
+import { Users, User, UserCheck, AlertCircle, Search, RefreshCw, Eye, EyeOff } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 interface EditableGroupCellProps {
@@ -73,15 +73,17 @@ export default function UserManagement() {
 
   // States สำหรับสร้างผู้ใช้ใหม่
   const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [newName, setNewName] = useState("");
   const [newRole, setNewRole] = useState<"superadmin" | "admin" | "head_user" | "user">("user");
   const [newProvince, setNewProvince] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newEmail || !newName) {
-      setErrorMsg("กรุณากรอกอีเมลและชื่อผู้ใช้งานใหม่ให้ครบถ้วนค่ะ");
+    if (!newEmail || !newName || !newPassword) {
+      setErrorMsg("กรุณากรอกอีเมล ชื่อ และรหัสผ่านให้ครบถ้วนค่ะ");
       return;
     }
     
@@ -96,6 +98,7 @@ export default function UserManagement() {
         .insert({
           id: generatedId,
           email: newEmail.trim().toLowerCase(),
+          password: newPassword,
           display_name: newName.trim(),
           role: newRole,
           province: newProvince,
@@ -107,6 +110,7 @@ export default function UserManagement() {
       } else {
         setSuccessMsg(`💾 สร้างบัญชีผู้ใช้ [${newEmail}] สำเร็จเรียบร้อยแล้วค่ะ!`);
         setNewEmail("");
+        setNewPassword("");
         setNewName("");
         setNewRole("user");
         setNewProvince("");
@@ -241,11 +245,11 @@ export default function UserManagement() {
         </div>
       )}
 
-      {/* ฟอร์มเพิ่มผู้ใช้ใหม่ (Password-less Account Creation) */}
+      {/* ฟอร์มเพิ่มผู้ใช้ใหม่ */}
       <form onSubmit={handleCreateUser} className="bg-zinc-50 border border-zinc-200/60 p-4 rounded-2xl space-y-3 shadow-2xs">
         <h5 className="text-[10px] font-black text-indigo-950 uppercase tracking-wider font-mono flex items-center gap-1.5 leading-none">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 block animate-pulse"></span>
-          ➕ เพิ่มบัญชีผู้ใช้งานระบบรายใหม่ (Password-less Account)
+          ➕ เพิ่มบัญชีผู้ใช้งานระบบรายใหม่
         </h5>
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
@@ -260,6 +264,28 @@ export default function UserManagement() {
               onChange={(e) => setNewEmail(e.target.value)}
               className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-mono text-zinc-800 shadow-2xs"
             />
+          </div>
+
+          {/* Password Input */}
+          <div className="space-y-1 md:col-span-2">
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">รหัสผ่าน</label>
+            <div className="relative">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                required
+                placeholder="ตั้งรหัสผ่าน"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full px-2.5 pr-8 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-mono text-zinc-800 shadow-2xs"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute inset-y-0 right-0 pr-2 flex items-center text-zinc-400 hover:text-zinc-600 cursor-pointer"
+              >
+                {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              </button>
+            </div>
           </div>
 
           {/* Name Input */}
@@ -277,39 +303,42 @@ export default function UserManagement() {
 
           {/* Role Select */}
           <div className="space-y-1 md:col-span-2">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">ระดับสิทธิ์ (Role)</label>
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">ระดับสิทธิ์</label>
             <select
               value={newRole}
               onChange={(e) => setNewRole(e.target.value as any)}
               className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-bold text-zinc-700 shadow-2xs cursor-pointer"
             >
-              <option value="user">👤 USER (ช่างทั่วไป)</option>
-              <option value="head_user">👥 HEAD USER (หัวหน้าภาค)</option>
-              <option value="admin">🛡️ ADMIN (ผู้ดูแลต้นทุน)</option>
-              <option value="superadmin">👑 SUPER ADMIN (สูงสุด)</option>
+              <option value="user">👤 USER</option>
+              <option value="head_user">👥 HEAD USER</option>
+              <option value="admin">🛡️ ADMIN</option>
+              <option value="superadmin">👑 SUPER ADMIN</option>
             </select>
           </div>
 
-          {/* Group/Department Input */}
-          <div className="space-y-1 md:col-span-4">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">กลุ่ม / ส่วนงานประจำการ</label>
+          {/* Group/Province + Submit */}
+          <div className="space-y-1 md:col-span-2">
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">กลุ่ม / ส่วนงาน</label>
             <div className="flex gap-2 items-center">
               <input
                 type="text"
-                placeholder="เช่น อุดรธานี, ฝ่ายเทคนิค, superadmin"
+                placeholder="เช่น อุดรธานี"
                 value={newProvince}
                 onChange={(e) => setNewProvince(e.target.value)}
                 className="grow px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-semibold text-zinc-800 shadow-2xs"
               />
-              <button
-                type="submit"
-                disabled={isCreating}
-                className="px-4 py-1.5 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 disabled:bg-zinc-400 text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-2xs shrink-0"
-              >
-                {isCreating ? "กำลังเพิ่ม..." : "เพิ่มบัญชี"}
-              </button>
             </div>
           </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={isCreating}
+            className="px-5 py-1.5 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 disabled:bg-zinc-400 text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+          >
+            {isCreating ? "กำลังเพิ่ม..." : "➕ เพิ่มบัญชีผู้ใช้"}
+          </button>
         </div>
       </form>
 

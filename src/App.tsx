@@ -508,14 +508,9 @@ export default function App() {
   };
 
   // Reusable handleLogout function
-  const handleLogout = async () => {
+  const handleLogout = () => {
     localStorage.removeItem("CCTV_USER_SESSION");
     localStorage.removeItem("CCTV_SESSION_EXPIRY");
-    try {
-      await supabase.auth.signOut();
-    } catch (e) {
-      console.error("Sign out error:", e);
-    }
     setCurrentUser(null);
     setUserProfile(null);
     window.location.reload();
