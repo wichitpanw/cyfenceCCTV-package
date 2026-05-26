@@ -663,7 +663,7 @@ export default function App() {
               createdAt: row.created_at || new Date().toISOString(),
               createdBy: row.created_by || null,
               cameraPoints: cams.map((c: any) => ({
-                id: c.id,
+                id: c.id.replace(`${row.id}-`, ""),
                 name: c.name || "",
                 type: c.type || "Dome",
                 poleType: c.pole_type || "None",
@@ -686,7 +686,7 @@ export default function App() {
                 selectedSet: c.selected_set ?? undefined,
               })),
               pricingItems: prices.map((p: any) => ({
-                id: p.id,
+                id: p.id.replace(`${row.id}-`, ""),
                 name: p.name || "",
                 quantity: parseFloat(p.quantity) || 1,
                 unit: p.unit || "ชิ้น",
@@ -1016,7 +1016,7 @@ export default function App() {
         await supabase.from("camera_points").delete().eq("project_id", freshId);
         if (cameraPoints.length > 0) {
           const camRows = cameraPoints.map((c, idx) => ({
-            id: c.id,
+            id: `${freshId}-${c.id}`,
             project_id: freshId,
             point_index: idx,
             name: c.name,
@@ -1052,7 +1052,7 @@ export default function App() {
         await supabase.from("pricing_items").delete().eq("project_id", freshId);
         if (pricingItems.length > 0) {
           const priceRows = pricingItems.map((p, idx) => ({
-            id: p.id,
+            id: `${freshId}-${p.id}`,
             project_id: freshId,
             item_index: idx,
             name: p.name,

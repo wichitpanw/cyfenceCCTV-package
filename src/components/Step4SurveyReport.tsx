@@ -95,47 +95,12 @@ export default function Step4SurveyReport({
     }
   }, [selectedPointId, selectedPoint?.lat, selectedPoint?.lng, centerLat, centerLng, isControlCenterSelected]);
 
-  // If cameraPoints is empty, auto-generate initial points based on selected count
+  // Sync selectedPointId if cameraPoints is populated but nothing is selected
   useEffect(() => {
-    if (cameraPoints.length === 0 && cameraCount > 0) {
-      const columns = Math.ceil(Math.sqrt(cameraCount));
-      const initialPoints: CameraPoint[] = Array.from({ length: cameraCount }).map((_, i) => {
-        const row = Math.floor(i / columns);
-        const col = i % columns;
-        const latOffset = (i % 2 === 0 ? 0.00015 : -0.00015) * Math.ceil((i + 1) / 2);
-        const lngOffset = (i % 2 !== 0 ? 0.00015 : -0.00015) * Math.ceil((i + 1) / 2);
-        const x = 30 + (i % 3) * 20;
-        const y = 30 + Math.floor(i / 3) * 20;
-        
-        return {
-          id: `pt-${i}`,
-          name: getCctvDefaultLocationName(i),
-          type: "Bullet",
-          poleType: "None",
-          hasSupportArm: true,
-          notes: "",
-          photoUrl: "", // Start completely empty, requires user image upload
-          x,
-          y,
-          focalAngle: 90,
-          rotation: 0,
-          lat: centerLat + latOffset,
-          lng: centerLng + lngOffset,
-          lanCableLength: stdLimit,
-          hasOutdoorCabinet: false,
-          hasGroundRod: false,
-          hasPowerMeter: false,
-          selectedSet: "None"
-        };
-      });
-      onChange(initialPoints);
-      if (initialPoints.length > 0) {
-        setSelectedPointId(initialPoints[0].id);
-      }
-    } else if (cameraPoints.length > 0 && !selectedPointId) {
+    if (cameraPoints.length > 0 && !selectedPointId) {
       setSelectedPointId(cameraPoints[0].id);
     }
-  }, [cameraCount]);
+  }, [cameraPoints, selectedPointId]);
 
   const getCctvDefaultLocationName = (index: number) => {
     const names = [
