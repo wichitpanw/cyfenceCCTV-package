@@ -1183,40 +1183,13 @@ export default function App() {
       <header className="bg-white border-b border-zinc-200 py-3 px-6 shrink-0 shadow-xs relative z-40 w-full">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md transition-transform hover:scale-105 relative overflow-hidden border border-zinc-200 p-0.5">
+            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md transition-transform hover:scale-105 relative overflow-hidden border border-zinc-200 p-1">
               <img 
-                src="/icon.png" 
+                src="/cyfence_logo.png" 
                 alt="NT Cyfence Logo" 
-                className="w-full h-full object-contain hidden"
+                className="w-full h-full object-contain"
                 id="header-logo-image"
-                onError={(e) => {
-                  const target = e.currentTarget;
-                  // If /icon.png fails to load, try /logo.png
-                  if (target.src.includes("/icon.png")) {
-                    target.src = "/logo.png";
-                  } else {
-                    // Both failed, hide image and show fallback SVG
-                    target.classList.add("hidden");
-                    document.getElementById("logo-fallback-container")?.classList.remove("hidden");
-                  }
-                }}
-                onLoad={(e) => {
-                  e.currentTarget.classList.remove("hidden");
-                  document.getElementById("logo-fallback-container")?.classList.add("hidden");
-                }}
               />
-              <div 
-                id="logo-fallback-container" 
-                className="absolute inset-0 bg-zinc-950 flex items-center justify-center"
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
-                <svg className="w-5.5 h-5.5 text-white relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  <path d="M9 9h6v4H9z" fill="currentColor" stroke="currentColor" strokeWidth="1" className="text-white/20" />
-                  <path d="M15 11l3-2v4l-3-2z" fill="currentColor" stroke="currentColor" strokeWidth="1" className="text-white/20" strokeLinejoin="round" />
-                  <circle cx="12" cy="11" r="1" fill="#0071e3" stroke="#0071e3" strokeWidth="1.5" />
-                </svg>
-              </div>
             </div>
             <div>
               <div className="flex items-center gap-2">

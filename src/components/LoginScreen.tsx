@@ -192,8 +192,8 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
       <div className="max-w-md w-full z-10">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-tr from-[#0071e3] to-blue-400 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/10 mb-4 animate-bounce">
-            <Landmark className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 mx-auto bg-white rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/10 mb-4 overflow-hidden p-2">
+            <img src="/cyfence_logo.png" alt="Cyfence Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-xl font-black text-white tracking-wide uppercase font-mono leading-none">
             NT Cyfence CCTV
