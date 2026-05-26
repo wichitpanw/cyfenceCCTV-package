@@ -807,8 +807,8 @@ export default function Step4SurveyReport({
             <div className="bg-white border border-zinc-200 rounded-2xl p-5 shadow-2xs space-y-5">
               <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 font-bold text-xs uppercase font-mono">
-                    PT
+                  <div className="w-8 h-8 rounded-lg bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
+                    <Camera className="w-4 h-4" />
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-zinc-800">แก้ไขรายละเอียดจุดติดตั้ง</h4>
