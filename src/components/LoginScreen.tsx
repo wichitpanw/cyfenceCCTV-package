@@ -358,24 +358,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           </form>
 
           {/* Support/Admin Contact Notice */}
-          <div className="pt-3 border-t border-zinc-100 text-center text-[10.5px] text-zinc-500 leading-relaxed space-y-2">
-            <div>
-              🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน <br />
-              กรุณาติดต่อแอดมิน (คุณบีม) โทร. <a href="tel:095-662-5871" className="font-bold text-[#0071e3] hover:underline">095-662-5871</a>
-            </div>
-            <div className="pt-2 border-t border-zinc-100/50">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  setErrorMsg("");
-                  setSuccessMsg("");
-                }}
-                className="text-[10px] text-zinc-400 hover:text-[#0071e3] font-semibold cursor-pointer transition-colors"
-              >
-                {isSignUp ? "← กลับไปหน้าเข้าสู่ระบบ" : "🆕 สมัครสมาชิกสำหรับผู้ใช้งานใหม่"}
-              </button>
-            </div>
+          <div className="pt-3 border-t border-zinc-100 text-center text-[10.5px] text-zinc-500 leading-relaxed">
+            🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน <br />
+            กรุณาติดต่อแอดมิน (คุณบีม) โทร. <a href="tel:095-662-5871" className="font-bold text-[#0071e3] hover:underline">095-662-5871</a>
           </div>
         </div>
 
