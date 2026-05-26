@@ -276,7 +276,7 @@ export default function ProjectHistory({
                       </span>
                       <strong className="text-[#0071e3] text-[11px] font-bold font-mono">
                         ฿{monthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                        <span className="text-[8px] font-normal text-[#0071e3]/60">/ด.</span>
+                        <span className="text-[8px] font-normal text-[#0071e3]/60">/เดือน</span>
                       </strong>
                     </div>
                   )}

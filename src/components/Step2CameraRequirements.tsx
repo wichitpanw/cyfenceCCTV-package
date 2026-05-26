@@ -268,7 +268,7 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
                   { speed: 400, price: 2750 },
                   { speed: 500, price: 3180 },
                 ].find(t => t.speed >= speed) || { speed: 500, price: 3180 };
-                return `${tier.speed} Mbps (฿${tier.price}/ด.)`;
+                return `${tier.speed} Mbps (฿${tier.price}/เดือน)`;
               })()}
             </div>
           </div>

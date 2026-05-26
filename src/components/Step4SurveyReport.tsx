@@ -1418,7 +1418,7 @@ export default function Step4SurveyReport({
                   { speed: 100, price: 1150 },
                 ].find(t => t.speed >= speed) || { price: 640 };
                 return sum + tier.price;
-              }, 0).toLocaleString("th-TH")}/ด.
+              }, 0).toLocaleString("th-TH")}/เดือน
             </div>
           </div>
         </div>
@@ -1434,7 +1434,7 @@ export default function Step4SurveyReport({
                     <th className="py-2 px-3.5">ชื่อจุดสำรวจติดตั้ง</th>
                     <th className="py-2 px-3.5 text-center">ชุดอุปกรณ์ (Set)</th>
                     <th className="py-2 px-3.5 text-center">ความเร็ววงจร (Speed)</th>
-                    <th className="py-2 px-3.5 text-right">ค่าบริการรายเดือน (฿/ด.)</th>
+                    <th className="py-2 px-3.5 text-right">ค่าบริการรายเดือน (฿/เดือน)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-200 bg-white">
