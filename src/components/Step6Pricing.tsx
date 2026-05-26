@@ -285,8 +285,7 @@ export default function Step6Pricing({
 <body>
   <div class="header">
     <div>
-      <div class="company-name">■ NT Cyfence</div>
-      <div class="company-sub">เครือข่ายโทรคมนาคมแห่งชาติ | NT Cyfence Security Solutions</div>
+      <img src="/cyfence_logo.png" alt="NT Cyfence" style="height: 52px; display: block; margin-bottom: 4px;" />
     </div>
     <div class="doc-info">
       <div class="doc-title">เอกสารสำรวจระบบกล้องวงจรปิด</div>
@@ -311,9 +310,6 @@ export default function Step6Pricing({
       <div class="info-row">ผู้สำรวจ: <span>${customerInfo?.surveyorName || "-"}</span></div>
       ${customerInfo?.surveyorDepartment ? `<div class="info-row">ส่วนงาน: <span>${customerInfo.surveyorDepartment}</span></div>` : ""}
       ${customerInfo?.surveyorPhone ? `<div class="info-row">เบอร์โทรผู้สำรวจ: <span>${customerInfo.surveyorPhone}</span></div>` : ""}
-      <div class="info-row">สเปกกล้อง: <span>${requirements?.cameraBrand || "Hikvision"}</span></div>
-      <div class="info-row">เครื่อง NVR: <span>${requirements?.nvrBrand || "-"} ${requirements?.nvrChannels || "-"}CH</span></div>
-      <div class="info-row">หน่วยความจำ: <span>${requirements?.storagePackage || "-"}</span></div>
     </div>
   </div>
 
@@ -332,17 +328,9 @@ export default function Step6Pricing({
 
   <div class="summary-wrap">
     <div class="summary" style="width: 380px;">
-      <div class="summary-row"><span>มูลค่าอุปกรณ์และบริการ (BOM Cost)</span><span>฿${calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-      ${discount > 0 ? `<div class="summary-row"><span>ส่วนลดพิเศษโครงการ</span><span style="color:#dc2626">-฿${discount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>` : ""}
-      <div class="summary-row"><span>ยอดจัดเช่าอุปกรณ์ต้นทุนสุทธิ์</span><span>฿${calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-      <div class="summary-row"><span>บวก กำไรโครงการ (+40%)</span><span>฿${(calBeforeVat * 0.4).toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-      <div class="summary-row"><span>บวก ดอกเบี้ยจัดเช่า 8% ต่อปี (3 ปี)</span><span>฿${leaseInterest.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-      <div class="summary-row"><span>รวมมูลค่าระบบจัดเช่าอุปกรณ์ (3 ปี)</span><span>฿${leaseTotalAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-      <div class="summary-row" style="font-weight: 700; color: #0071e3;"><span>ค่าเช่าระบบอุปกรณ์ต่อเดือน (36 งวด)</span><span>฿${leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
-      <div class="summary-row"><span>ค่าเช่าวงจรเครือข่ายรายเดือน (NT Links)</span><span>฿${totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
-      <div class="summary-row" style="border-top: 1px dashed #ccc; font-weight: 700;"><span>ค่าบริการรายเดือนสุทธิ์ (ก่อนภาษี)</span><span>฿${grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
+      <div class="summary-row" style="font-weight: 700; color: #111;"><span>ค่าเช่าระบบรายเดือน (ก่อนภาษีมูลค่าเพิ่ม)</span><span>฿${grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
       ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม ${vatRate}%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>` : ""}
-      <div class="summary-row total"><span>ค่าเช่ารวมรายเดือนทั้งสิ้น</span><span>฿${grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
+      <div class="summary-row total"><span>ค่าเช่าระบบรวมรายเดือนทั้งสิ้น (หลังภาษี)</span><span>฿${grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/ด.</span></div>
     </div>
   </div>
 
