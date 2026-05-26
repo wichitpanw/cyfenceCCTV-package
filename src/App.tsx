@@ -1425,6 +1425,7 @@ export default function App() {
                     requirements={requirements}
                     onUpdateCameraBrand={(brand) => setRequirements(p => ({ ...p, cameraBrand: brand }))}
                     showConfirm={showConfirm}
+                    onUpdateCustomerInfo={setCustomerInfo}
                   />
                 )}
 

@@ -32,6 +32,7 @@ interface Step4Props {
     onConfirm: () => void,
     options?: { confirmText?: string; cancelText?: string; onCancel?: () => void }
   ) => void;
+  onUpdateCustomerInfo?: (info: CustomerInfo) => void;
 }
 
 // Map center panning controller sub-component
@@ -57,7 +58,8 @@ export default function Step4SurveyReport({
   customerInfo,
   requirements,
   onUpdateCameraBrand,
-  showConfirm
+  showConfirm,
+  onUpdateCustomerInfo
 }: Step4Props) {
   const stdLimit = requirements?.standardCableLimit ?? 25;
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
@@ -74,19 +76,24 @@ export default function Step4SurveyReport({
   const centerLat = isNaN(defaultLat) ? 13.7563 : defaultLat;
   const centerLng = isNaN(defaultLng) ? 100.5018 : defaultLng;
 
+  const isControlCenterSelected = selectedPointId === "control-center";
+
   // Selected camera point object
   const selectedPoint = cameraPoints.find(p => p.id === selectedPointId);
 
   // Sync manual coordinate inputs when selected camera changes or updates
   useEffect(() => {
-    if (selectedPoint) {
+    if (isControlCenterSelected) {
+      setLocalLat(centerLat.toString());
+      setLocalLng(centerLng.toString());
+    } else if (selectedPoint) {
       setLocalLat(selectedPoint.lat !== undefined ? selectedPoint.lat.toString() : "");
       setLocalLng(selectedPoint.lng !== undefined ? selectedPoint.lng.toString() : "");
     } else {
       setLocalLat("");
       setLocalLng("");
     }
-  }, [selectedPointId, selectedPoint?.lat, selectedPoint?.lng]);
+  }, [selectedPointId, selectedPoint?.lat, selectedPoint?.lng, centerLat, centerLng, isControlCenterSelected]);
 
   // If cameraPoints is empty, auto-generate initial points based on selected count
   useEffect(() => {
@@ -394,7 +401,9 @@ export default function Step4SurveyReport({
     });
   };
 
-  const createControlCenterIcon = () => {
+  const createControlCenterIcon = (isSelected?: boolean) => {
+    const ringStyle = isSelected ? "box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.4), 0 4px 14px rgba(0, 113, 227, 0.55);" : "box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);";
+    const scaleStyle = isSelected ? "transform: scale(1.2);" : "transform: scale(1);";
     return L.divIcon({
       html: `
         <div style="
@@ -407,7 +416,9 @@ export default function Step4SurveyReport({
           justify-content: center;
           background-color: #0071e3;
           border: 2px solid white;
-          box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);
+          ${ringStyle}
+          ${scaleStyle}
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
           box-sizing: border-box;
         ">
           <!-- Sleek white Monitor SVG -->
@@ -446,10 +457,16 @@ export default function Step4SurveyReport({
   const handleLatManualChange = (val: string) => {
     setLocalLat(val);
     const parsed = parseFloat(val);
-    if (!isNaN(parsed) && selectedPoint) {
-      // Avoid firing intermediate updates when typing trailing dot (like "13.")
+    if (!isNaN(parsed)) {
       if (!val.endsWith(".")) {
-        handleUpdatePointFields(selectedPoint.id, { lat: parsed });
+        if (isControlCenterSelected) {
+          onUpdateCustomerInfo?.({
+            ...customerInfo,
+            latitude: val
+          });
+        } else if (selectedPoint) {
+          handleUpdatePointFields(selectedPoint.id, { lat: parsed });
+        }
       }
     }
   };
@@ -458,17 +475,23 @@ export default function Step4SurveyReport({
   const handleLngManualChange = (val: string) => {
     setLocalLng(val);
     const parsed = parseFloat(val);
-    if (!isNaN(parsed) && selectedPoint) {
-      // Avoid firing intermediate updates when typing trailing dot (like "100.")
+    if (!isNaN(parsed)) {
       if (!val.endsWith(".")) {
-        handleUpdatePointFields(selectedPoint.id, { lng: parsed });
+        if (isControlCenterSelected) {
+          onUpdateCustomerInfo?.({
+            ...customerInfo,
+            longitude: val
+          });
+        } else if (selectedPoint) {
+          handleUpdatePointFields(selectedPoint.id, { lng: parsed });
+        }
       }
     }
   };
 
   // Determine active target coordinates for the center controller
-  const panLat = selectedPoint?.lat !== undefined ? selectedPoint.lat : centerLat;
-  const panLng = selectedPoint?.lng !== undefined ? selectedPoint.lng : centerLng;
+  const panLat = isControlCenterSelected ? centerLat : (selectedPoint?.lat !== undefined ? selectedPoint.lat : centerLat);
+  const panLng = isControlCenterSelected ? centerLng : (selectedPoint?.lng !== undefined ? selectedPoint.lng : centerLng);
 
   return (
     <div className="space-y-6" id="survey-step-container">
@@ -631,7 +654,24 @@ export default function Step4SurveyReport({
                   {/* Control Center Reference Point */}
                    <Marker
                     position={[centerLat, centerLng]}
-                    icon={createControlCenterIcon()}
+                    icon={createControlCenterIcon(selectedPointId === "control-center")}
+                    draggable={true}
+                    eventHandlers={{
+                      click: (e) => {
+                        L.DomEvent.stopPropagation(e);
+                        setSelectedPointId(selectedPointId === "control-center" ? null : "control-center");
+                      },
+                      dragend: (e) => {
+                        const marker = e.target;
+                        const position = marker.getLatLng();
+                        onUpdateCustomerInfo?.({
+                          ...customerInfo,
+                          latitude: position.lat.toString(),
+                          longitude: position.lng.toString()
+                        });
+                        setSelectedPointId("control-center");
+                      }
+                    }}
                   />
 
                   {/* Camera Markers on Map */}
@@ -694,6 +734,27 @@ export default function Step4SurveyReport({
 
           {/* Quick List of Points Grid for selecting */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {/* Control Center Point as #0 */}
+            <button
+              type="button"
+              onClick={() => setSelectedPointId(selectedPointId === "control-center" ? null : "control-center")}
+              className={`p-2 rounded-xl text-left border flex flex-col justify-between h-16 text-xs select-none transition-all cursor-pointer ${
+                selectedPointId === "control-center"
+                  ? "bg-zinc-50 border-zinc-900 font-semibold"
+                  : "bg-white border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50/50"
+              }`}
+            >
+              <div className="flex items-center justify-between w-full">
+                <span className="text-[9px] font-bold text-[#0071e3] font-mono">#0</span>
+                <span className="text-[8px] px-1 bg-zinc-150 text-zinc-650 rounded font-semibold uppercase tracking-wider">
+                  CONTROL
+                </span>
+              </div>
+              <span className="truncate text-zinc-800 text-[11px] block mt-1 font-semibold">
+                ห้องควบคุม (ต้นทาง)
+              </span>
+            </button>
+
             {cameraPoints.map((pt, index) => {
               const isSelected = pt.id === selectedPointId;
               return (
@@ -724,7 +785,60 @@ export default function Step4SurveyReport({
 
         {/* RIGHT COMPONENT (COL 4): Edit selected Pin details & Pole features */}
         <div className="lg:col-span-4">
-          {selectedPoint ? (
+          {isControlCenterSelected ? (
+            <div className="bg-white border border-zinc-200 rounded-2xl p-5 shadow-2xs space-y-5">
+              <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3] font-bold text-xs uppercase font-mono">
+                    #0
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-800">ห้องควบคุม (ต้นทาง)</h4>
+                    <p className="text-[10px] text-zinc-400">แก้ไขพิกัดจุดศูนย์กลาง/ห้องควบคุมระบบ</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Coordinates Editor */}
+              <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-3.5 space-y-3.5">
+                <span className="block text-[10px] font-bold text-zinc-650 flex items-center gap-1.5 uppercase font-mono tracking-wider">
+                  📍 ป้อนพิกัดภูมิศาสตร์ (แก้ไขเด้งหาตำแหน่งทันที)
+                </span>
+                
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label className="block text-[10px] text-zinc-500 font-semibold mb-1">LATITUDE (ละติจูด)</label>
+                    <input
+                      type="text"
+                      value={localLat}
+                      onChange={(e) => handleLatManualChange(e.target.value)}
+                      className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                      placeholder="เช่น 17.3992"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-zinc-500 font-semibold mb-1">LONGITUDE (ลองจิจูด)</label>
+                    <input
+                      type="text"
+                      value={localLng}
+                      onChange={(e) => handleLngManualChange(e.target.value)}
+                      className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                      placeholder="เช่น 102.8582"
+                    />
+                  </div>
+                </div>
+                <span className="block text-[9px] text-zinc-400 mt-1 leading-relaxed">
+                  *พิมพ์แก้ไขทศนิยมได้โดยตรง หรือคลิกลากหมุดสีน้ำเงินหลักบนแผนที่เพื่ออัปเดตพิกัดแบบ Interactive
+                </span>
+              </div>
+
+              {/* Info alert */}
+              <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-2 text-[10px] text-zinc-600 leading-relaxed">
+                <Info className="w-3.5 h-3.5 text-[#0071e3] shrink-0 mt-0.5" />
+                <span>พิกัดนี้คือจุดติดตั้ง "เครื่องบันทึก NVR" และ "ห้องควบคุม (ต้นทาง)" ซึ่งจะใช้คำนวณระยะทางสายติดตั้งและอุปกรณ์หลักของโครงการทั้งหมด</span>
+              </div>
+            </div>
+          ) : selectedPoint ? (
             <div className="bg-white border border-zinc-200 rounded-2xl p-5 shadow-2xs space-y-5">
               <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
                 <div className="flex items-center gap-2">
@@ -1155,10 +1269,10 @@ export default function Step4SurveyReport({
                         หมายเหตุเพิ่มเติมทัศนอุปสรรค
                       </label>
                       <textarea
-                        rows={2}
+                        rows={4}
                         value={selectedPoint.notes}
                         onChange={(e) => handleUpdatePointField(selectedPoint.id, "notes", e.target.value)}
-                        className="w-full px-3 py-1.5 border border-zinc-200 bg-zinc-50 rounded-lg text-xs"
+                        className="w-full px-3 py-1.5 border border-zinc-200 bg-zinc-50 rounded-lg text-xs min-h-[90px]"
                         placeholder="เช่น ต้องเจาะรูกำแพงคอนกรีตหนา 15 ซม., แสงสะท้อนจ้าช่วงเช้า"
                       />
                     </div>

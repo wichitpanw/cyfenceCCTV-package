@@ -73,8 +73,8 @@ export default function Step5Summary({
 
   // Get current active point to pan the map
   const activeSummaryPoint = cameraPoints.find(p => p.id === selectedSummaryPointId);
-  const panLat = activeSummaryPoint?.lat !== undefined ? activeSummaryPoint.lat : centerLat;
-  const panLng = activeSummaryPoint?.lng !== undefined ? activeSummaryPoint.lng : centerLng;
+  const panLat = selectedSummaryPointId === "control-center" ? centerLat : (activeSummaryPoint?.lat !== undefined ? activeSummaryPoint.lat : centerLat);
+  const panLng = selectedSummaryPointId === "control-center" ? centerLng : (activeSummaryPoint?.lng !== undefined ? activeSummaryPoint.lng : centerLng);
 
   // Create mini camera icon for read-only map (className: "" is CRITICAL to fix offset issues)
   const createMiniCameraIcon = (type: string, index: number, isSelected: boolean, camCount: number) => {
@@ -158,7 +158,9 @@ export default function Step5Summary({
     });
   };
 
-  const createControlCenterIcon = () => {
+  const createControlCenterIcon = (isSelected?: boolean) => {
+    const ringStyle = isSelected ? "box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.4), 0 4px 12px rgba(0, 113, 227, 0.55);" : "box-shadow: 0 4px 12px rgba(0, 113, 227, 0.35);";
+    const scaleStyle = isSelected ? "transform: scale(1.15);" : "transform: scale(1);";
     return L.divIcon({
       html: `
         <div style="
@@ -171,7 +173,9 @@ export default function Step5Summary({
           justify-content: center;
           background-color: #0071e3;
           border: 2px solid white;
-          box-shadow: 0 4px 12px rgba(0, 113, 227, 0.35);
+          ${ringStyle}
+          ${scaleStyle}
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
           box-sizing: border-box;
         ">
           <!-- Sleek white Monitor SVG -->
@@ -392,6 +396,25 @@ export default function Step5Summary({
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Visual list showing point specs - Upgraded to clickable button list to fly map to camera */}
             <div className="md:col-span-1 border border-zinc-200 rounded-xl divide-y max-h-[300px] overflow-y-auto divide-zinc-200 text-xs bg-zinc-50">
+              {/* #0 Control Center starting point */}
+              <button
+                type="button"
+                onClick={() => setSelectedSummaryPointId(selectedSummaryPointId === "control-center" ? null : "control-center")}
+                className={`w-full p-2.5 text-left border-l-4 transition-all block cursor-pointer outline-none ${
+                  selectedSummaryPointId === "control-center"
+                    ? "bg-white border-l-[#0071e3] font-semibold shadow-xs" 
+                    : "bg-zinc-50 border-l-transparent hover:bg-zinc-100/50"
+                }`}
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-bold text-[#0071e3] font-mono text-[10px]">#0 CONTROL</span>
+                </div>
+                <strong className="block text-zinc-800 truncate text-xs">ห้องควบคุม (ต้นทาง)</strong>
+                <p className="text-[10px] text-zinc-450 mt-0.5 truncate font-normal">
+                  พิกัด: {centerLat.toFixed(5)}, {centerLng.toFixed(5)}
+                </p>
+              </button>
+
               {cameraPoints.map((pt, ind) => {
                 const isSelected = pt.id === selectedSummaryPointId;
                 return (
@@ -469,7 +492,12 @@ export default function Step5Summary({
                   {/* Control Center (Monitor Site) */}
                   <Marker
                     position={[centerLat, centerLng]}
-                    icon={createControlCenterIcon()}
+                    icon={createControlCenterIcon(selectedSummaryPointId === "control-center")}
+                    eventHandlers={{
+                      click: () => {
+                        setSelectedSummaryPointId(selectedSummaryPointId === "control-center" ? null : "control-center");
+                      }
+                    }}
                   />
 
                   {/* Markers */}
