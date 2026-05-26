@@ -657,6 +657,7 @@ export default function App() {
               vatRate: parseFloat(row.vat_rate) || 7,
               status: row.status || "draft",
               createdAt: row.created_at || new Date().toISOString(),
+              createdBy: row.created_by || null,
               cameraPoints: cams.map((c: any) => ({
                 id: c.id,
                 name: c.name || "",
@@ -1331,6 +1332,8 @@ export default function App() {
             currentProjectId={activeProjectId}
             isCloudSyncActive={isSupabaseConfigured}
             costLastUpdated={formattedCostTimestamp}
+            userRole={userProfile?.role || "user"}
+            currentUserId={currentUser?.id || null}
           />
         </section>
 

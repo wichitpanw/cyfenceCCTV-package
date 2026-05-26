@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderKanban, Search, Trash2, Calendar, FileType2, FileText, ArrowUpRight, PlusCircle, CheckCircle } from "lucide-react";
+import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle } from "lucide-react";
 import { ProjectSurvey } from "../types";
 
 interface ProjectHistoryProps {
@@ -10,6 +10,8 @@ interface ProjectHistoryProps {
   currentProjectId: string | null;
   isCloudSyncActive?: boolean;
   costLastUpdated?: string;
+  userRole?: string;
+  currentUserId?: string | null;
 }
 
 export default function ProjectHistory({
@@ -19,24 +21,48 @@ export default function ProjectHistory({
   onNewProject,
   currentProjectId,
   isCloudSyncActive = false,
-  costLastUpdated
+  costLastUpdated,
+  userRole = "user",
+  currentUserId = null,
 }: ProjectHistoryProps) {
   const [search, setSearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("all");
 
+  // สิทธิ์ที่แสดงได้ทั้งหมด
+  const canSeeAllProjects = userRole === "superadmin" || userRole === "admin";
+  // สิทธิ์ที่มองเห็นราคาต้นทุนได้
+  const canSeeCost = userRole === "superadmin" || userRole === "admin";
+
+  // กรองโปรเจคตามสิทธิ์ผู้ใช้ (Frontend filter เพิ่มเติม ป้องกันกรณี RLS ถูก disable)
+  const roleFilteredProjects = canSeeAllProjects
+    ? projects
+    : userRole === "head_user"
+    ? projects // head_user: Backend กรองด้วย province แล้ว แสดงทั้งหมดที่ได้รับมา
+    : projects.filter((p) => {
+        // user: เห็นเฉพาะงานที่ตัวเองสร้างเท่านั้น (ตรวจจาก createdBy field)
+        if (!currentUserId) return false;
+        const proj = p as any;
+        if (proj.createdBy) return proj.createdBy === currentUserId;
+        if (proj.created_by) return proj.created_by === currentUserId;
+        // ถ้าไม่มีข้อมูล createdBy เลย (งานเก่า) ให้ซ่อนไปก่อนเพื่อความปลอดภัย
+        return false;
+      });
+
   // Extract unique provinces present in history list
   const uniqueProvinces = [
     "all",
-    ...Array.from(new Set(projects.map(p => p.customerInfo.province).filter(Boolean)))
+    ...Array.from(new Set(roleFilteredProjects.map((p) => p.customerInfo.province).filter(Boolean))),
   ];
 
-  const filtered = projects.filter((p) => {
+  const filtered = roleFilteredProjects.filter((p) => {
     const matchesSearch =
       p.customerInfo.customerName.toLowerCase().includes(search.toLowerCase()) ||
       p.customerInfo.projectName.toLowerCase().includes(search.toLowerCase()) ||
-      (p.customerInfo.province && p.customerInfo.province.toLowerCase().includes(search.toLowerCase()));
+      (p.customerInfo.province &&
+        p.customerInfo.province.toLowerCase().includes(search.toLowerCase()));
 
-    const matchesProvince = selectedProvince === "all" || p.customerInfo.province === selectedProvince;
+    const matchesProvince =
+      selectedProvince === "all" || p.customerInfo.province === selectedProvince;
 
     return matchesSearch && matchesProvince;
   });
@@ -62,7 +88,7 @@ export default function ProjectHistory({
               <PlusCircle className="w-3.5 h-3.5 shrink-0" />
               <span>เปิดไฟล์งานใหม่</span>
             </div>
-            {costLastUpdated && (
+            {canSeeCost && costLastUpdated && (
               <span className="text-[7px] text-zinc-400 font-normal">
                 ราคา ณ {costLastUpdated}
               </span>
@@ -94,15 +120,19 @@ export default function ProjectHistory({
               onChange={(e) => setSelectedProvince(e.target.value)}
               className="grow bg-white border border-zinc-200 rounded px-1.5 py-0.5 text-[10px] focus:outline-none focus:ring-1 focus:ring-[#0071e3] cursor-pointer"
             >
-              <option value="all">ทั้งหมด ({projects.length})</option>
-              {uniqueProvinces.filter(p => p !== "all").map((prov) => {
-                const count = projects.filter(p => p.customerInfo.province === prov).length;
-                return (
-                  <option key={prov} value={prov}>
-                    {prov} ({count})
-                  </option>
-                );
-              })}
+              <option value="all">ทั้งหมด ({roleFilteredProjects.length})</option>
+              {uniqueProvinces
+                .filter((p) => p !== "all")
+                .map((prov) => {
+                  const count = roleFilteredProjects.filter(
+                    (p) => p.customerInfo.province === prov
+                  ).length;
+                  return (
+                    <option key={prov} value={prov}>
+                      {prov} ({count})
+                    </option>
+                  );
+                })}
             </select>
           </div>
         )}
@@ -112,8 +142,11 @@ export default function ProjectHistory({
           {filtered.length > 0 ? (
             filtered.map((proj) => {
               const isActive = proj.id === currentProjectId;
-              const subtotal = proj.pricingItems.reduce((acc, curr) => acc + (curr.quantity * curr.unitPrice), 0);
-              
+              const subtotal = proj.pricingItems.reduce(
+                (acc, curr) => acc + curr.quantity * curr.unitPrice,
+                0
+              );
+
               return (
                 <div
                   key={proj.id}
@@ -152,9 +185,13 @@ export default function ProjectHistory({
                           {proj.customerInfo.surveyorName.substring(0, 2)}
                         </span>
                       </div>
-                      <span className="truncate font-medium text-zinc-600">{proj.customerInfo.surveyorName}</span>
+                      <span className="truncate font-medium text-zinc-600">
+                        {proj.customerInfo.surveyorName}
+                      </span>
                       {proj.customerInfo.surveyorPhone && (
-                        <span className="shrink-0 text-zinc-400">· {proj.customerInfo.surveyorPhone}</span>
+                        <span className="shrink-0 text-zinc-400">
+                          · {proj.customerInfo.surveyorPhone}
+                        </span>
                       )}
                     </div>
                   )}
@@ -174,16 +211,21 @@ export default function ProjectHistory({
                         </span>
                       )}
                     </span>
-                    <strong className="text-zinc-900 text-xs font-semibold">
-                      ฿{subtotal.toLocaleString("th-TH")}
-                    </strong>
+                    {/* แสดงราคาสรุปเฉพาะ superadmin และ admin เท่านั้น */}
+                    {canSeeCost && (
+                      <strong className="text-zinc-900 text-xs font-semibold">
+                        ฿{subtotal.toLocaleString("th-TH")}
+                      </strong>
+                    )}
                   </div>
                 </div>
               );
             })
           ) : (
             <div className="p-6 text-center text-zinc-400 border border-dashed rounded-xl border-zinc-200 text-[11px]">
-              ยังไม่มีใบงานใดบันทึกไว้ในเบราว์เซอร์นี้
+              {userRole === "user"
+                ? "ยังไม่มีใบงานที่คุณสร้างไว้ค่ะ กดปุ่ม 'เปิดไฟล์งานใหม่' เพื่อเริ่มต้น"
+                : "ยังไม่มีใบงานใดบันทึกไว้ในเบราว์เซอร์นี้"}
             </div>
           )}
         </div>
