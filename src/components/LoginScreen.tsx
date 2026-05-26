@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Lock, Mail, Eye, EyeOff, ShieldAlert, CheckCircle2, Loader2 } from "lucide-react";
+import { Lock, User, Eye, EyeOff, ShieldAlert, CheckCircle2, Loader2 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 interface LoginScreenProps {
@@ -30,11 +30,11 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     setSuccessMsg("");
 
     try {
-      // ค้นหา user จาก profiles table โดยตรงด้วย email + password
+      // ค้นหา user จาก profiles table โดยตรงด้วย username + password
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
-        .eq("email", email.trim().toLowerCase())
+        .eq("email", email.trim())
         .eq("password", password)
         .maybeSingle();
 
@@ -120,17 +120,17 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           {/* Form */}
           <form onSubmit={handleSignIn} className="space-y-4">
 
-            {/* Email Input */}
+            {/* Username Input */}
             <div className="space-y-1">
-              <label className="block text-[10px] font-semibold text-zinc-650 uppercase">ที่อยู่อีเมลบริษัท (Email)</label>
+              <label className="block text-[10px] font-semibold text-zinc-650 uppercase">ชื่อผู้ใช้งาน (Username)</label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                  <Mail className="w-4 h-4" />
+                  <User className="w-4 h-4" />
                 </span>
                 <input
-                  type="email"
+                  type="text"
                   required
-                  placeholder="username@ntplc.co.th"
+                  placeholder="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-medium text-zinc-800 transition-all"

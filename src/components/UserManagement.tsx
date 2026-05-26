@@ -253,13 +253,13 @@ export default function UserManagement() {
         </h5>
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          {/* Email Input */}
+          {/* Username Input */}
           <div className="space-y-1 md:col-span-3">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">อีเมลผู้ใช้ (Email)</label>
+            <label className="block text-[9px] font-bold text-zinc-550 uppercase">ชื่อผู้ใช้ (Username)</label>
             <input
-              type="email"
+              type="text"
               required
-              placeholder="username@ntplc.co.th"
+              placeholder="username"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-mono text-zinc-800 shadow-2xs"
