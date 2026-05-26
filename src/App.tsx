@@ -1010,6 +1010,9 @@ export default function App() {
         }
 
         // 2. Replace camera_points: delete old, insert new
+        let hasDetailError = false;
+        let detailErrorMessage = "";
+
         await supabase.from("camera_points").delete().eq("project_id", freshId);
         if (cameraPoints.length > 0) {
           const camRows = cameraPoints.map((c, idx) => ({
@@ -1038,7 +1041,11 @@ export default function App() {
             selected_set: c.selectedSet ?? null,
           }));
           const { error: camError } = await supabase.from("camera_points").insert(camRows);
-          if (camError) console.error("Camera points insert error:", camError.message);
+          if (camError) {
+            console.error("Camera points insert error:", camError.message);
+            hasDetailError = true;
+            detailErrorMessage += "\n- ไม่สามารถบันทึกจุดติดตั้งกล้องได้: " + camError.message;
+          }
         }
 
         // 3. Replace pricing_items: delete old, insert new
@@ -1055,9 +1062,17 @@ export default function App() {
             category: p.category,
           }));
           const { error: priceError } = await supabase.from("pricing_items").insert(priceRows);
-          if (priceError) console.error("Pricing items insert error:", priceError.message);
+          if (priceError) {
+            console.error("Pricing items insert error:", priceError.message);
+            hasDetailError = true;
+            detailErrorMessage += "\n- ไม่สามารถบันทึกรายการราคาประเมินได้: " + priceError.message;
+          }
         }
 
+        if (hasDetailError) {
+          showAlert("⚠️ บันทึกข้อมูลไม่สมบูรณ์", "ข้อมูลหลักถูกบันทึกแล้ว แต่พบปัญหาในส่วนข้อมูลย่อย:" + detailErrorMessage);
+          return;
+        }
       } catch (err) {
         console.error("Supabase Save Exception:", err);
       }
