@@ -601,7 +601,11 @@ export default function App() {
 
         if (projectsError) {
           console.error("Failed to fetch projects from Supabase:", projectsError.message);
-        } else if (projectsData && projectsData.length > 0) {
+        } else if (projectsData) {
+          if (projectsData.length === 0) {
+            setProjectsList([]);
+            return;
+          }
           const projectIds = projectsData.map((p: any) => p.id);
 
           // Fetch all camera_points for these projects
@@ -952,7 +956,8 @@ export default function App() {
       discount,
       vatRate,
       createdAt: new Date().toISOString(),
-      status: "draft"
+      status: "draft",
+      createdBy: currentUser?.id || null
     };
 
     let updatedList: ProjectSurvey[] = [];

@@ -761,54 +761,58 @@ export default function Step6Pricing({
 
             {/* Price values summary stack */}
             <div className="space-y-4 text-xs text-zinc-700 font-sans border-b border-zinc-200 pb-5">
-              <div className="flex justify-between items-center text-zinc-650 font-medium">
-                <span>มูลค่าอุปกรณ์และบริการ (Subtotal):</span>
-                <span className="font-mono font-bold text-sm text-zinc-900">
-                  ฿{calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
+              {isAdminVerified && (
+                <>
+                  <div className="flex justify-between items-center text-zinc-650 font-medium">
+                    <span>มูลค่าอุปกรณ์และบริการ (Subtotal):</span>
+                    <span className="font-mono font-bold text-sm text-zinc-900">
+                      ฿{calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
 
-              {/* Discount inputs */}
-              <div className="space-y-1 bg-zinc-100 p-3 rounded-2xl border border-zinc-250">
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-650 font-medium">ส่วนลดพิเศษโครงการ (฿):</span>
-                  <input
-                    type="number"
-                    min={0}
-                    value={discount}
-                    onChange={(e) => onUpdateDiscount(parseFloat(e.target.value) || 0)}
-                    className="w-24 text-right px-2 py-1 rounded-lg font-mono font-bold bg-white text-zinc-800 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
-                  />
-                </div>
-              </div>
+                  {/* Discount inputs */}
+                  <div className="space-y-1 bg-zinc-100 p-3 rounded-2xl border border-zinc-250">
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-650 font-medium">ส่วนลดพิเศษโครงการ (฿):</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={discount}
+                        onChange={(e) => onUpdateDiscount(parseFloat(e.target.value) || 0)}
+                        className="w-24 text-right px-2 py-1 rounded-lg font-mono font-bold bg-white text-zinc-800 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                      />
+                    </div>
+                  </div>
 
-              <div className="flex justify-between items-center text-zinc-550">
-                <span>ยอดจัดเช่าอุปกรณ์ต้นทุนสุทธิ์:</span>
-                <span className="font-mono font-bold text-zinc-800">
-                  ฿{calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
+                  <div className="flex justify-between items-center text-zinc-550">
+                    <span>ยอดจัดเช่าอุปกรณ์ต้นทุนสุทธิ์:</span>
+                    <span className="font-mono font-bold text-zinc-800">
+                      ฿{calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
 
-              <div className="flex justify-between items-center text-zinc-500 border-t border-zinc-200/50 pt-2">
-                <span>บวก กำไรโครงการ (+40%):</span>
-                <span className="font-mono font-semibold text-zinc-750">
-                  ฿{(calBeforeVat * 0.4).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
+                  <div className="flex justify-between items-center text-zinc-500 border-t border-zinc-200/50 pt-2">
+                    <span>บวก กำไรโครงการ (+40%):</span>
+                    <span className="font-mono font-semibold text-zinc-750">
+                      ฿{(calBeforeVat * 0.4).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
 
-              <div className="flex justify-between items-center text-zinc-500">
-                <span>บวก ดอกเบี้ยจัดเช่า 8%/ปี (3 ปี = 24%):</span>
-                <span className="font-mono font-semibold text-zinc-750">
-                  ฿{leaseInterest.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
+                  <div className="flex justify-between items-center text-zinc-500">
+                    <span>บวก ดอกเบี้ยจัดเช่า 8%/ปี (3 ปี = 24%):</span>
+                    <span className="font-mono font-semibold text-zinc-750">
+                      ฿{leaseInterest.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
 
-              <div className="flex justify-between items-center text-zinc-800 font-bold border-t border-zinc-200/50 pt-2">
-                <span>รวมมูลค่าระบบจัดเช่าอุปกรณ์:</span>
-                <span className="font-mono text-zinc-900">
-                  ฿{leaseTotalAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
+                  <div className="flex justify-between items-center text-zinc-800 font-bold border-t border-zinc-200/50 pt-2">
+                    <span>รวมมูลค่าระบบจัดเช่าอุปกรณ์:</span>
+                    <span className="font-mono text-zinc-900">
+                      ฿{leaseTotalAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </>
+              )}
 
               {/* VAT toggler and selection */}
               <div className="space-y-2 bg-zinc-100 p-3 rounded-2xl border border-zinc-250">
@@ -839,35 +843,56 @@ export default function Step6Pricing({
             </div>
 
             {/* Grand Total output showcase */}
-            <div className="space-y-3 border-t border-zinc-200/60 pt-3">
+            <div className="space-y-4 border-t border-zinc-200/60 pt-3">
+              {/* ค่าเช่าระบบอุปกรณ์ต่อเดือน (36 งวด) */}
               <div className="space-y-1">
                 <span className="text-zinc-550 text-[9px] uppercase font-bold font-mono tracking-wider block">
                   ค่าเช่าระบบอุปกรณ์ต่อเดือน (36 งวด)
                 </span>
-                <div className="text-xl font-bold font-mono text-zinc-900 flex items-baseline justify-between">
-                  <span>฿</span>
-                  <span className="text-[#0071e3]">{leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2 })}<span className="text-xs text-zinc-500 font-sans font-normal">/เดือน</span></span>
+                <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between">
+                  <span className="text-zinc-500 font-sans text-xs">ก่อน VAT:</span>
+                  <span className="text-[#0071e3]">฿{leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                 </div>
+                {isVatEnabled && (
+                  <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-zinc-100 pt-1">
+                    <span className="text-zinc-500 font-sans text-xs">รวม VAT (7%):</span>
+                    <span className="text-[#0071e3]">฿{(leaseMonthlyPayment * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  </div>
+                )}
               </div>
 
+              {/* ค่าเช่าวงจรเครือข่ายรายเดือน (NT LINKS) */}
               <div className="space-y-1 pt-3 border-t border-zinc-200/40">
                 <span className="text-zinc-550 text-[9px] uppercase font-bold font-mono tracking-wider block">
-                  ค่าเช่าวงจรเครือข่ายรายเดือน (NT LINKS OPEX)
+                  ค่าเช่าวงจรเครือข่ายรายเดือน (NT LINKS)
                 </span>
-                <div className="text-xl font-bold font-mono text-zinc-900 flex items-baseline justify-between">
-                  <span>฿</span>
-                  <span className="text-[#0071e3]">{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}<span className="text-xs text-zinc-500 font-sans font-normal">/เดือน</span></span>
+                <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between">
+                  <span className="text-zinc-500 font-sans text-xs">ก่อน VAT:</span>
+                  <span className="text-[#0071e3]">฿{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                 </div>
+                {isVatEnabled && (
+                  <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-zinc-100 pt-1">
+                    <span className="text-zinc-500 font-sans text-xs">รวม VAT (7%):</span>
+                    <span className="text-[#0071e3]">฿{(totalMonthlyPrice * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  </div>
+                )}
               </div>
 
+              {/* ค่าเช่ารวมรายเดือนทั้งสิ้น (GRAND TOTAL MONTHLY) */}
               <div className="space-y-1 pt-3 border-t-2 border-dashed border-zinc-250">
                 <span className="text-[#0071e3] text-[9.5px] uppercase font-bold font-mono tracking-wider block">
-                  ค่าเช่ารวมรายเดือนทั้งสิ้น (GRAND TOTAL MONTHLY)
+                  ค่าเช่ารวมรายเดือนทั้งสิ้น (GRAND TOTAL)
                 </span>
-                <div className="text-2xl font-black font-mono text-zinc-900 flex items-baseline justify-between">
-                  <span>฿</span>
-                  <span className="text-[#0071e3]">{grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}<span className="text-xs text-zinc-500 font-sans font-normal">/เดือน</span></span>
+                <div className="text-sm font-bold font-mono text-zinc-900 flex justify-between">
+                  <span className="text-zinc-500 font-sans text-xs">ก่อน VAT:</span>
+                  <span className="text-[#0071e3]">฿{grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                 </div>
+                {isVatEnabled && (
+                  <div className="text-lg font-black font-mono text-zinc-900 flex justify-between border-t border-zinc-200/60 pt-1.5">
+                    <span className="text-zinc-650 font-sans text-xs font-bold">รวม VAT (7%):</span>
+                    <span className="text-[#0071e3]">฿{grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  </div>
+                )}
               </div>
             </div>
 
