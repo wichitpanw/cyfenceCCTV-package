@@ -10,7 +10,8 @@ import {
   ShieldAlert,
   HardDrive,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Image as ImageIcon
 } from "lucide-react";
 import { CustomerInfo, TechRequirements, CameraPoint, PricingItem } from "../types";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
@@ -529,6 +530,61 @@ export default function Step5Summary({
                 <div className="absolute top-2 right-2 bg-zinc-900/90 backdrop-blur-md rounded-lg border border-zinc-800 text-[9px] font-mono px-2 py-1 text-white uppercase tracking-wider z-[400] shadow-sm">
                   🗺️ ผังพิกัดแผนที่ (คลิกเลือกกล้องเพื่อเคลื่อนย้ายดูพิกัดได้)
                 </div>
+
+                {/* Floating Camera Detail & Photo Preview Card (Bottom Left) */}
+                {activeSummaryPoint && (
+                  <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-zinc-200 text-xs shadow-md z-[400] w-64 select-none flex flex-col gap-2 transition-all">
+                    <div className="flex items-center justify-between border-b border-zinc-150 pb-1.5">
+                      <span className="font-bold text-[#0071e3] font-mono">
+                        #{cameraPoints.findIndex(p => p.id === activeSummaryPoint.id) + 1} {activeSummaryPoint.type}
+                      </span>
+                      <span className="text-[9px] px-1.5 bg-zinc-100 text-zinc-550 rounded font-semibold uppercase tracking-wider">
+                        {activeSummaryPoint.poleType !== "None" ? "มีเสาเสริม" : "ยึดติดอาคาร"}
+                      </span>
+                    </div>
+                    
+                    <strong className="text-zinc-800 truncate text-[11px] block">{activeSummaryPoint.name}</strong>
+                    
+                    {activeSummaryPoint.photoUrl ? (
+                      <div className="relative aspect-video w-full rounded-lg overflow-hidden border border-zinc-200 bg-zinc-50 shadow-inner group">
+                        <img 
+                          src={activeSummaryPoint.photoUrl} 
+                          alt={activeSummaryPoint.name} 
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-video w-full rounded-lg border border-zinc-200 border-dashed bg-zinc-50 flex flex-col items-center justify-center text-zinc-400 gap-1 py-4">
+                        <ImageIcon className="w-5 h-5 text-zinc-350 animate-pulse" />
+                        <span className="text-[9px]">ไม่มีภาพประกอบหน้างานจริง</span>
+                      </div>
+                    )}
+
+                    {activeSummaryPoint.notes && (
+                      <p className="text-[9.5px] text-zinc-500 leading-relaxed bg-zinc-50 px-2 py-1.5 rounded-lg border border-zinc-100 max-h-16 overflow-y-auto">
+                        {activeSummaryPoint.notes}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Floating Control Center Info Card (Bottom Left) */}
+                {selectedSummaryPointId === "control-center" && (
+                  <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-zinc-200 text-xs shadow-md z-[400] w-64 select-none flex flex-col gap-1.5 transition-all">
+                    <div className="flex items-center justify-between border-b border-zinc-150 pb-1.5">
+                      <span className="font-bold text-[#0071e3] font-mono">#0 CONTROL</span>
+                      <span className="text-[9px] px-1.5 bg-[#0071e3]/10 text-[#0071e3] rounded font-semibold uppercase tracking-wider">
+                        ต้นทาง
+                      </span>
+                    </div>
+                    <strong className="text-zinc-800 text-[11px] block">ห้องควบคุม (ต้นทาง)</strong>
+                    <p className="text-[10px] text-zinc-550 leading-relaxed bg-zinc-50 px-2 py-1.5 rounded-lg border border-zinc-100">
+                      📍 พิกัดหลักโครงการ: {centerLat.toFixed(6)}, {centerLng.toFixed(6)}<br/>
+                      🖥️ อุปกรณ์หลัก: เครื่องบันทึกภาพ NVR และตู้ควบคุมกลางระบบกล้องวงจรปิด
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
