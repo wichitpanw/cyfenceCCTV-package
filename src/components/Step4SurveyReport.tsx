@@ -802,12 +802,12 @@ export default function Step4SurveyReport({
               {/* Coordinates Editor */}
               <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-3.5 space-y-3.5">
                 <span className="block text-[10px] font-bold text-zinc-650 flex items-center gap-1.5 uppercase font-mono tracking-wider">
-                  📍 ป้อนพิกัดภูมิศาสตร์ (แก้ไขเด้งหาตำแหน่งทันที)
+                  📍 ป้อนพิกัดภูมิศาสตร์
                 </span>
                 
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <label className="block text-[10px] text-zinc-500 font-semibold mb-1">LATITUDE (ละติจูด)</label>
+                    <label className="block text-[10px] text-zinc-500 font-semibold mb-1">LATITUDE</label>
                     <input
                       type="text"
                       value={localLat}
@@ -817,7 +817,7 @@ export default function Step4SurveyReport({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-zinc-500 font-semibold mb-1">LONGITUDE (ลองจิจูด)</label>
+                    <label className="block text-[10px] text-zinc-500 font-semibold mb-1">LONGITUDE</label>
                     <input
                       type="text"
                       value={localLng}
@@ -1234,11 +1234,11 @@ export default function Step4SurveyReport({
                     {/* Coordinate Info Box (Interactive Text-inputs with map panning) */}
                     <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200 space-y-2">
                       <span className="text-[10px] font-bold text-zinc-555 block uppercase font-mono tracking-wider">
-                        📍 ป้อนพิกัดภูมิศาสตร์เฉพาะจุด (แก้ไขเด้งหาตำแหน่งทันที)
+                        📍 ป้อนพิกัดภูมิศาสตร์เฉพาะจุด
                       </span>
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
                         <div className="space-y-1">
-                          <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Latitude (ละติจูด)</label>
+                          <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Latitude</label>
                           <input
                             type="text"
                             value={localLat}
@@ -1248,7 +1248,7 @@ export default function Step4SurveyReport({
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Longitude (ลองจิจูด)</label>
+                          <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Longitude</label>
                           <input
                             type="text"
                             value={localLng}
@@ -1280,7 +1280,7 @@ export default function Step4SurveyReport({
                     {/* Photo Attachments - Direct Image Upload Dropzone only */}
                     <div className="space-y-2">
                       <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
-                        ภาพประกอบจุดสำรวจหน้างานจริง (ภาพจากการอัปโหลดจริงเท่านั้น)
+                        ภาพประกอบจุดสำรวจหน้างานจริง
                       </label>
                       
                       {/* Apple Style Direct Upload Container */}
