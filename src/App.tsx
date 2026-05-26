@@ -52,6 +52,9 @@ const DEFAULT_REQUIREMENTS: TechRequirements = {
   nvrChannels: 8,
   storagePackage: "HDD 8TB (มาตรฐานส่วนกลาง 8CH NVR)",
   otherRequirements: "",
+  rackType: "rack 19 นิ้ว 6U",
+  monitorType: "จอ 27 นิ้ว",
+  upsType: "UPS 1Kva",
 };
 
 const DEFAULT_MASTER_COSTS: MasterCostDb = {
@@ -926,6 +929,9 @@ export default function App() {
       nvrChannels: 8,
       storagePackage: "HDD 8TB (มาตรฐานส่วนกลาง 8CH NVR)",
       otherRequirements: "",
+      rackType: "rack 19 นิ้ว 6U",
+      monitorType: "จอ 27 นิ้ว",
+      upsType: "UPS 1Kva",
     });
     setHasSurveyReport(true);
     setCameraPoints([]);
