@@ -395,9 +395,26 @@ export default function App() {
     const checkUserSession = async () => {
       setAuthLoading(true);
       try {
-        // 1. ตรวจสอบเซสชันผู้ใช้แบบ Password-less (LocalStorage) ก่อน
+        // 1. ตรวจสอบเซสชันผู้ใช้และอายุเซสชันหมดเวลา 2 ชั่วโมงก่อน
         const savedSession = localStorage.getItem("CCTV_USER_SESSION");
+        const sessionExpiry = localStorage.getItem("CCTV_SESSION_EXPIRY");
+
         if (savedSession) {
+          if (sessionExpiry) {
+            const expiryTime = parseInt(sessionExpiry, 10);
+            if (!isNaN(expiryTime) && Date.now() > expiryTime) {
+              // เซสชันหมดอายุแล้ว!
+              localStorage.removeItem("CCTV_USER_SESSION");
+              localStorage.removeItem("CCTV_SESSION_EXPIRY");
+              await supabase.auth.signOut();
+              setCurrentUser(null);
+              setUserProfile(null);
+              setAuthLoading(false);
+              alert("🔒 เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 2 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ");
+              return;
+            }
+          }
+
           const parsed = JSON.parse(savedSession);
           setCurrentUser(parsed.user);
           setUserProfile(parsed.profile);
@@ -410,6 +427,8 @@ export default function App() {
         if (session && session.user) {
           setCurrentUser(session.user);
           await loadUserProfile(session.user.id, session.user.email || "");
+          const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
+          localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
         } else {
           setCurrentUser(null);
           setUserProfile(null);
@@ -427,6 +446,10 @@ export default function App() {
       if (session && session.user) {
         setCurrentUser(session.user);
         await loadUserProfile(session.user.id, session.user.email || "");
+        if (event === "SIGNED_IN") {
+          const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
+          localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
+        }
       } else {
         setCurrentUser(null);
         setUserProfile(null);
@@ -483,6 +506,63 @@ export default function App() {
       setAuthLoading(false);
     }
   };
+
+  // Reusable handleLogout function
+  const handleLogout = async () => {
+    localStorage.removeItem("CCTV_USER_SESSION");
+    localStorage.removeItem("CCTV_SESSION_EXPIRY");
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error("Sign out error:", e);
+    }
+    setCurrentUser(null);
+    setUserProfile(null);
+    window.location.reload();
+  };
+
+  // Rolling Expiry Activity Tracker (ต่ออายุอีก 2 ชั่วโมงเมื่อมีการเคลื่อนไหว)
+  useEffect(() => {
+    if (!currentUser) return;
+
+    let lastUpdated = Date.now();
+    const updateExpiry = () => {
+      const now = Date.now();
+      // Throttle: อัปเดตลง localStorage อย่างมากที่สุดทุกๆ 10 วินาที เพื่อไม่ให้เบราว์เซอร์ทำงานหนักเกินไป
+      if (now - lastUpdated > 10000) {
+        const newExpiry = now + 2 * 60 * 60 * 1000;
+        localStorage.setItem("CCTV_SESSION_EXPIRY", newExpiry.toString());
+        lastUpdated = now;
+      }
+    };
+
+    window.addEventListener("click", updateExpiry);
+    window.addEventListener("keydown", updateExpiry);
+
+    return () => {
+      window.removeEventListener("click", updateExpiry);
+      window.removeEventListener("keydown", updateExpiry);
+    };
+  }, [currentUser]);
+
+  // Background interval checking for session expiration (เช็คทุกๆ 15 วินาที)
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const interval = setInterval(() => {
+      const expiry = localStorage.getItem("CCTV_SESSION_EXPIRY");
+      if (expiry) {
+        const expiryTime = parseInt(expiry, 10);
+        if (!isNaN(expiryTime) && Date.now() > expiryTime) {
+          clearInterval(interval);
+          alert("🔒 เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 2 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ");
+          handleLogout();
+        }
+      }
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [currentUser]);
 
   // Sync tempCosts when opening the costs modal
   useEffect(() => {
@@ -1266,11 +1346,7 @@ export default function App() {
               type="button"
               onClick={async () => {
                 if (confirm("🚪 คุณต้องการออกจากระบบใช่หรือไม่?")) {
-                  localStorage.removeItem("CCTV_USER_SESSION");
-                  await supabase.auth.signOut();
-                  setCurrentUser(null);
-                  setUserProfile(null);
-                  window.location.reload();
+                  await handleLogout();
                 }
               }}
               className="p-2 rounded-lg bg-red-50 hover:bg-red-100 active:bg-red-150 text-red-650 transition-all border border-red-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5 shadow-2xs"

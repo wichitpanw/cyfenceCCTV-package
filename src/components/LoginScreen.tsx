@@ -46,8 +46,8 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
-      setErrorMsg("กรุณากรอกที่อยู่อีเมลของคุณด้วยค่ะ");
+    if (!email || !password) {
+      setErrorMsg("กรุณากรอกอีเมลและรหัสผ่านของคุณด้วยค่ะ");
       return;
     }
 
@@ -56,21 +56,38 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     setSuccessMsg("");
 
     try {
-      // ตรวจสอบที่อยู่อีเมลจากตาราง profiles โดยตรง (แบบไม่ต้องกรอกรหัสผ่าน)
+      // 1. ลงชื่อเข้าใช้งานด้วย Email และ Password จริงผ่าน Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password: password
+      });
+
+      if (authError) {
+        setErrorMsg("❌ " + translateAuthError(authError.message));
+        setLoading(false);
+        return;
+      }
+
+      if (!authData.user) {
+        setErrorMsg("❌ ไม่สามารถลงชื่อเข้าใช้งานได้ กรุณาลองใหม่อีกครั้งค่ะ");
+        setLoading(false);
+        return;
+      }
+
+      // 2. ดึงข้อมูลโปรไฟล์ (Profile) เพิ่มเติมเพื่อดูสิทธิ์และจังหวัดกลุ่มงาน
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
-        .eq("email", email.trim().toLowerCase())
+        .eq("id", authData.user.id)
         .maybeSingle();
 
       if (profileError) {
-        setErrorMsg("เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์ผู้ใช้งาน: " + profileError.message);
+        setErrorMsg("เกิดข้อผิดพลาดในการดึงข้อมูลสิทธิ์ผู้ใช้งาน: " + profileError.message);
       } else if (!profile) {
-        setErrorMsg("❌ ไม่พบที่อยู่อีเมลนี้ในระบบความปลอดภัยค่ะ กรุณาติดต่อผู้ดูแลระบบ (Super Admin) เพื่อขอเพิ่มสิทธิ์เข้าใช้งาน");
+        setErrorMsg("❌ ไม่พบข้อมูลโปรไฟล์ในระบบความปลอดภัยค่ะ กรุณาติดต่อผู้ดูแลระบบเพื่อสร้างข้อมูลสิทธิ์");
       } else {
-        setSuccessMsg("🎉 ยืนยันสิทธิ์เข้าใช้งานสำเร็จเรียบร้อยค่ะ!");
+        setSuccessMsg("🎉 เข้าสู่ระบบสำเร็จเรียบร้อยค่ะ!");
         
-        // Mock user session object
         const mockUser = {
           id: profile.id,
           email: email.trim().toLowerCase(),
@@ -89,8 +106,12 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           }
         };
 
+        // ตั้งเวลาหมดอายุของเซสชันไว้ที่ 2 ชั่วโมง (7200000 ms)
+        const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
+
         // เซฟลง localStorage เพื่อให้ผู้ใช้งานล็อกอินค้างไว้ได้เมื่อรีเฟรชหน้าเบราว์เซอร์
         localStorage.setItem("CCTV_USER_SESSION", JSON.stringify(sessionPayload));
+        localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
 
         setTimeout(() => {
           onLoginSuccess(mockUser, sessionPayload.profile);
@@ -277,6 +298,33 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-medium text-zinc-800 transition-all"
                 />
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="block text-[10px] font-semibold text-zinc-650 uppercase">รหัสผ่าน (Password)</label>
+              </div>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+                  <Lock className="w-4 h-4" />
+                </span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-9 pr-10 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-medium text-zinc-800 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 focus:outline-none cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
