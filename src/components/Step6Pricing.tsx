@@ -287,6 +287,12 @@ export default function Step6Pricing({
     .remark-title { font-size: 8pt; font-weight: 700; color: #92400e; margin-bottom: 4px; }
     .remark-text { font-size: 8.5pt; color: #78350f; line-height: 1.6; }
     .footer { margin-top: 14px; font-size: 7.5pt; color: #999; border-top: 1px solid #eee; padding-top: 8px; text-align: center; }
+
+    .custom-print-icon {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
   </style>
 </head>
 <body>
@@ -392,7 +398,7 @@ export default function Step6Pricing({
               </svg>
             </div>
           \`,
-          className: "",
+          className: "custom-print-icon",
           iconSize: [24, 24],
           iconAnchor: [12, 12]
         });
@@ -437,7 +443,7 @@ export default function Step6Pricing({
                 <span style="font-size: 8px; font-weight: 850; color: \${colorHex}">\${pt.count}</span>
               </div>
             \`,
-            className: "",
+            className: "custom-print-icon",
             iconSize: [22, 22],
             iconAnchor: [11, 11]
           });
