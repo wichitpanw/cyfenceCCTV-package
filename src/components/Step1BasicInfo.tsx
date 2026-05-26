@@ -115,19 +115,6 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
 
   return (
     <div className="space-y-6" id="step1-container">
-      {/* Quick Autofill Button */}
-      <div className="bg-zinc-50/80 px-4 py-3 rounded-xl border border-zinc-200 flex items-center gap-3">
-        <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider font-mono shrink-0">⚡ ลองดูตัวอย่าง:</span>
-        <button
-          type="button"
-          onClick={() => autofillTemplate("subdistrict")}
-          className="px-3.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-700 text-xs font-medium rounded-lg border border-zinc-300 transition-all shadow-xs active:scale-95 cursor-pointer flex items-center gap-1.5"
-        >
-          🏗️ อบต.หนองนาคำ (อุดรธานี) — กรอกข้อมูลตัวอย่าง
-        </button>
-      </div>
-
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Column: Client primary details */}
         <div className="space-y-4">

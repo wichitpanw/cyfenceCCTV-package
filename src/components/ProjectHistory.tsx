@@ -123,7 +123,7 @@ export default function ProjectHistory({
           <div className="flex items-center gap-1.5">
             <FolderKanban className="w-4 h-4 text-[#0071e3] shrink-0" />
             <h3 className="font-semibold text-[11px] text-zinc-800 uppercase tracking-wide font-sans leading-none">
-              ประวัติงานสำรวจและแบบบันทึก
+              ประวัติงานสำรวจ
             </h3>
           </div>
           <button
