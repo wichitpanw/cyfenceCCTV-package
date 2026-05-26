@@ -61,9 +61,7 @@ export default function Step5Summary({
   const supportArmCount = cameraPoints.filter(p => p.hasSupportArm).length;
 
   // Selected camera point for interactive map navigation
-  const [selectedSummaryPointId, setSelectedSummaryPointId] = useState<string | null>(
-    cameraPoints.length > 0 ? cameraPoints[0].id : null
-  );
+  const [selectedSummaryPointId, setSelectedSummaryPointId] = useState<string | null>(null);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
 
   // Compute map center from customer info

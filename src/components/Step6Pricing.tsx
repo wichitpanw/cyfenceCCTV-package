@@ -217,6 +217,11 @@ export default function Step6Pricing({
         year: "numeric", month: "long", day: "numeric"
       });
       const quotationNo = `SR-${Date.now().toString().slice(-8)}`;
+      const defaultLat = customerInfo?.latitude ? parseFloat(customerInfo.latitude) : 13.7563;
+      const defaultLng = customerInfo?.longitude ? parseFloat(customerInfo.longitude) : 100.5018;
+      const centerLat = isNaN(defaultLat) ? 13.7563 : defaultLat;
+      const centerLng = isNaN(defaultLng) ? 100.5018 : defaultLng;
+
       const catLabel = (cat: string) =>
         cat === "hardware" ? "ฮาร์ดแวร์" :
         cat === "accessory" ? "อุปกรณ์เสริม" :
