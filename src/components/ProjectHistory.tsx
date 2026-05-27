@@ -41,7 +41,7 @@ function calcMonthlyTotal(proj: ProjectSurvey): number {
     { speed: 100, price: 1150 }, { speed: 150, price: 1440 },
     { speed: 200, price: 1730 }, { speed: 300, price: 2310 },
     { speed: 400, price: 2750 }, { speed: 500, price: 3180 },
-  ].find(t => t.speed >= speed) || { price: 3180 };
+  ].find(t => t.speed >= speed) || { speed: 500, price: 3180 };
 
   const totalMonthlyPrice = totalFieldLinksPrice + centerTier.price;
   const grandMonthlyBeforeVat = leaseMonthlyPayment + totalMonthlyPrice;
