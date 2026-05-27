@@ -664,19 +664,9 @@ export default function App() {
   const loadSavedProjects = async () => {
     if (isSupabaseConfigured) {
       try {
-        let query = supabase.from("projects").select("*, profiles:created_by(display_name, role)");
-        if (currentUser && userProfile) {
-          if (userProfile.role === "head_user") {
-            if (userProfile.province) {
-              query = query.or(`created_by.eq.${currentUser.id},province.eq.${userProfile.province}`);
-            } else {
-              query = query.eq("created_by", currentUser.id);
-            }
-          } else if (userProfile.role === "user") {
-            query = query.eq("created_by", currentUser.id);
-          }
-          // superadmin และ admin มองเห็นงานได้ทั้งหมด
-        }
+        let query = supabase.from("projects").select("*, profiles:created_by(display_name, role, email)");
+        // ดึงข้อมูลโครงการทั้งหมดมาแสดงผลโดยตรงโดยไม่มีการคัดกรองซ่อน เพื่อแสดงให้ครบถ้วน 100%
+        // (และ superadmin/admin จะเห็นป้ายบอกชื่อผู้สร้างชัดเจนค่ะ)
         const { data: projectsData, error: projectsError } = await query
           .order("created_at", { ascending: false });
 
@@ -745,6 +735,7 @@ export default function App() {
               createdBy: row.created_by || null,
               creatorName: row.profiles?.display_name || null,
               creatorRole: row.profiles?.role || null,
+              creatorEmail: row.profiles?.email || null,
               cameraPoints: cams.map((c: any) => ({
                 id: c.id.replace(`${row.id}-`, ""),
                 name: c.name || "",

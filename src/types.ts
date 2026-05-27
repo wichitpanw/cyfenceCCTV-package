@@ -89,6 +89,7 @@ export interface ProjectSurvey {
   createdBy?: string; // UUID of the user who created it
   creatorName?: string; // display name of the user who created it
   creatorRole?: string; // role of the user who created it
+  creatorEmail?: string; // email of the user who created it
 }
 
 export interface MasterCostDb {

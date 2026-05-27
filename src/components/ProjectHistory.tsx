@@ -81,20 +81,8 @@ export default function ProjectHistory({
   // สิทธิ์ที่มองเห็นราคาต้นทุนได้
   const canSeeCost = userRole === "superadmin" || userRole === "admin";
 
-  // กรองโปรเจคตามสิทธิ์ผู้ใช้ (Frontend filter เพิ่มเติม ป้องกันกรณี RLS ถูก disable)
-  const roleFilteredProjects = canSeeAllProjects
-    ? projects
-    : userRole === "head_user"
-    ? projects // head_user: Backend กรองด้วย province แล้ว แสดงทั้งหมดที่ได้รับมา
-    : projects.filter((p) => {
-        // user: เห็นเฉพาะงานที่ตัวเองสร้างเท่านั้น (ตรวจจาก createdBy field)
-        if (!currentUserId) return false;
-        const proj = p as any;
-        if (proj.createdBy) return proj.createdBy === currentUserId;
-        if (proj.created_by) return proj.created_by === currentUserId;
-        // ถ้าไม่มีข้อมูล createdBy เลย (งานเก่า) ให้ซ่อนไปก่อนเพื่อความปลอดภัย
-        return false;
-      });
+  // ให้ทุกคนมองเห็นใบงานทั้งหมดจากฐานข้อมูล Supabase ได้ครบถ้วน 100% ตามความต้องการของคุณบีมค่ะ
+  const roleFilteredProjects = projects;
 
   // Extract unique provinces present in history list
   const uniqueProvinces = [
@@ -291,10 +279,10 @@ export default function ProjectHistory({
                         </span>
                       )}
                       {canSeeAllProjects && proj.creatorName && (
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide font-sans shrink-0 uppercase ${
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide font-sans shrink-0 ${
                           isActive ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-800 border border-emerald-200"
                         }`} title={`สร้างโดย ID: ${proj.createdBy || "Unknown"}`}>
-                          👤 {proj.creatorName}
+                          👤 {proj.creatorName} {proj.creatorEmail ? `(${proj.creatorEmail})` : ""}
                         </span>
                       )}
                     </span>
