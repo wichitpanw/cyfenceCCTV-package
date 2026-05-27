@@ -273,6 +273,13 @@ export default function ProjectHistory({
                           {proj.customerInfo.province}
                         </span>
                       )}
+                      {canSeeAllProjects && proj.creatorName && (
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide font-sans shrink-0 uppercase ${
+                          isActive ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                        }`} title={`สร้างโดย ID: ${proj.createdBy || "Unknown"}`}>
+                          👤 {proj.creatorName}
+                        </span>
+                      )}
                     </span>
                     {/* แสดงราคาต้นทุนเฉพาะ superadmin และ admin เท่านั้น */}
                     {canSeeCost && (

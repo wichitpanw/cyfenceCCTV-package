@@ -87,6 +87,7 @@ export interface ProjectSurvey {
   createdAt: string;
   status: "draft" | "completed";
   createdBy?: string; // UUID of the user who created it
+  creatorName?: string; // display name of the user who created it
 }
 
 export interface MasterCostDb {

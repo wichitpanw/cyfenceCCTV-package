@@ -664,8 +664,7 @@ export default function App() {
   const loadSavedProjects = async () => {
     if (isSupabaseConfigured) {
       try {
-        // Fetch projects with related camera_points and pricing_items
-        let query = supabase.from("projects").select("*");
+        let query = supabase.from("projects").select("*, profiles:created_by(display_name)");
         if (currentUser && userProfile) {
           if (userProfile.role === "head_user") {
             if (userProfile.province) {
@@ -744,6 +743,7 @@ export default function App() {
               status: row.status || "draft",
               createdAt: row.created_at || new Date().toISOString(),
               createdBy: row.created_by || null,
+              creatorName: row.profiles?.display_name || null,
               cameraPoints: cams.map((c: any) => ({
                 id: c.id.replace(`${row.id}-`, ""),
                 name: c.name || "",
