@@ -89,43 +89,47 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0c1033] via-[#0d1647] to-zinc-950 flex items-center justify-center p-4 font-sans select-none overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-[#070a24] via-[#0b113a] to-zinc-950 flex items-center justify-center p-4 font-sans select-none overflow-hidden relative">
       
-      {/* Dynamic Background Circles */}
-      <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-blue-650/20 blur-[90px] animate-pulse animate-duration-[4000ms]"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-purple-650/15 blur-[100px] animate-pulse animate-duration-[6000ms]"></div>
+      {/* Premium Dynamic Ambient Lights */}
+      <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[130px] animate-pulse animate-duration-[8000ms]"></div>
+      <div className="absolute bottom-1/4 right-1/3 w-[450px] h-[450px] rounded-full bg-indigo-500/10 blur-[120px] animate-pulse animate-duration-[10000ms]"></div>
 
-      <div className="mx-auto w-full max-w-sm z-10 space-y-6">
-        {/* Brand Header (blocks-07 style) */}
-        <div className="space-y-3 text-center">
-          <div className="w-16 h-16 mx-auto bg-white rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/10 overflow-hidden p-2 transition-transform hover:scale-105">
+      {/* Main Container styled in a clean, minimalist blocks.so/login-07 fashion */}
+      <div className="mx-auto w-full max-w-[340px] z-10 space-y-8">
+        
+        {/* Brand Header */}
+        <div className="space-y-4 text-center">
+          <div className="w-16 h-16 mx-auto bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/10 overflow-hidden p-2 transition-all hover:scale-105 hover:shadow-blue-500/20">
             <img src="/cyfence_logo.png" alt="Cyfence Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-balance text-2xl font-black text-white tracking-wide uppercase font-mono">
-            NT CYFENCE CCTV
-          </h1>
-          <p className="text-pretty text-xs text-zinc-400 leading-normal max-w-[280px] mx-auto">
-            ระบบจัดทำใบเสนอราคาและรายงานสำรวจแพ็คเกจกล้องวงจรปิด NT
-          </p>
+          <div className="space-y-1.5">
+            <h1 className="text-balance text-2xl font-black text-white tracking-wide uppercase font-mono">
+              NT CYFENCE CCTV
+            </h1>
+            <p className="text-pretty text-xs text-zinc-400 font-medium leading-normal max-w-[280px] mx-auto">
+              ระบบจัดทำใบเสนอราคาและรายงานสำรวจแพ็คเกจกล้องวงจรปิด NT
+            </p>
+          </div>
         </div>
 
-        {/* Premium Form Card styled like blocks-07 but keeping customized frame */}
-        <div className="bg-white rounded-3xl p-6.5 border border-zinc-200/50 shadow-2xl space-y-5">
+        {/* Sleek Minimalist Form (Directly on Background, no white card, pure premium styling) */}
+        <div className="space-y-6">
           <div className="text-center">
-            <h2 className="text-xs font-bold text-zinc-900 uppercase tracking-wide">
+            <h2 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
               เข้าสู่ระบบเพื่อเริ่มใช้งาน
             </h2>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSignIn} className="space-y-4">
+          <form onSubmit={handleSignIn} className="space-y-5">
 
-            {/* Username Input (blocks-07 design) */}
-            <div className="space-y-1">
-              <label htmlFor="username" className="block text-[10px] font-bold text-zinc-550 uppercase">
+            {/* Username Input */}
+            <div className="space-y-2">
+              <label htmlFor="username" className="block text-[10px] font-bold text-zinc-400 tracking-wider uppercase">
                 ชื่อผู้ใช้งาน (USERNAME)
               </label>
-              <div className="relative mt-2">
+              <div className="relative">
                 <input
                   id="username"
                   type="text"
@@ -133,20 +137,20 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   placeholder="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full ps-9 pe-3 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:ring-2 focus:ring-[#0071e3] text-xs font-mono font-medium text-zinc-800 transition-all peer"
+                  className="w-full ps-10 pe-4 py-2.5 bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] focus:border-blue-500 focus:bg-white/[0.05] rounded-xl text-sm font-mono text-white placeholder-zinc-600 transition-all outline-none focus:ring-1 focus:ring-blue-500/30 peer"
                 />
-                <div className="text-zinc-400 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                <div className="text-zinc-500 absolute inset-y-0 start-0 flex items-center justify-center ps-3.5 peer-focus:text-blue-500 transition-colors pointer-events-none">
                   <User size={16} aria-hidden="true" />
                 </div>
               </div>
             </div>
 
-            {/* Password Input (blocks-07 design with Eye Toggle) */}
-            <div className="space-y-1">
-              <label htmlFor="password" className="block text-[10px] font-bold text-zinc-550 uppercase">
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-[10px] font-bold text-zinc-400 tracking-wider uppercase">
                 รหัสผ่าน (PASSWORD)
               </label>
-              <div className="relative mt-2">
+              <div className="relative">
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -154,15 +158,15 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full ps-9 pe-9 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:ring-2 focus:ring-[#0071e3] text-xs font-mono font-medium text-zinc-800 transition-all peer"
+                  className="w-full ps-10 pe-10 py-2.5 bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] focus:border-blue-500 focus:bg-white/[0.05] rounded-xl text-sm font-mono text-white placeholder-zinc-600 transition-all outline-none focus:ring-1 focus:ring-blue-500/30 peer"
                 />
-                <div className="text-zinc-400 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                <div className="text-zinc-500 absolute inset-y-0 start-0 flex items-center justify-center ps-3.5 peer-focus:text-blue-500 transition-colors pointer-events-none">
                   <Lock size={16} aria-hidden="true" />
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-zinc-400 hover:text-zinc-650 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-colors outline-none cursor-pointer"
+                  className="text-zinc-500 hover:text-zinc-300 absolute inset-y-0 end-0 flex h-full w-10 items-center justify-center rounded-e-xl transition-colors outline-none cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -176,24 +180,24 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
             {/* Notifications */}
             {errorMsg && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-[10.5px] leading-relaxed flex items-start gap-2 animate-shake">
-                <ShieldAlert className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
+              <div className="bg-red-500/10 border border-red-500/20 text-red-200 p-3.5 rounded-xl text-xs leading-relaxed flex items-start gap-2.5 animate-shake">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
                 <span>{errorMsg}</span>
               </div>
             )}
 
             {successMsg && (
-              <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-xl text-[10.5px] leading-relaxed flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-green-500 mt-0.5" />
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-200 p-3.5 rounded-xl text-xs leading-relaxed flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
                 <span>{successMsg}</span>
               </div>
             )}
 
-            {/* Form Submit Button (blocks-07 style with dynamic states) */}
+            {/* Form Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-[#0071e3] hover:bg-blue-600 active:bg-blue-700 disabled:bg-zinc-400 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-2"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:bg-zinc-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer mt-4"
             >
               {loading ? (
                 <>
@@ -210,14 +214,16 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           </form>
 
           {/* Support/Admin Contact Notice */}
-          <div className="pt-3 border-t border-zinc-100 text-center text-[10.5px] text-zinc-500 leading-relaxed">
-            🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน <br />
-            กรุณาติดต่อแอดมิน (คุณบีม) โทร. <a href="tel:095-662-5871" className="font-bold text-[#0071e3] hover:underline">095-662-5871</a>
+          <div className="pt-5 border-t border-white/[0.05] text-center text-xs text-zinc-500 leading-relaxed space-y-1">
+            <span className="block text-[11px] text-zinc-500">🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน</span>
+            <span className="block text-zinc-400">
+              กรุณาติดต่อแอดมิน (คุณบีม) โทร. <a href="tel:095-662-5871" className="font-bold text-blue-400 hover:underline">095-662-5871</a>
+            </span>
           </div>
         </div>
 
         {/* Footer Credit info */}
-        <div className="text-center mt-6 text-[9.5px] text-zinc-400 font-mono">
+        <div className="text-center pt-4 text-[9.5px] text-zinc-650 font-mono tracking-wider">
           Powered by Warapon Wichitpan &copy; 2026 &middot; NT Cyfence
         </div>
       </div>
