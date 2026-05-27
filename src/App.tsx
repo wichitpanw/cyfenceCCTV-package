@@ -1339,10 +1339,18 @@ export default function App() {
             {/* Log Out Button */}
             <button
               type="button"
-              onClick={async () => {
-                if (confirm("🚪 คุณต้องการออกจากระบบใช่หรือไม่?")) {
-                  await handleLogout();
-                }
+              onClick={() => {
+                showConfirm(
+                  "🚪 ออกจากระบบ",
+                  "คุณต้องการออกจากระบบ ใช่หรือไม่คะ?",
+                  async () => {
+                    await handleLogout();
+                  },
+                  {
+                    confirmText: "🚪 ออกจากระบบ",
+                    cancelText: "ยกเลิก"
+                  }
+                );
               }}
               className="p-2 rounded-lg bg-red-50 hover:bg-red-100 active:bg-red-150 text-red-650 transition-all border border-red-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5 shadow-2xs"
               title="ออกจากระบบ (Log Out)"
@@ -2051,9 +2059,17 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (confirm("🔄 คุณต้องการคืนค่าคู่มือราคาต้นทุนมาตรฐานของโรงงาน (Factory Defaults) ใช่หรือไม่?")) {
-                      setTempCosts(DEFAULT_MASTER_COSTS);
-                    }
+                    showConfirm(
+                      "🔄 คืนค่าเริ่มต้นโรงงาน",
+                      "คุณต้องการคืนค่าคู่มือราคาต้นทุนมาตรฐานของโรงงาน (Factory Defaults) ใช่หรือไม่คะ?",
+                      () => {
+                        setTempCosts(DEFAULT_MASTER_COSTS);
+                      },
+                      {
+                        confirmText: "🔄 ยืนยันคืนค่า",
+                        cancelText: "ยกเลิก"
+                      }
+                    );
                   }}
                   className="px-3.5 py-2 bg-red-50 hover:bg-red-100 active:bg-red-150 text-red-600 border border-red-200 text-xs font-bold rounded-xl transition-all cursor-pointer"
                 >
