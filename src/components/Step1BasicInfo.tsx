@@ -130,7 +130,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
                 id="province-select"
                 value={data.province || ""}
                 onChange={(e) => onChange({ ...data, province: e.target.value })}
-                className={`blocks-input appearance-none pl-10 pr-10 py-2.5 transition-all cursor-pointer ${
+                className={`blocks-input appearance-none !pl-11 pr-10 py-2.5 transition-all cursor-pointer ${
                   errorObj.province ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
               >
