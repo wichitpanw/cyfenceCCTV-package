@@ -21,7 +21,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      setErrorMsg("กรุณากรอกอีเมลและรหัสผ่านของคุณด้วยค่ะ");
+      setErrorMsg("กรุณากรอกชื่อผู้ใช้งานและรหัสผ่านของคุณด้วยค่ะ");
       return;
     }
 
@@ -45,7 +45,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
       }
 
       if (!profile) {
-        setErrorMsg("❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้งค่ะ");
+        setErrorMsg("❌ ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้งค่ะ");
         setLoading(false);
         return;
       }
@@ -89,44 +89,46 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#070a24] via-[#0b113a] to-zinc-950 flex items-center justify-center p-4 font-sans select-none overflow-hidden relative">
-      
-      {/* Premium Dynamic Ambient Lights */}
-      <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[130px] animate-pulse animate-duration-[8000ms]"></div>
-      <div className="absolute bottom-1/4 right-1/3 w-[450px] h-[450px] rounded-full bg-indigo-500/10 blur-[120px] animate-pulse animate-duration-[10000ms]"></div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans select-none overflow-hidden relative">
 
-      {/* Main Container styled in a clean, minimalist blocks.so/login-07 fashion */}
-      <div className="mx-auto w-full max-w-[340px] z-10 space-y-8">
-        
-        {/* Brand Header */}
-        <div className="space-y-4 text-center">
-          <div className="w-16 h-16 mx-auto bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/10 overflow-hidden p-2 transition-all hover:scale-105 hover:shadow-blue-500/20">
-            <img src="/cyfence_logo.png" alt="Cyfence Logo" className="w-full h-full object-contain" />
-          </div>
-          <div className="space-y-1.5">
-            <h1 className="text-balance text-2.5xl font-black text-white tracking-wide uppercase font-mono">
-              NT CYFENCE CCTV
-            </h1>
-            <p className="text-pretty text-xs text-zinc-300 font-medium leading-normal max-w-[280px] mx-auto">
-              ระบบจัดทำใบเสนอราคาและรายงานสำรวจแพ็คเกจกล้องวงจรปิด NT
-            </p>
-          </div>
-        </div>
+      {/* Subtle background texture — very light blue-gray tint on top corners */}
+      <div className="absolute top-0 left-0 w-[600px] h-[400px] rounded-full bg-blue-100/50 blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[400px] rounded-full bg-indigo-100/40 blur-[100px] translate-x-1/4 translate-y-1/4 pointer-events-none"></div>
 
-        {/* Sleek Minimalist Form (Directly on Background, no white card, pure premium styling) */}
-        <div className="space-y-6">
-          <div className="text-center">
-            <h2 className="text-[11px] font-bold text-zinc-200 uppercase tracking-widest">
-              เข้าสู่ระบบเพื่อเริ่มใช้งาน
-            </h2>
+      {/* Main Card Container */}
+      <div className="mx-auto w-full max-w-[400px] z-10">
+
+        {/* White Card */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/80 border border-gray-200/80 px-8 pt-8 pb-7 space-y-6">
+
+          {/* Brand Header */}
+          <div className="text-center space-y-3">
+            <div className="w-14 h-14 mx-auto bg-white rounded-2xl flex items-center justify-center shadow-md shadow-gray-200 border border-gray-100 overflow-hidden p-1.5 transition-all hover:scale-105">
+              <img src="/cyfence_logo.png" alt="Cyfence Logo" className="w-full h-full object-contain" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-lg font-black text-gray-900 tracking-widest uppercase font-mono leading-tight">
+                NT CYFENCE CCTV
+              </h1>
+              <p className="text-[11px] text-gray-500 font-medium leading-snug max-w-[260px] mx-auto">
+                ระบบจัดทำใบเสนอราคาและรายงานสำรวจ<br />แพ็คเกจกล้องวงจรปิด NT
+              </p>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-200"></div>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">เข้าสู่ระบบเพื่อเริ่มใช้งาน</span>
+            <div className="flex-1 h-px bg-gray-200"></div>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSignIn} className="space-y-5">
+          <form onSubmit={handleSignIn} className="space-y-4">
 
             {/* Username Input */}
-            <div className="space-y-2">
-              <label htmlFor="username" className="block text-[10px] font-bold text-zinc-300 tracking-wider uppercase">
+            <div className="space-y-1.5">
+              <label htmlFor="username" className="block text-[11px] font-bold text-gray-600 tracking-wide uppercase">
                 ชื่อผู้ใช้งาน (USERNAME)
               </label>
               <div className="relative">
@@ -134,20 +136,20 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   id="username"
                   type="text"
                   required
-                  placeholder="username"
+                  placeholder="กรอกชื่อผู้ใช้งาน"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full ps-10 pe-4 py-2.5 bg-white/[0.04] border border-white/[0.12] hover:border-white/[0.22] focus:border-blue-500 focus:bg-white/[0.06] rounded-xl text-sm font-mono text-white placeholder-zinc-500 transition-all outline-none focus:ring-1 focus:ring-blue-500/30 peer"
+                  className="w-full ps-9 pe-4 py-2.5 bg-gray-50 border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:bg-white rounded-xl text-sm font-sans text-gray-800 placeholder-gray-400 transition-all outline-none focus:ring-2 focus:ring-blue-500/15 peer"
                 />
-                <div className="text-zinc-400 absolute inset-y-0 start-0 flex items-center justify-center ps-3.5 peer-focus:text-blue-400 transition-colors pointer-events-none">
-                  <User size={16} aria-hidden="true" />
+                <div className="text-gray-400 absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-focus:text-blue-500 transition-colors pointer-events-none">
+                  <User size={15} aria-hidden="true" />
                 </div>
               </div>
             </div>
 
             {/* Password Input */}
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-[10px] font-bold text-zinc-300 tracking-wider uppercase">
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="block text-[11px] font-bold text-gray-600 tracking-wide uppercase">
                 รหัสผ่าน (PASSWORD)
               </label>
               <div className="relative">
@@ -155,75 +157,77 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  placeholder="••••••••"
+                  placeholder="กรอกรหัสผ่าน"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full ps-10 pe-10 py-2.5 bg-white/[0.04] border border-white/[0.12] hover:border-white/[0.22] focus:border-blue-500 focus:bg-white/[0.06] rounded-xl text-sm font-mono text-white placeholder-zinc-500 transition-all outline-none focus:ring-1 focus:ring-blue-500/30 peer"
+                  className="w-full ps-9 pe-10 py-2.5 bg-gray-50 border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:bg-white rounded-xl text-sm font-sans text-gray-800 placeholder-gray-400 transition-all outline-none focus:ring-2 focus:ring-blue-500/15 peer"
                 />
-                <div className="text-zinc-400 absolute inset-y-0 start-0 flex items-center justify-center ps-3.5 peer-focus:text-blue-400 transition-colors pointer-events-none">
-                  <Lock size={16} aria-hidden="true" />
+                <div className="text-gray-400 absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-focus:text-blue-500 transition-colors pointer-events-none">
+                  <Lock size={15} aria-hidden="true" />
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-zinc-400 hover:text-zinc-200 absolute inset-y-0 end-0 flex h-full w-10 items-center justify-center rounded-e-xl transition-colors outline-none cursor-pointer"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="text-gray-400 hover:text-gray-600 absolute inset-y-0 end-0 flex h-full w-10 items-center justify-center transition-colors outline-none cursor-pointer rounded-e-xl"
+                  aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
                 >
-                  {showPassword ? (
-                    <EyeOff size={16} aria-hidden="true" />
-                  ) : (
-                    <Eye size={16} aria-hidden="true" />
-                  )}
+                  {showPassword ? <EyeOff size={15} aria-hidden="true" /> : <Eye size={15} aria-hidden="true" />}
                 </button>
               </div>
             </div>
 
-            {/* Notifications */}
+            {/* Error Notification */}
             {errorMsg && (
-              <div className="bg-red-500/15 border border-red-500/35 text-red-100 p-3.5 rounded-xl text-xs leading-relaxed flex items-start gap-2.5 animate-shake">
-                <ShieldAlert className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
-                <span>{errorMsg}</span>
+              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs leading-relaxed flex items-start gap-2">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
+                <span className="font-medium">{errorMsg}</span>
               </div>
             )}
 
+            {/* Success Notification */}
             {successMsg && (
-              <div className="bg-emerald-500/15 border border-emerald-500/35 text-emerald-100 p-3.5 rounded-xl text-xs leading-relaxed flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
-                <span>{successMsg}</span>
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-xl text-xs leading-relaxed flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500 mt-0.5" />
+                <span className="font-medium">{successMsg}</span>
               </div>
             )}
 
-            {/* Form Submit Button */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:bg-zinc-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer mt-4"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold shadow-md shadow-blue-500/20 hover:shadow-blue-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer mt-1"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   <span>กำลังดำเนินการ...</span>
                 </>
               ) : (
                 <>
                   <span>ล็อกอินเข้าสู่ระบบ</span>
-                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
           {/* Support/Admin Contact Notice */}
-          <div className="pt-5 border-t border-white/[0.08] text-center text-xs text-zinc-400 leading-relaxed space-y-1">
-            <span className="block text-[11px] text-zinc-450">🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน</span>
-            <span className="block text-zinc-350">
-              กรุณาติดต่อแอดมิน (คุณบีม) โทร. <a href="tel:095-662-5871" className="font-bold text-blue-400 hover:underline">095-662-5871</a>
-            </span>
+          <div className="pt-4 border-t border-gray-100 text-center space-y-0.5">
+            <p className="text-[11px] text-gray-500 leading-snug">
+              🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน
+            </p>
+            <p className="text-[11px] text-gray-600 leading-snug">
+              กรุณาติดต่อแอดมิน (คุณบีม) โทร.{" "}
+              <a href="tel:095-662-5871" className="font-bold text-blue-600 hover:text-blue-700 hover:underline">
+                095-662-5871
+              </a>
+            </p>
           </div>
         </div>
 
-        {/* Footer Credit info */}
-        <div className="text-center pt-4 text-[10px] text-zinc-500 font-mono tracking-wider">
+        {/* Footer Credit */}
+        <div className="text-center mt-5 text-[10px] text-gray-400 font-mono tracking-wider">
           Powered by Warapon Wichitpan &copy; 2026 &middot; NT Cyfence
         </div>
       </div>
