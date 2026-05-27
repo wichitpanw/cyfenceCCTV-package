@@ -234,6 +234,17 @@ export default function ProjectHistory({
                     {proj.customerInfo.customerName || "ไม่ระบุชื่อบริษัท"}
                   </strong>
 
+                  {/* ป้ายผู้สร้างใบงานสำรวจ (แสดงเฉพาะ Admin/Superadmin เสมอ แม้ไม่มีผู้สำรวจ) */}
+                  {canSeeAllProjects && proj.createdByEmail && (
+                    <div className="mt-2 flex items-center gap-1.5 text-[10px]">
+                      <span className={`px-1.5 py-0.5 rounded font-mono shrink-0 uppercase tracking-tight ${
+                        isActive ? "bg-white/20 text-zinc-100" : "bg-zinc-100 text-zinc-600 border border-zinc-200"
+                      }`} title={`ผู้สร้างใบงาน: ${proj.createdByEmail}`}>
+                        👤 ผู้สร้าง: {proj.createdByEmail.split("@")[0]}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Surveyor info */}
                   {proj.customerInfo.surveyorName && (
                     <div className="mt-2 flex items-center gap-1.5 text-xs">
@@ -250,13 +261,6 @@ export default function ProjectHistory({
                       {proj.customerInfo.surveyorPhone && (
                         <span className={`shrink-0 ${isActive ? "text-gray-400" : "text-gray-400"}`}>
                           · {proj.customerInfo.surveyorPhone}
-                        </span>
-                      )}
-                      {canSeeAllProjects && proj.createdByEmail && (
-                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-mono shrink-0 uppercase tracking-tight ml-auto ${
-                          isActive ? "bg-white/20 text-zinc-100" : "bg-zinc-100 text-zinc-600 border border-zinc-200"
-                        }`} title={`ผู้สร้าง: ${proj.createdByEmail}`}>
-                          👤 {proj.createdByEmail.split("@")[0]}
                         </span>
                       )}
                     </div>
