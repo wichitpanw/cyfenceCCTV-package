@@ -286,7 +286,7 @@ export default function Step4SurveyReport({
 
   // Create custom DivIcon for Leaflet markers (className: "" is CRITICAL to fix offset issues)
   const createCameraIcon = (type: string, index: number, isSelected: boolean, camCount: number) => {
-    const colorHex = type === "Dome" ? "#0071e3" : type === "PTZ" ? "#bf5af2" : "#30d158";
+    const colorHex = type === "Dome" ? "#111827" : type === "PTZ" ? "#bf5af2" : "#30d158";
     const shadowColor = isSelected ? "rgba(0, 113, 227, 0.3)" : "rgba(0, 0, 0, 0.08)";
     const scaleStyle = isSelected ? "scale(1.15)" : "scale(1)";
     const ringStyle = isSelected ? "box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.25);" : "";
@@ -379,7 +379,7 @@ export default function Step4SurveyReport({
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #0071e3;
+          background-color: #111827;
           border: 2px solid white;
           ${ringStyle}
           ${scaleStyle}
@@ -399,13 +399,13 @@ export default function Step4SurveyReport({
             left: 50%;
             transform: translateX(-50%);
             background-color: white;
-            color: #0071e3;
+            color: #111827;
             font-size: 7px;
             font-weight: 850;
             padding: 1.5px 5.5px;
             border-radius: 5px;
             white-space: nowrap;
-            border: 1px solid #0071e3;
+            border: 1px solid #111827;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
           ">
             ห้องควบคุม (ต้นทาง)
@@ -461,20 +461,20 @@ export default function Step4SurveyReport({
   return (
     <div className="space-y-6" id="survey-step-container">
       {/* Title & Stats */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-zinc-50 p-5 rounded-2xl border border-zinc-200 shadow-2xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
         <div className="space-y-2.5">
           <div>
-            <h3 className="text-sm font-bold text-zinc-800 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
               โครงการ: {customerInfo.projectName || "โครงการทั่วไป"}
             </h3>
-            <p className="text-[11px] text-zinc-500">
+            <p className="text-[11px] text-gray-500">
               พิกัด GIS โครงการ: {customerInfo.latitude || "-"}, {customerInfo.longitude || "-"} | ผู้นำทีมสำรวจ: {customerInfo.surveyorName}
             </p>
           </div>
           
           {/* Elegant Camera Brand Selector */}
-          <div className="flex items-center gap-3 pt-2.5 border-t border-zinc-200/60">
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">
+          <div className="flex items-center gap-3 pt-2.5 border-t border-gray-200/60">
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">
               🛡️ เลือกแบรนด์กล้องของโครงการ:
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -487,8 +487,8 @@ export default function Step4SurveyReport({
                     onClick={() => onUpdateCameraBrand?.(br)}
                     className={`px-3 py-1 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
                       isSelected 
-                        ? "bg-zinc-900 border-zinc-900 text-white shadow-2xs scale-102" 
-                        : "bg-white border-zinc-250 text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50"
+                        ? "bg-gray-900 border-zinc-900 text-white shadow-sm scale-102" 
+                        : "bg-white border-gray-200 text-gray-600 hover:border-zinc-400 hover:bg-white"
                     }`}
                   >
                     {br}
@@ -499,9 +499,9 @@ export default function Step4SurveyReport({
           </div>
         </div>
 
-        <div className="flex items-center justify-between md:justify-end gap-3.5 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-zinc-200/60 font-sans select-none">
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-zinc-200 shadow-2xs">
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">
+        <div className="flex items-center justify-between md:justify-end gap-3.5 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-200/60 font-sans select-none">
+          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm">
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">
               จำนวนจุดติดตั้ง:
             </span>
             
@@ -512,8 +512,8 @@ export default function Step4SurveyReport({
                 disabled={cameraPoints.length <= 1}
                 className={`w-6 h-6 rounded-lg font-bold flex items-center justify-center transition-colors cursor-pointer text-xs ${
                   cameraPoints.length <= 1 
-                    ? "bg-zinc-50 text-zinc-300 border border-zinc-200/50 cursor-not-allowed" 
-                    : "bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200"
+                    ? "bg-white text-zinc-300 border border-gray-200/50 cursor-not-allowed" 
+                    : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
                 }`}
               >
                 -
@@ -537,7 +537,7 @@ export default function Step4SurveyReport({
                 type="button"
                 onClick={() => handleUpdateCameraPointsCount(cameraPoints.length + 1)}
                 disabled={cameraPoints.length >= 64}
-                className="w-6 h-6 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold flex items-center justify-center transition-colors cursor-pointer text-xs"
+                className="w-6 h-6 rounded-lg bg-gray-900 hover:bg-gray-800 text-white font-bold flex items-center justify-center transition-colors cursor-pointer text-xs"
               >
                 +
               </button>
@@ -549,22 +549,22 @@ export default function Step4SurveyReport({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* LEFT COMPONENT (COL 8): OpenStreetMap Container */}
         <div className="lg:col-span-8 space-y-4">
-          <div className="bg-white border border-zinc-200 rounded-2xl p-4 shadow-2xs">
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
                 <span className="text-[10px] font-bold text-zinc-555 block uppercase font-mono tracking-wider">MAP PLACEMENT / พิกัดแผนที่จริง</span>
-                <span className="text-[11px] text-zinc-400">คลิกลงบนแผนที่เพื่อระบุหรือขยับหมุดจุดติดตั้งกล้องวงจรปิด</span>
+                <span className="text-[11px] text-gray-400">คลิกลงบนแผนที่เพื่อระบุหรือขยับหมุดจุดติดตั้งกล้องวงจรปิด</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 bg-zinc-50 px-2.5 py-1.5 rounded-lg border border-zinc-200">
-                  <MapPin className="w-3 h-3 text-[#0071e3]" />
+                <div className="flex items-center gap-1.5 text-[10px] text-gray-500 bg-white px-2.5 py-1.5 rounded-lg border border-gray-200">
+                  <MapPin className="w-3 h-3 text-[#111827]" />
                   <span>ศูนย์กลาง: {centerLat.toFixed(4)}, {centerLng.toFixed(4)}</span>
                 </div>
                 {!isMapExpanded && (
                   <button
                     type="button"
                     onClick={() => setIsMapExpanded(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-850 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
                     <span>ขยายแผนที่</span>
@@ -576,20 +576,20 @@ export default function Step4SurveyReport({
             {/* Interactive Leaflet Map Container */}
             <div 
               className={isMapExpanded 
-                ? "fixed inset-4 z-[9999] bg-white p-4 rounded-2xl border border-zinc-200 shadow-2xl flex flex-col gap-4 select-none" 
-                : "relative w-full h-[550px] md:h-[750px] rounded-xl overflow-hidden border border-zinc-200 shadow-inner group select-none z-10 flex flex-col"
+                ? "fixed inset-4 z-[9999] bg-white p-4 rounded-xl border border-gray-200 shadow-2xl flex flex-col gap-4 select-none" 
+                : "relative w-full h-[550px] md:h-[750px] rounded-xl overflow-hidden border border-gray-200 shadow-inner group select-none z-10 flex flex-col"
               }
             >
               {isMapExpanded && (
-                <div className="flex items-center justify-between bg-zinc-50 border border-zinc-200 p-3 rounded-xl">
+                <div className="flex items-center justify-between bg-white border border-gray-200 p-3 rounded-xl">
                   <div>
                     <span className="text-[10px] font-bold text-zinc-555 block uppercase font-mono tracking-wider">MAP PLACEMENT / พิกัดแผนที่จริง (โหมดขยายใหญ่)</span>
-                    <span className="text-[11px] text-zinc-500">คลิกลงบนแผนที่เพื่อระบุหรือขยับหมุดจุดติดตั้งกล้องวงจรปิด</span>
+                    <span className="text-[11px] text-gray-500">คลิกลงบนแผนที่เพื่อระบุหรือขยับหมุดจุดติดตั้งกล้องวงจรปิด</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setIsMapExpanded(false)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-850 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                   >
                     <Minimize2 className="w-3.5 h-3.5" />
                     <span>ย่อขนาด</span>
@@ -597,7 +597,7 @@ export default function Step4SurveyReport({
                 </div>
               )}
 
-              <div className="flex-1 w-full relative min-h-0 rounded-xl overflow-hidden border border-zinc-200">
+              <div className="flex-1 w-full relative min-h-0 rounded-xl overflow-hidden border border-gray-200">
                 <MapContainer 
                   key={isMapExpanded ? 'expanded' : 'normal'}
                   center={[centerLat, centerLng]} 
@@ -678,19 +678,19 @@ export default function Step4SurveyReport({
                 </MapContainer>
 
                 {/* Map Legend Overlay (Top Right) */}
-                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl border border-zinc-200 text-[10px] text-zinc-700 shadow-sm flex flex-col gap-1.5 z-[400] select-none pointer-events-none w-48">
-                  <span className="font-bold text-zinc-800 text-[9px] uppercase tracking-wider font-mono">ประเภทกล้องตามสีสัญลักษณ์</span>
+                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-gray-200 text-[10px] text-gray-700 shadow-sm flex flex-col gap-1.5 z-[400] select-none pointer-events-none w-48">
+                  <span className="font-bold text-gray-900 text-[9px] uppercase tracking-wider font-mono">ประเภทกล้องตามสีสัญลักษณ์</span>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#30d158] border border-white shadow-xs"></span>
-                      <span className="font-semibold text-zinc-600">Bullet (🟢 กล้องทรงกระบอก)</span>
+                      <span className="font-semibold text-gray-600">Bullet (🟢 กล้องทรงกระบอก)</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Instructions Help Tag overlay */}
                 <div className="absolute bottom-3 left-3 bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800 text-[10px] text-zinc-300 pointer-events-none flex items-center gap-1 z-[400]">
-                  <Info className="w-3.5 h-3.5 text-[#0071e3]" />
+                  <Info className="w-3.5 h-3.5 text-[#111827]" />
                   <span>คลิกแผนที่เพื่อวาง/ย้ายหมุด หรือคลิกลากหมุดโดยตรงเพื่อปรับแต่งพิกัด</span>
                 </div>
               </div>
@@ -705,17 +705,17 @@ export default function Step4SurveyReport({
               onClick={() => setSelectedPointId(selectedPointId === "control-center" ? null : "control-center")}
               className={`p-2 rounded-xl text-left border flex flex-col justify-between h-16 text-xs select-none transition-all cursor-pointer ${
                 selectedPointId === "control-center"
-                  ? "bg-zinc-50 border-zinc-900 font-semibold"
-                  : "bg-white border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50/50"
+                  ? "bg-white border-zinc-900 font-semibold"
+                  : "bg-white border-gray-200 hover:border-zinc-350 hover:bg-white/50"
               }`}
             >
               <div className="flex items-center justify-between w-full">
-                <span className="text-[9px] font-bold text-[#0071e3] font-mono">#0</span>
-                <span className="text-[8px] px-1 bg-zinc-150 text-zinc-650 rounded font-semibold uppercase tracking-wider">
+                <span className="text-[9px] font-bold text-[#111827] font-mono">#0</span>
+                <span className="text-[8px] px-1 bg-gray-100 text-zinc-650 rounded font-semibold uppercase tracking-wider">
                   CONTROL
                 </span>
               </div>
-              <span className="truncate text-zinc-800 text-[11px] block mt-1 font-semibold">
+              <span className="truncate text-gray-900 text-[11px] block mt-1 font-semibold">
                 ห้องควบคุม (ต้นทาง)
               </span>
             </button>
@@ -729,17 +729,17 @@ export default function Step4SurveyReport({
                   onClick={() => setSelectedPointId(isSelected ? null : pt.id)}
                   className={`p-2 rounded-xl text-left border flex flex-col justify-between h-16 text-xs select-none transition-all cursor-pointer ${
                     isSelected
-                      ? "bg-zinc-50 border-zinc-900 font-semibold"
-                      : "bg-white border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50/50"
+                      ? "bg-white border-zinc-900 font-semibold"
+                      : "bg-white border-gray-200 hover:border-zinc-350 hover:bg-white/50"
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
-                    <span className="text-[9px] font-bold text-[#0071e3] font-mono">#{index + 1}</span>
-                    <span className="text-[8px] px-1 bg-zinc-100 text-zinc-500 rounded font-semibold uppercase tracking-wider">
+                    <span className="text-[9px] font-bold text-[#111827] font-mono">#{index + 1}</span>
+                    <span className="text-[8px] px-1 bg-gray-50 text-gray-500 rounded font-semibold uppercase tracking-wider">
                       {pt.type}
                     </span>
                   </div>
-                  <span className="truncate text-zinc-800 text-[11px] block mt-1">
+                  <span className="truncate text-gray-900 text-[11px] block mt-1">
                     {pt.name}
                   </span>
                 </button>
@@ -751,74 +751,73 @@ export default function Step4SurveyReport({
         {/* RIGHT COMPONENT (COL 4): Edit selected Pin details & Pole features */}
         <div className="lg:col-span-4">
           {isControlCenterSelected ? (
-            <div className="bg-white border border-zinc-200 rounded-2xl p-5 shadow-2xs space-y-5">
-              <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-5">
+              <div className="flex justify-between items-center border-b border-gray-150 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3] font-bold text-xs uppercase font-mono">
+                  <div className="w-8 h-8 rounded-lg bg-[#111827]/10 flex items-center justify-center text-[#111827] font-bold text-xs uppercase font-mono">
                     #0
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-zinc-800">ห้องควบคุม (ต้นทาง)</h4>
-                    <p className="text-[10px] text-zinc-400">แก้ไขพิกัดจุดศูนย์กลาง/ห้องควบคุมระบบ</p>
+                    <h4 className="text-xs font-bold text-gray-900">ห้องควบคุม (ต้นทาง)</h4>
+                    <p className="text-[10px] text-gray-400">แก้ไขพิกัดจุดศูนย์กลาง/ห้องควบคุมระบบ</p>
                   </div>
                 </div>
               </div>
 
               {/* Coordinates Editor */}
-              <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-3.5 space-y-3.5">
+              <div className="bg-white border border-gray-200 rounded-xl p-3.5 space-y-3.5">
                 <span className="block text-[10px] font-bold text-zinc-650 flex items-center gap-1.5 uppercase font-mono tracking-wider">
                   📍 ป้อนพิกัดภูมิศาสตร์
                 </span>
                 
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <label className="block text-[10px] text-zinc-500 font-semibold mb-1">LATITUDE</label>
+                    <label className="block text-[10px] text-gray-500 font-semibold mb-1">LATITUDE</label>
                     <input
                       type="text"
                       value={localLat}
                       onChange={(e) => handleLatManualChange(e.target.value)}
-                      className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                      className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
                       placeholder="เช่น 17.3992"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-zinc-500 font-semibold mb-1">LONGITUDE</label>
+                    <label className="block text-[10px] text-gray-500 font-semibold mb-1">LONGITUDE</label>
                     <input
                       type="text"
                       value={localLng}
                       onChange={(e) => handleLngManualChange(e.target.value)}
-                      className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                      className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
                       placeholder="เช่น 102.8582"
                     />
                   </div>
                 </div>
-                <span className="block text-[9px] text-zinc-400 mt-1 leading-relaxed">
+                <span className="block text-[9px] text-gray-400 mt-1 leading-relaxed">
                   *พิมพ์แก้ไขทศนิยมได้โดยตรง หรือคลิกลากหมุดสีน้ำเงินหลักบนแผนที่เพื่ออัปเดตพิกัดแบบ Interactive
                 </span>
               </div>
 
               {/* Info alert */}
-              <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-2 text-[10px] text-zinc-600 leading-relaxed">
-                <Info className="w-3.5 h-3.5 text-[#0071e3] shrink-0 mt-0.5" />
+              <div className="p-3 bg-white border border-gray-200 rounded-xl flex items-start gap-2 text-[10px] text-gray-600 leading-relaxed">
+                <Info className="w-3.5 h-3.5 text-[#111827] shrink-0 mt-0.5" />
                 <span>พิกัดนี้คือจุดติดตั้ง "เครื่องบันทึก NVR" และ "ห้องควบคุม (ต้นทาง)" ซึ่งจะใช้คำนวณระยะทางสายติดตั้งและอุปกรณ์หลักของโครงการทั้งหมด</span>
               </div>
             </div>
           ) : selectedPoint ? (
-            <div className="bg-white border border-zinc-200 rounded-2xl p-5 shadow-2xs space-y-5">
-              <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-5">
+              <div className="flex justify-between items-center border-b border-gray-150 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
+                  <div className="w-8 h-8 rounded-lg bg-[#111827]/10 flex items-center justify-center text-[#111827]">
                     <Camera className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-zinc-800">แก้ไขรายละเอียดจุดติดตั้ง</h4>
-                    <p className="text-[10px] text-zinc-400">ระบุรายละเอียดเสา ค้ำจุน และภาพจริง</p>
+                    <h4 className="text-xs font-bold text-gray-900">รายละเอียดจุดติดตั้ง</h4>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={(e) => handleDeletePoint(selectedPoint.id, e)}
-                  className="p-1 px-2 hover:bg-zinc-50 hover:text-red-600 text-zinc-400 rounded-lg text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                  className="p-1 px-2 hover:bg-white hover:text-red-600 text-gray-400 rounded-lg text-xs transition-colors flex items-center gap-1 cursor-pointer"
                   title="ลบจุดนี้"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -827,14 +826,14 @@ export default function Step4SurveyReport({
               </div>
 
               {/* Segmented Tabs (Apple Style) */}
-              <div className="flex bg-zinc-100 p-0.5 rounded-xl border border-zinc-200/50 select-none">
+              <div className="flex bg-gray-50 p-0.5 rounded-xl border border-gray-200/50 select-none">
                 <button
                   type="button"
                   onClick={() => setActiveTab("main")}
-                  className={`flex-1 py-1.5 text-center text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`flex-1 py-1.5 text-center text-[9px] sm:text-[10px] font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap px-1 ${
                     activeTab === "main"
-                      ? "bg-white text-zinc-900 shadow-2xs border border-zinc-200/10"
-                      : "text-zinc-500 hover:text-zinc-800"
+                      ? "bg-white text-zinc-900 shadow-sm border border-gray-200/10"
+                      : "text-gray-500 hover:text-gray-900"
                   }`}
                 >
                   📦 อุปกรณ์หลัก
@@ -842,10 +841,10 @@ export default function Step4SurveyReport({
                 <button
                   type="button"
                   onClick={() => setActiveTab("options")}
-                  className={`flex-1 py-1.5 text-center text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`flex-1 py-1.5 text-center text-[9px] sm:text-[10px] font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap px-1 ${
                     activeTab === "options"
-                      ? "bg-white text-zinc-900 shadow-2xs border border-zinc-200/10"
-                      : "text-zinc-500 hover:text-zinc-800"
+                      ? "bg-white text-zinc-900 shadow-sm border border-gray-200/10"
+                      : "text-gray-500 hover:text-gray-900"
                   }`}
                 >
                   🔌 อุปกรณ์เสริม
@@ -853,13 +852,13 @@ export default function Step4SurveyReport({
                 <button
                   type="button"
                   onClick={() => setActiveTab("location")}
-                  className={`flex-1 py-1.5 text-center text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`flex-1 py-1.5 text-center text-[9px] sm:text-[10px] font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap px-1 ${
                     activeTab === "location"
-                      ? "bg-white text-zinc-900 shadow-2xs border border-zinc-200/10"
-                      : "text-zinc-500 hover:text-zinc-800"
+                      ? "bg-white text-zinc-900 shadow-sm border border-gray-200/10"
+                      : "text-gray-500 hover:text-gray-900"
                   }`}
                 >
-                  📍 พิกัด & รูปถ่าย
+                  📍 รูป & พิกัด
                 </button>
               </div>
 
@@ -875,13 +874,13 @@ export default function Step4SurveyReport({
                         type="text"
                         value={selectedPoint.name}
                         onChange={(e) => handleUpdatePointField(selectedPoint.id, "name", e.target.value)}
-                        className="w-full px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] text-zinc-800"
+                        className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#111827] text-gray-900"
                         placeholder="เช่น ทางเข้าตู้คอนเทนเนอร์, เสาไฟสปอร์ตไลท์หลัก"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-zinc-555 font-bold mb-1 uppercase tracking-wide flex items-center gap-1.5 text-xs text-[#0071e3]">
+                      <label className="block text-zinc-555 font-bold mb-1 uppercase tracking-wide flex items-center gap-1.5 text-xs text-[#111827]">
                         📦 ชุดอุปกรณ์ติดตั้งปลายทาง (Installation Set)
                       </label>
                       <select
@@ -963,7 +962,7 @@ export default function Step4SurveyReport({
                           
                           handleUpdatePointFields(selectedPoint.id, updates);
                         }}
-                        className="w-full px-3 py-2 border-2 border-[#0071e3]/30 bg-white hover:border-[#0071e3] transition-colors rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                        className="blocks-input appearance-none pr-8 cursor-pointer font-semibold"
                       >
                         <option value="Set 1">📦 Set 1 (กล้อง 1 ตัว)</option>
                         <option value="Set 2">📦 Set 2 (กล้อง 2 ตัว)</option>
@@ -979,7 +978,7 @@ export default function Step4SurveyReport({
                       <select
                         value={selectedPoint.type}
                         disabled
-                        className="w-full px-3 py-2 border border-zinc-200 bg-zinc-100 rounded-lg text-xs font-medium focus:outline-none text-zinc-500 cursor-not-allowed"
+                        className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-xs font-medium focus:outline-none text-gray-500 cursor-not-allowed"
                       >
                         <option value="Bullet">Bullet (กล้องทรงกระบอกกันน้ำภายนอก)</option>
                       </select>
@@ -1007,7 +1006,7 @@ export default function Step4SurveyReport({
                             handleUpdatePointFields(selectedPoint.id, { poleType: val });
                           }
                         }}
-                        className="w-full px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg text-xs font-medium focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3]"
+                        className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-xs font-medium focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#111827]"
                       >
                         <option value="None">ไม่มี (ติดตั้งยึดเข้ากับกำแพงหรือผนังอาคารโดยตรง)</option>
                         <option value="เสาไฟฟ้า (ยึดสายรัดสแตนเลส)">เสาไฟฟ้าของการไฟฟ้า (ยึดติดโดยสายรัดสแตนเลส & ค้ำจุน)</option>
@@ -1017,19 +1016,19 @@ export default function Step4SurveyReport({
                     </div>
 
                     {/* Support arm checkbox */}
-                    <div className="flex items-start gap-3 bg-zinc-50 p-3.5 rounded-xl border border-zinc-200">
+                    <div className="flex items-start gap-3 bg-white p-3.5 rounded-xl border border-gray-200">
                       <input
                         id="support-arm-check"
                         type="checkbox"
                         checked={selectedPoint.hasSupportArm}
                         onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasSupportArm", e.target.checked)}
-                        className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer shrink-0"
+                        className="w-4 h-4 mt-0.5 rounded text-[#111827] border-zinc-300 focus:ring-[#111827] cursor-pointer shrink-0"
                       />
                       <div className="text-left select-none">
-                        <label htmlFor="support-arm-check" className="block text-xs font-bold text-zinc-700 cursor-pointer">
+                        <label htmlFor="support-arm-check" className="block text-xs font-bold text-gray-700 cursor-pointer">
                           ต้องการแขนจับยึดกล้องยื่นออก (Wall Support Bracket)
                         </label>
-                        <span className="text-[10px] text-zinc-455 block mt-1 leading-relaxed">
+                        <span className="text-[10px] text-gray-400 block mt-1 leading-relaxed">
                           เหมาะสำหรับติดตั้งห้อยหัวกล้องยื่นจากแนวเสาหรือกำแพง (ความยาวไม่น้อยกว่า 1 เมตร)
                         </span>
                       </div>
@@ -1040,7 +1039,7 @@ export default function Step4SurveyReport({
                 {activeTab === "options" && (
                   <div className="space-y-4 animate-fadeIn">
                     {/* ADVANCED INSTALLATION SPECS (Apple Widget style for professional layout) */}
-                    <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200 space-y-4">
+                    <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-4">
                       <span className="text-[10px] font-bold text-zinc-550 block uppercase font-mono tracking-wider">
                         ⚙️ ข้อมูลการเดินสายและฐานอุปกรณ์ปลายทาง
                       </span>
@@ -1050,7 +1049,7 @@ export default function Step4SurveyReport({
                         <div className="flex justify-between items-center">
                           <label className="text-zinc-550 block text-[9px] uppercase font-bold">ระยะสาย LAN เดินท่อเฟล็กซ์ (เมตร)</label>
                           {selectedPoint.lanCableLength !== undefined && selectedPoint.lanCableLength > 25 && (
-                            <span className="text-[8px] bg-amber-50 text-amber-600 font-bold px-1.5 py-0.5 rounded font-mono shadow-3xs">
+                            <span className="text-[8px] bg-amber-50 text-amber-600 font-bold px-1.5 py-0.5 rounded font-mono shadow-sm">
                               เกินมาตรฐาน +{selectedPoint.lanCableLength - 25} เมตร
                             </span>
                           )}
@@ -1064,18 +1063,18 @@ export default function Step4SurveyReport({
                               const val = parseInt(e.target.value);
                               handleUpdatePointField(selectedPoint.id, "lanCableLength", isNaN(val) ? 25 : val);
                             }}
-                            className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                            className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
                             placeholder="ดีฟอลต์ 25 เมตร"
                           />
-                          <span className="text-zinc-400 text-xs flex items-center justify-center font-semibold bg-zinc-200/55 px-2.5 rounded-lg border border-zinc-200/40 select-none">ม.</span>
+                          <span className="text-gray-400 text-xs flex items-center justify-center font-semibold bg-zinc-200/55 px-2.5 rounded-lg border border-gray-200/40 select-none">ม.</span>
                         </div>
-                        <span className="block text-[8px] text-zinc-400 leading-normal">
+                        <span className="block text-[8px] text-gray-400 leading-normal">
                           *ระยะเดินสายสัญญาณ LAN ในท่อเฟล็กซ์อ่อนภายนอก ฟรีมาตรฐาน 25 เมตรแรก/ตัว หากเกินจะมีการคำนวณราคาเพิ่มต่อเมตรตามจริง
                         </span>
                       </div>
 
                       {/* Advanced checkboxes list */}
-                      <div className="space-y-2.5 pt-2.5 border-t border-zinc-200/50">
+                      <div className="space-y-2.5 pt-2.5 border-t border-gray-200/50">
                         {/* Outdoor cabinet */}
                         <div className="flex items-start gap-2.5 cursor-pointer">
                           <input
@@ -1083,13 +1082,13 @@ export default function Step4SurveyReport({
                             type="checkbox"
                             checked={!!selectedPoint.hasOutdoorCabinet}
                             onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasOutdoorCabinet", e.target.checked)}
-                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                            className="w-4 h-4 mt-0.5 rounded text-[#111827] border-zinc-300 focus:ring-[#111827] cursor-pointer"
                           />
                           <div className="text-left select-none">
-                            <label htmlFor="outdoor-cabinet-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                            <label htmlFor="outdoor-cabinet-check" className="block text-[11px] font-bold text-gray-700 cursor-pointer">
                               ติดตั้งตู้ Outdoor Cabinet ปลายทาง
                             </label>
-                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                            <span className="text-[9px] text-gray-400 block mt-0.5 leading-normal">
                               ตู้พักอุปกรณ์ภายนอกอาคาร พร้อมพัดลมระบายอากาศ 2 ตัว, รางปลั๊กไฟ และ Circuit Breaker
                             </span>
                           </div>
@@ -1102,13 +1101,13 @@ export default function Step4SurveyReport({
                             type="checkbox"
                             checked={!!selectedPoint.hasGroundRod}
                             onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasGroundRod", e.target.checked)}
-                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                            className="w-4 h-4 mt-0.5 rounded text-[#111827] border-zinc-300 focus:ring-[#111827] cursor-pointer"
                           />
                           <div className="text-left select-none">
-                            <label htmlFor="ground-rod-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                            <label htmlFor="ground-rod-check" className="block text-[11px] font-bold text-gray-700 cursor-pointer">
                               ติดตั้งชุด Ground Rod (ขุดเจาะบ่อกราวด์)
                             </label>
-                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                            <span className="text-[9px] text-gray-400 block mt-0.5 leading-normal">
                               ติดตั้งแท่งทองแดง Ground Rod ป้องกันกระแสไฟฟ้ารั่วและฟ้าผ่าสำหรับจุดติดตั้งเสานอกอาคาร
                             </span>
                           </div>
@@ -1121,13 +1120,13 @@ export default function Step4SurveyReport({
                             type="checkbox"
                             checked={!!selectedPoint.hasPowerMeter}
                             onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasPowerMeter", e.target.checked)}
-                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                            className="w-4 h-4 mt-0.5 rounded text-[#111827] border-zinc-300 focus:ring-[#111827] cursor-pointer"
                           />
                           <div className="text-left select-none">
-                            <label htmlFor="power-meter-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                            <label htmlFor="power-meter-check" className="block text-[11px] font-bold text-gray-700 cursor-pointer">
                               ขอติดตั้งมิเตอร์ไฟฟ้า & ลากสาย THW 16 sq.mm. 50 เมตร
                             </label>
-                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                            <span className="text-[9px] text-gray-400 block mt-0.5 leading-normal">
                               ลากสายไฟฟ้าเมน THW IEC 16 sq.mm. ระยะสาย 50 เมตร ปลายทาง พร้อมยื่นคำขอติดตั้งมิเตอร์ไฟหน้างาน
                             </span>
                           </div>
@@ -1140,13 +1139,13 @@ export default function Step4SurveyReport({
                             type="checkbox"
                             checked={!!selectedPoint.hasPoeSwitch}
                             onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasPoeSwitch", e.target.checked)}
-                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                            className="w-4 h-4 mt-0.5 rounded text-[#111827] border-zinc-300 focus:ring-[#111827] cursor-pointer"
                           />
                           <div className="text-left select-none">
-                            <label htmlFor="poe-switch-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                            <label htmlFor="poe-switch-check" className="block text-[11px] font-bold text-gray-700 cursor-pointer">
                               ติดตั้ง Switch POE 4 Port Industrial Grade
                             </label>
-                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                            <span className="text-[9px] text-gray-400 block mt-0.5 leading-normal">
                               สวิตช์จ่ายไฟผ่านสายแลนเกรดอุตสาหกรรมในตู้ปลายทาง เพื่อกระจายเน็ตเวิร์ก
                             </span>
                           </div>
@@ -1159,13 +1158,13 @@ export default function Step4SurveyReport({
                             type="checkbox"
                             checked={!!selectedPoint.hasCabinetUps}
                             onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasCabinetUps", e.target.checked)}
-                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                            className="w-4 h-4 mt-0.5 rounded text-[#111827] border-zinc-300 focus:ring-[#111827] cursor-pointer"
                           />
                           <div className="text-left select-none">
-                            <label htmlFor="cabinet-ups-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                            <label htmlFor="cabinet-ups-check" className="block text-[11px] font-bold text-gray-700 cursor-pointer">
                               ติดตั้งเครื่องสำรองไฟ UPS 800 VA ปลายทาง
                             </label>
-                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                            <span className="text-[9px] text-gray-400 block mt-0.5 leading-normal">
                               เครื่องสำรองไฟขนาด 800 VA ป้องกันกล้องดับและอุปกรณ์พังเมื่อไฟตก/ดับภายนอกอาคาร
                             </span>
                           </div>
@@ -1178,13 +1177,13 @@ export default function Step4SurveyReport({
                             type="checkbox"
                             checked={!!selectedPoint.hasSdCard}
                             onChange={(e) => handleUpdatePointField(selectedPoint.id, "hasSdCard", e.target.checked)}
-                            className="w-4 h-4 mt-0.5 rounded text-[#0071e3] border-zinc-300 focus:ring-[#0071e3] cursor-pointer"
+                            className="w-4 h-4 mt-0.5 rounded text-[#111827] border-zinc-300 focus:ring-[#111827] cursor-pointer"
                           />
                           <div className="text-left select-none">
-                            <label htmlFor="sdcard-check" className="block text-[11px] font-bold text-zinc-700 cursor-pointer">
+                            <label htmlFor="sdcard-check" className="block text-[11px] font-bold text-gray-700 cursor-pointer">
                               ติดตั้ง Micro SD Card 128GB ในตัวกล้อง
                             </label>
-                            <span className="text-[9px] text-zinc-400 block mt-0.5 leading-normal">
+                            <span className="text-[9px] text-gray-400 block mt-0.5 leading-normal">
                               เมมโมรี่การ์ด 128GB เพื่อบันทึกภาพสำรองในตัวกล้องโดยตรง (Edge Recording)
                             </span>
                           </div>
@@ -1197,7 +1196,7 @@ export default function Step4SurveyReport({
                 {activeTab === "location" && (
                   <div className="space-y-4 animate-fadeIn">
                     {/* Coordinate Info Box (Interactive Text-inputs with map panning) */}
-                    <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200 space-y-2">
+                    <div className="bg-white p-3.5 rounded-xl border border-gray-200 space-y-2">
                       <span className="text-[10px] font-bold text-zinc-555 block uppercase font-mono tracking-wider">
                         📍 ป้อนพิกัดภูมิศาสตร์เฉพาะจุด
                       </span>
@@ -1208,7 +1207,7 @@ export default function Step4SurveyReport({
                             type="text"
                             value={localLat}
                             onChange={(e) => handleLatManualChange(e.target.value)}
-                            className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                            className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
                             placeholder="เช่น 13.6872"
                           />
                         </div>
@@ -1218,12 +1217,12 @@ export default function Step4SurveyReport({
                             type="text"
                             value={localLng}
                             onChange={(e) => handleLngManualChange(e.target.value)}
-                            className="w-full px-2.5 py-1.5 border border-zinc-200 bg-white rounded-lg font-mono text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                            className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
                             placeholder="เช่น 100.6057"
                           />
                         </div>
                       </div>
-                      <span className="block text-[9px] text-zinc-400 mt-1 leading-relaxed">
+                      <span className="block text-[9px] text-gray-400 mt-1 leading-relaxed">
                         *พิมพ์แก้ไขทศนิยมได้โดยตรง แผนที่จะทำการร่อนหน้าจอ (Pan) ไปหาพิกัดใหม่นั้นให้ทันที
                       </span>
                     </div>
@@ -1237,7 +1236,7 @@ export default function Step4SurveyReport({
                         rows={4}
                         value={selectedPoint.notes}
                         onChange={(e) => handleUpdatePointField(selectedPoint.id, "notes", e.target.value)}
-                        className="w-full px-3 py-1.5 border border-zinc-200 bg-zinc-50 rounded-lg text-xs min-h-[90px]"
+                        className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs min-h-[90px]"
                         placeholder="เช่น ต้องเจาะรูกำแพงคอนกรีตหนา 15 ซม., แสงสะท้อนจ้าช่วงเช้า"
                       />
                     </div>
@@ -1249,7 +1248,7 @@ export default function Step4SurveyReport({
                       </label>
                       
                       {/* Apple Style Direct Upload Container */}
-                      <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-zinc-50 border border-zinc-200 border-dashed hover:border-zinc-350 transition-colors flex flex-col items-center justify-center group">
+                      <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-white border border-gray-200 border-dashed hover:border-zinc-350 transition-colors flex flex-col items-center justify-center group">
                         {selectedPoint.photoUrl ? (
                           <>
                             <img 
@@ -1259,8 +1258,8 @@ export default function Step4SurveyReport({
                               referrerPolicy="no-referrer"
                             />
                             {/* Overlay with change button */}
-                            <div className="absolute inset-x-0 bottom-0 bg-zinc-900/70 p-2 flex items-center justify-center z-20">
-                              <label className="px-3 py-1.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors">
+                            <div className="absolute inset-x-0 bottom-0 bg-gray-900/70 p-2 flex items-center justify-center z-20">
+                              <label className="px-3 py-1.5 bg-white hover:bg-gray-50 text-zinc-900 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors">
                                 อัปโหลดเปลี่ยนรูปถ่ายจุดนี้
                                 <input
                                   type="file"
@@ -1283,10 +1282,10 @@ export default function Step4SurveyReport({
                             </div>
                           </>
                         ) : (
-                          <label className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-zinc-100/50 transition-colors group/label">
-                            <ImageIcon className="w-8 h-8 text-zinc-400 group-hover/label:text-[#0071e3] transition-colors mb-2" />
-                            <span className="block text-xs font-semibold text-zinc-700">อัปโหลดภาพประกอบหน้างานจริง</span>
-                            <span className="block text-[10px] text-zinc-400 mt-1 leading-relaxed">
+                          <label className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-gray-50/50 transition-colors group/label">
+                            <ImageIcon className="w-8 h-8 text-gray-400 group-hover/label:text-[#111827] transition-colors mb-2" />
+                            <span className="block text-xs font-semibold text-gray-700">อัปโหลดภาพประกอบหน้างานจริง</span>
+                            <span className="block text-[10px] text-gray-400 mt-1 leading-relaxed">
                               คลิกตรงนี้เพื่อเลือกไฟล์รูปภาพจริงเฉพาะจุดติดตั้งนี้
                             </span>
                             <input
@@ -1315,11 +1314,11 @@ export default function Step4SurveyReport({
               </div>
             </div>
           ) : (
-            <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-center text-zinc-400 space-y-3">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center text-gray-400 space-y-3">
               <Camera className="w-10 h-10 mx-auto text-zinc-300" />
               <div>
-                <h4 className="text-xs font-semibold text-zinc-600">ยังไม่มีจุดสำรวจที่เลือก</h4>
-                <p className="text-[11px] text-zinc-400 mt-1 max-w-xs mx-auto">
+                <h4 className="text-xs font-semibold text-gray-600">ยังไม่มีจุดสำรวจที่เลือก</h4>
+                <p className="text-[11px] text-gray-400 mt-1 max-w-xs mx-auto">
                   กรุณากดปุ่มเพิ่มจุดติดตั้งเสริม หรือคลิกลงบนแผนที่เพื่อระบุตำแหน่งปักหมุดกล้องและจำลองระบบเสายึดจับ
                 </p>
               </div>
@@ -1329,31 +1328,31 @@ export default function Step4SurveyReport({
       </div>
 
       {/* NT Carrier Ethernet Lite (Field Sites Links Widget) */}
-      <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-2xs space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-zinc-150">
-          <div className="w-8 h-8 rounded-lg bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
+      <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-gray-150">
+          <div className="w-8 h-8 rounded-lg bg-[#111827]/10 flex items-center justify-center text-[#111827]">
             <Layers className="w-4 h-4" />
           </div>
           <div>
             <h4 className="text-xs font-bold text-zinc-805 flex items-center gap-1.5 font-sans">
               🌐 รายละเอียดวงจรปลายทางรายจุด NT Carrier Ethernet Lite (ประมาณการรายเดือน)
             </h4>
-            <p className="text-[10px] text-zinc-400">คำนวณแบนด์วิดท์รายจุด 5Mbps ต่อจำนวนกล้องในจุดติดตั้ง และราคาเช่าวงจรเครือข่ายปลายทางรายเดือน</p>
+            <p className="text-[10px] text-gray-400">คำนวณแบนด์วิดท์รายจุด 5Mbps ต่อจำนวนกล้องในจุดติดตั้ง และราคาเช่าวงจรเครือข่ายปลายทางรายเดือน</p>
           </div>
         </div>
 
         {/* Calculations metrics grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
-          <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200/60 space-y-1">
+          <div className="bg-white p-3.5 rounded-xl border border-gray-200/60 space-y-1">
             <span className="text-[9px] uppercase font-bold text-zinc-450 block font-mono">จำนวนจุดเชื่อมต่อปลายทาง (Field Sites)</span>
-            <div className="text-base font-black text-zinc-800 font-mono">
-              {cameraPoints.length} <span className="text-xs font-normal text-zinc-500 font-sans">จุด</span>
+            <div className="text-base font-black text-gray-900 font-mono">
+              {cameraPoints.length} <span className="text-xs font-normal text-gray-500 font-sans">จุด</span>
             </div>
           </div>
 
-          <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200/60 space-y-1">
+          <div className="bg-white p-3.5 rounded-xl border border-gray-200/60 space-y-1">
             <span className="text-[9px] uppercase font-bold text-zinc-450 block font-mono">แบนด์วิดท์รวมปลายทางทั้งหมด</span>
-            <div className="text-base font-black text-zinc-800 font-mono">
+            <div className="text-base font-black text-gray-900 font-mono">
               {cameraPoints.reduce((sum, pt) => {
                 let ptCams = 1;
                 if (pt.selectedSet === "Set 1") ptCams = 1;
@@ -1361,13 +1360,13 @@ export default function Step4SurveyReport({
                 else if (pt.selectedSet === "Set 3") ptCams = 3;
                 else if (pt.selectedSet === "Set 4") ptCams = 4;
                 return sum + (ptCams * 5);
-              }, 0)} <span className="text-xs font-semibold text-[#0071e3] font-mono">Mbps</span>
+              }, 0)} <span className="text-xs font-semibold text-[#111827] font-mono">Mbps</span>
             </div>
           </div>
 
-          <div className="bg-[#0071e3]/5 p-3.5 rounded-xl border border-[#0071e3]/15 space-y-1">
-            <span className="text-[9px] uppercase font-bold text-[#0071e3] block font-mono">รวมค่าลิงก์ปลายทางทุกจุด</span>
-            <div className="text-base font-black text-[#0071e3] font-mono">
+          <div className="bg-[#111827]/5 p-3.5 rounded-xl border border-[#111827]/15 space-y-1">
+            <span className="text-[9px] uppercase font-bold text-[#111827] block font-mono">รวมค่าลิงก์ปลายทางทุกจุด</span>
+            <div className="text-base font-black text-[#111827] font-mono">
               ฿{cameraPoints.reduce((sum, pt) => {
                 let ptCams = 1;
                 if (pt.selectedSet === "Set 1") ptCams = 1;
@@ -1390,11 +1389,11 @@ export default function Step4SurveyReport({
 
         {/* Detailed Points Links table list */}
         {cameraPoints.length > 0 && (
-          <div className="border border-zinc-200/80 rounded-xl overflow-hidden text-xs bg-zinc-50">
+          <div className="border border-gray-200/80 rounded-xl overflow-hidden text-xs bg-white">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-zinc-700">
+              <table className="w-full text-left text-gray-700">
                 <thead>
-                  <tr className="bg-zinc-100 text-zinc-500 uppercase font-mono text-[9px] border-b border-zinc-200">
+                  <tr className="bg-gray-50 text-gray-500 uppercase font-mono text-[9px] border-b border-gray-200">
                     <th className="py-2 px-3.5">จุดที่</th>
                     <th className="py-2 px-3.5">ชื่อจุดสำรวจติดตั้ง</th>
                     <th className="py-2 px-3.5 text-center">ชุดอุปกรณ์ (Set)</th>
@@ -1419,13 +1418,13 @@ export default function Step4SurveyReport({
                     ].find(t => t.speed >= speed) || { price: 640 };
 
                     return (
-                      <tr key={pt.id} className="hover:bg-zinc-50/50">
-                        <td className="py-2 px-3.5 font-mono text-zinc-455 text-center">#{ind + 1}</td>
-                        <td className="py-2 px-3.5 font-semibold text-zinc-800">{pt.name}</td>
+                      <tr key={pt.id} className="hover:bg-white/50">
+                        <td className="py-2 px-3.5 font-mono text-gray-400 text-center">#{ind + 1}</td>
+                        <td className="py-2 px-3.5 font-semibold text-gray-900">{pt.name}</td>
                         <td className="py-2 px-3.5 text-center text-zinc-650 font-mono">
                           {pt.selectedSet || "Set 1"}
                         </td>
-                        <td className="py-2 px-3.5 text-center font-semibold text-[#0071e3] font-mono">
+                        <td className="py-2 px-3.5 text-center font-semibold text-[#111827] font-mono">
                           {speed} Mbps
                         </td>
                         <td className="py-2 px-3.5 text-right font-mono font-bold text-zinc-900">
@@ -1441,14 +1440,14 @@ export default function Step4SurveyReport({
         )}
       </div>
 
-      <div className="border-t border-zinc-100 pt-6"></div>
+      <div className="border-t border-gray-150 pt-6"></div>
 
       {/* Action control bar */}
       <div className="flex justify-between" id="step4-actions-bar">
         <button
           type="button"
           onClick={onPrev}
-          className="inline-flex items-center gap-1 px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-medium rounded-xl border border-zinc-250 transition-all cursor-pointer"
+          className="inline-flex items-center gap-1 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-900 text-xs font-medium rounded-xl border border-gray-200 transition-all cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           ย้อนกลับ
@@ -1457,7 +1456,7 @@ export default function Step4SurveyReport({
         <button
           type="button"
           onClick={onNext}
-          className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+          className="blocks-btn-primary"
         >
           ถัดไป: รายละเอียดงานติดตั้งต้นทาง 🖥️
           <ArrowRight className="w-3.5 h-3.5" />

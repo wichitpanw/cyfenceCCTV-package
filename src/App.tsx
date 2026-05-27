@@ -26,8 +26,11 @@ import ProjectHistory from "./components/ProjectHistory";
 import LoginScreen from "./components/LoginScreen";
 import UserManagement from "./components/UserManagement";
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
-import { User } from "@supabase/supabase-js";
 import { LogOut, Users, Loader2 } from "lucide-react";
+import { Sidebar02 } from "../components/blocks/sidebar-02";
+import { Dialog01 } from "../components/blocks/dialog-01";
+import { CommandMenu01 } from "../components/blocks/command-menu-01";
+
 
 // Primary default layout values
 const DEFAULT_CUSTOMER_INFO: CustomerInfo = {
@@ -355,6 +358,7 @@ export default function App() {
   const [pricingItems, setPricingItems] = useState<PricingItem[]>([]);
   const [discount, setDiscount] = useState<number>(0);
   const [vatRate, setVatRate] = useState<number>(7);
+  const [isCommandMenuOpen, setIsCommandMenuOpen] = useState<boolean>(false);
 
   // Confirmation Modal state
   const [confirmModal, setConfirmModal] = useState<{
@@ -1250,11 +1254,11 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#f5f5f7] flex flex-col items-center justify-center font-sans">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
-          <Loader2 className="w-6 h-6 text-indigo-650 animate-spin" />
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center font-sans">
+        <div className="w-12 h-12 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center shrink-0">
+          <Loader2 className="w-5 h-5 text-gray-600 animate-spin" />
         </div>
-        <span className="text-xs font-bold text-zinc-500 mt-4 animate-pulse">กำลังเตรียมระบบความปลอดภัย...</span>
+        <span className="text-xs font-medium text-gray-500 mt-4 animate-pulse">กำลังเตรียมระบบความปลอดภัย...</span>
       </div>
     );
   }
@@ -1271,13 +1275,13 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col font-sans" id="applet-primary-layout">
+    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col font-sans" id="applet-primary-layout">
       
-      {/* Top Professional Header Navigation - Apple Translucent style */}
-      <header className="bg-white border-b border-zinc-200 py-3 px-6 shrink-0 shadow-xs relative z-40 w-full">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Top Header — blocks.so style */}
+      <header className="bg-white border-b border-gray-200 py-3 px-6 shrink-0 relative z-40 w-full">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md transition-transform hover:scale-105 relative overflow-hidden border border-zinc-200 p-1">
+            <div className="w-9 h-9 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden p-1 transition-transform hover:scale-105">
               <img 
                 src="/cyfence_logo.png" 
                 alt="NT Cyfence Logo" 
@@ -1286,19 +1290,17 @@ export default function App() {
               />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base font-bold tracking-tight text-zinc-900">
-                  CCTV Package by NT Cyfence
-                </h1>
-              </div>
-              <p className="text-[10px] text-zinc-500 font-normal">
+              <h1 className="text-sm font-bold text-gray-900 tracking-tight leading-tight">
+                CCTV Package by NT Cyfence
+              </h1>
+              <p className="text-[11px] text-gray-500 leading-tight">
                 เครื่องมือสำรวจออกแบบกล้องวงจรปิด
               </p>
             </div>
           </div>
 
           {/* Right side controls */}
-          <div className="flex items-center gap-2 text-xs font-normal text-zinc-600">
+          <div className="flex items-center gap-2">
             {/* Home Button */}
             {step > 1 && (
               <button
@@ -1311,7 +1313,7 @@ export default function App() {
                     () => setStep(1)
                   );
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-700 font-semibold text-[11px] transition-all border border-zinc-200/50 cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 text-gray-700 font-medium text-xs rounded-lg transition-all cursor-pointer"
                 title="กลับหน้าแรก"
               >
                 <Home className="w-3.5 h-3.5" />
@@ -1319,20 +1321,20 @@ export default function App() {
               </button>
             )}
             {/* Clock */}
-            <div className="flex items-center gap-1.5 bg-zinc-100/80 px-2.5 py-1.5 rounded-lg border border-zinc-200/40">
-              <Clock className="w-3.5 h-3.5 text-zinc-500" />
-              <span className="font-mono text-[10px] font-medium text-zinc-700">
+            <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 px-2.5 py-1.5 rounded-lg">
+              <Clock className="w-3.5 h-3.5 text-gray-400" />
+              <span className="font-mono text-xs text-gray-600">
                 {new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" })}
               </span>
             </div>
-            {/* Surveyor Badge */}
-            <div className="flex items-center gap-2 bg-zinc-100/80 px-2.5 py-1 rounded-lg border border-zinc-200/40">
-              <div className="w-6 h-6 rounded-full bg-[#0071e3] text-center flex items-center justify-center font-bold text-white uppercase text-[10px]">
+            {/* User Badge */}
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-2.5 py-1.5 rounded-lg">
+              <div className="w-6 h-6 rounded-full bg-gray-900 text-center flex items-center justify-center font-bold text-white uppercase text-[10px]">
                 {userProfile?.displayName?.substring(0, 2) || "SV"}
               </div>
               <div className="text-left leading-none">
-                <span className="block text-zinc-450 text-[8px] uppercase font-extrabold tracking-wider">{userProfile?.role || "user"}</span>
-                <span className="text-[11px] font-bold text-zinc-800">{userProfile?.displayName || "ผู้ใช้งาน"}</span>
+                <span className="block text-[9px] text-gray-400 uppercase font-semibold tracking-wider">{userProfile?.role || "user"}</span>
+                <span className="text-xs font-semibold text-gray-800">{userProfile?.displayName || "ผู้ใช้งาน"}</span>
               </div>
             </div>
 
@@ -1340,40 +1342,38 @@ export default function App() {
             <button
               type="button"
               onClick={() => {
-                showConfirm(
-                  "🚪 ออกจากระบบ",
-                  "คุณต้องการออกจากระบบ ใช่หรือไม่คะ?",
-                  async () => {
-                    await handleLogout();
-                  },
-                  {
-                    confirmText: "🚪 ออกจากระบบ",
-                    cancelText: "ยกเลิก"
-                  }
-                );
+            showConfirm(
+              "🔐 ออกจากระบบ",
+              "คุณต้องการออกจากระบบ ใช่หรือไม่คะ?",
+              async () => {
+                await handleLogout();
+              },
+              {
+                confirmText: "🔐 ออกจากระบบ",
+                cancelText: "ยกเลิก"
+              }
+            );
               }}
-              className="p-2 rounded-lg bg-red-50 hover:bg-red-100 active:bg-red-150 text-red-650 transition-all border border-red-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5 shadow-2xs"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-red-50 border border-gray-200 hover:border-red-200 text-gray-600 hover:text-red-600 text-xs font-medium rounded-lg transition-all cursor-pointer"
               title="ออกจากระบบ (Log Out)"
             >
-              <LogOut className="w-3.5 h-3.5 text-red-500" />
-              <span className="text-[10px] font-bold text-red-700 hidden sm:inline">ออกจากระบบ</span>
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">ออกจากระบบ</span>
             </button>
-            {/* User Management Button (Users Icon) - superadmin only */}
+            {/* User Management Button - superadmin only */}
             {userProfile?.role === "superadmin" && (
               <button
                 type="button"
-                onClick={() => {
-                  setIsUserMgmtOpen(true);
-                }}
-                className="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-150 text-indigo-650 transition-all border border-indigo-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5 shadow-2xs"
-                title="จัดการสิทธิ์ผู้ใช้งาน (User Management)"
+                onClick={() => { setIsUserMgmtOpen(true); }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-medium rounded-lg transition-all cursor-pointer"
+                title="จัดการสิทธิ์ผู้ใช้งาน"
               >
-                <Users className="w-3.5 h-3.5 text-indigo-600" />
-                <span className="text-[10px] font-bold text-indigo-700 hidden sm:inline">จัดการสิทธิ์</span>
+                <Users className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">จัดการสิทธิ์</span>
               </button>
             )}
             
-            {/* Master Cost Database Button (Coins Icon) - superadmin or admin */}
+            {/* Master Cost Button - admin */}
             {(userProfile?.role === "superadmin" || userProfile?.role === "admin") && (
               <button
                 type="button"
@@ -1383,15 +1383,15 @@ export default function App() {
                   setAdminPinPurpose("costs");
                   setIsAdminPinModalOpen(true);
                 }}
-                className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-650 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center gap-1 sm:px-2.5"
-                title="แก้ไขราคาต้นทุนกลาง (Master Cost Database)"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-amber-50 border border-gray-200 hover:border-amber-200 text-gray-600 hover:text-amber-700 text-xs font-medium rounded-lg transition-all cursor-pointer"
+                title="แก้ไขราคาต้นทุนกลาง"
               >
                 <Coins className="w-3.5 h-3.5 text-amber-500" />
-                <span className="text-[10px] font-bold text-zinc-700 hidden sm:inline">สำหรับผู้ดูแลระบบ</span>
+                <span className="hidden sm:inline">ราคากลาง</span>
               </button>
             )}
 
-            {/* Admin Settings Button (Gear Icon) - superadmin or admin */}
+            {/* Admin Settings Button - admin */}
             {(userProfile?.role === "superadmin" || userProfile?.role === "admin") && (
               <button
                 type="button"
@@ -1401,10 +1401,10 @@ export default function App() {
                   setAdminPinPurpose("settings");
                   setIsAdminPinModalOpen(true);
                 }}
-                className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-650 transition-all border border-zinc-200/50 cursor-pointer flex items-center justify-center"
-                title="สำหรับผู้ดูแลระบบ (Admin Panel)"
+                className="p-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-500 hover:text-gray-700 rounded-lg transition-all cursor-pointer"
+                title="Admin Panel"
               >
-                <Settings className="w-4 h-4 text-zinc-650" />
+                <Settings className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -1412,7 +1412,7 @@ export default function App() {
       </header>
 
       {/* Main body area */}
-      <main className="grow max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex flex-col lg:flex-row lg:items-start gap-6">
+      <main className="grow max-w-7xl w-full mx-auto px-4 md:px-6 py-5 flex flex-col lg:flex-row lg:items-start gap-5">
         
         {/* SIDE BAR (COL 3): Project history logs */}
         <section className="w-full lg:w-80 shrink-0 space-y-4">
@@ -1436,63 +1436,33 @@ export default function App() {
 
         {/* WORKSPACE AREA (COL 9): Wizard steps and components */}
         <section className="grow flex flex-col min-w-0">
-          
-          {/* Breadcrumbs / Steps Indicator for Wizard */}
-          <div className="bg-white rounded-2xl p-4 border border-zinc-250 mb-6 shadow-xs">
-            <div className="flex justify-between items-center flex-wrap gap-2">
-              {STAGE_STEPS.map((stepUnit) => {
-                const isPassed = stepUnit.number < step;
-                const isCurrent = stepUnit.number === step;
-                const isSurveyIgnored = (stepUnit.number === 4) && !hasSurveyReport;
-                const isClickable = (isPassed || isCurrent) && activeProjectId;
-
-                return (
-                  <div
-                    key={stepUnit.number}
-                    onClick={() => {
-                      if (isClickable && !isCurrent) setStep(stepUnit.number);
-                    }}
-                    className={`flex items-center gap-1.5 text-xs font-medium transition-all ${
-                      isSurveyIgnored ? "opacity-25 line-through" : ""
-                    } ${
-                      isClickable && !isCurrent
-                        ? "cursor-pointer group"
-                        : "cursor-default"
-                    }`}
-                  >
-                    <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
-                        isCurrent
-                          ? "bg-[#0071e3] text-white"
-                          : isPassed
-                          ? "bg-emerald-50 text-emerald-600 border border-emerald-200 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500"
-                          : "bg-zinc-100 text-zinc-400 border border-zinc-200/50"
-                      }`}
-                    >
-                      {isPassed ? "✓" : stepUnit.number}
-                    </div>
-                    <span
-                      className={`text-[11px] transition-colors ${
-                        isCurrent
-                          ? "text-[#0071e3] font-semibold"
-                          : isPassed
-                          ? "text-zinc-650 group-hover:text-[#0071e3] group-hover:underline underline-offset-2"
-                          : "text-zinc-400 font-normal"
-                      }`}
-                    >
-                      {stepUnit.label}
-                    </span>
-                    {stepUnit.number < 5 && (
-                      <span className="text-zinc-300 font-normal text-[10px] ml-1.5">/</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          {/* Stepper / Steps Indicator — blocks.so Sidebar02 style */}
+          {(() => {
+            const sidebarSteps = STAGE_STEPS.map((stepUnit) => {
+              const isPassed = stepUnit.number < step;
+              const isCurrent = stepUnit.number === step;
+              const isSurveyIgnored = (stepUnit.number === 4) && !hasSurveyReport;
+              const isClickable = (isPassed || isCurrent) || !!activeProjectId;
+              return {
+                number: stepUnit.number,
+                label: stepUnit.label,
+                isPassed,
+                isCurrent,
+                isClickable,
+                isIgnored: isSurveyIgnored,
+              };
+            });
+            return (
+              <Sidebar02 
+                steps={sidebarSteps} 
+                onStepSelect={setStep} 
+                className="mb-5 flex flex-col md:flex-row gap-2 bg-white p-2.5 rounded-xl border border-gray-200 shadow-sm md:items-center space-y-0"
+              />
+            );
+          })()}
 
           {/* Active Step Panel */}
-          <div className="bg-white border border-zinc-250/80 rounded-2xl p-6 md:p-8 shadow-xs grow">
+          <div className="bg-white border border-gray-200 rounded-xl p-5 md:p-7 shadow-sm grow">
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
@@ -1588,94 +1558,68 @@ export default function App() {
 
       </main>
 
-      {/* Footer copyright and attribution */}
-      <footer className="bg-white py-5 px-6 text-center text-xs shrink-0 border-t border-zinc-200/60 mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-zinc-550 font-sans">
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 py-4 px-6 shrink-0 mt-auto">
+        <div className="max-w-7xl mx-auto text-center text-xs text-gray-400">
           <span>Powered by Warapon Wichitpan © 2026 · NT Cyfence</span>
         </div>
       </footer>
 
-      {/* Central Apple-style Glassmorphic Confirmation Modal */}
-      <AnimatePresence>
-        {confirmModal.isOpen && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] select-none font-sans">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="bg-white rounded-2xl max-w-xs w-full shadow-2xl overflow-hidden border border-zinc-100"
-            >
-              {/* Content area */}
-              <div className="px-6 pt-7 pb-5 text-center space-y-2">
-                <div className="text-2xl mb-3 leading-none">
-                  {confirmModal.title.match(/[\u{1F000}-\u{1FFFF}]|[\u2600-\u27FF]/u)?.[0] || "💬"}
-                </div>
-                <h4 className="text-sm font-bold text-zinc-900 leading-snug">
-                  {confirmModal.title.replace(/^[\u{1F000}-\u{1FFFF}]|^[\u2600-\u27FF]\s*/u, "").trim()}
-                </h4>
-                <p className="text-[11.5px] text-zinc-500 leading-relaxed">
-                  {confirmModal.message}
-                </p>
-              </div>
-              {/* Divider */}
-              <div className="h-px bg-zinc-100" />
-              {/* Action buttons */}
-              <div className={`flex ${confirmModal.cancelText === "" ? "" : "divide-x divide-zinc-100"}`}>
-                {confirmModal.cancelText !== "" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setConfirmModal(prev => ({ ...prev, isOpen: false }));
-                      confirmModal.onCancel?.();
-                    }}
-                    className="flex-1 py-3.5 text-xs font-semibold text-zinc-500 hover:bg-zinc-50 active:bg-zinc-100 transition-colors cursor-pointer"
-                  >
-                    {confirmModal.cancelText || "ยกเลิก"}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
-                    confirmModal.onConfirm();
-                  }}
-                  className={`flex-1 py-3.5 text-xs font-bold transition-colors cursor-pointer ${
-                    confirmModal.title.includes("❌") || confirmModal.title.includes("🗑️")
-                      ? "text-red-500 hover:bg-red-50 active:bg-red-100"
-                      : "text-[#0071e3] hover:bg-blue-50 active:bg-blue-100"
-                  }`}
-                >
-                  {confirmModal.confirmText || "ยืนยัน"}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Confirmation Modal — blocks.so style */}
+      <Dialog01
+        open={confirmModal.isOpen}
+        onOpenChange={(open) => setConfirmModal(prev => ({ ...prev, isOpen: open }))}
+        title={confirmModal.title}
+        description={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={confirmModal.onCancel}
+        variant={confirmModal.title.includes("❌") || confirmModal.title.includes("🗑️") || confirmModal.title.includes("ลบ") ? "danger" : "default"}
+        icon={confirmModal.title.match(/[\u{1F000}-\u{1FFFF}]|[\u2600-\u27FF]/u)?.[0] || "💬"}
+      />
 
-      {/* Admin PIN Verification Modal */}
+      {/* Quick Command Menu */}
+      <CommandMenu01
+        open={isCommandMenuOpen}
+        setOpen={setIsCommandMenuOpen}
+        onSelectAction={(action) => {
+          if (action === "Dashboard" || action === "Home") setStep(1);
+          else if (action === "Projects") setStep(1);
+          else if (action === "Sign out") handleLogout();
+          else if (action === "Preferences" || action === "Appearance") {
+            setAdminPinInput("");
+            setAdminPinError("");
+            setAdminPinPurpose("costs");
+            setIsAdminPinModalOpen(true);
+          }
+        }}
+      />
+
+      {/* Admin PIN Modal — blocks.so style */}
       <AnimatePresence>
         {isAdminPinModalOpen && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] font-sans">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-zinc-100 p-6 space-y-4"
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              transition={{ duration: 0.18 }}
+              className="bg-white rounded-2xl max-w-sm w-full shadow-xl border border-gray-200 p-7 space-y-5"
             >
               <div className="text-center space-y-2">
-                <div className="text-3xl">🔒</div>
-                <h4 className="text-sm font-bold text-zinc-950">
+                <div className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mx-auto text-2xl">
+                  🔒
+                </div>
+                <h4 className="text-sm font-bold text-gray-900">
                   ยืนยันสิทธิ์ผู้ดูแลระบบ
                 </h4>
-                <p className="text-[11px] text-zinc-500">
+                <p className="text-xs text-gray-500">
                   ระบุรหัส PIN ของผู้ดูแลระบบเพื่อเข้าสู่หน้าต่างการตั้งค่า
                 </p>
               </div>
 
-              <form onSubmit={handleVerifyAdminPin} className="space-y-3">
+              <form onSubmit={handleVerifyAdminPin} className="space-y-4">
                 <div>
                   <input
                     type="password"
@@ -1685,18 +1629,18 @@ export default function App() {
                       setAdminPinInput(e.target.value.replace(/\D/g, ""));
                       setAdminPinError("");
                     }}
-                    className="w-full text-center tracking-[1.5em] text-lg font-mono py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white"
+                    className="w-full text-center tracking-[1.5em] text-xl font-mono py-3 bg-gray-50 border border-gray-300 hover:border-gray-400 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/8 rounded-xl outline-none transition-all placeholder-gray-400"
                     placeholder="••••"
                     autoFocus
                   />
                   {adminPinError && (
-                    <p className="text-[10px] text-red-500 text-center mt-1.5 font-medium">
+                    <p className="text-xs text-red-600 text-center mt-2 font-medium">
                       ⚠️ {adminPinError}
                     </p>
                   )}
                 </div>
 
-                <div className="flex gap-2.5 pt-2">
+                <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => {
@@ -1704,13 +1648,13 @@ export default function App() {
                       setAdminPinInput("");
                       setAdminPinError("");
                     }}
-                    className="flex-1 py-2 text-xs font-semibold text-zinc-500 bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 rounded-xl transition-all cursor-pointer"
+                    className="flex-1 py-2.5 text-sm font-medium text-gray-600 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg transition-all cursor-pointer"
                   >
                     ยกเลิก
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2 text-xs font-bold text-white bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 rounded-xl shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                    className="flex-1 py-2.5 text-sm font-semibold text-white bg-gray-900 hover:bg-gray-800 active:bg-gray-700 rounded-lg transition-all cursor-pointer"
                   >
                     ยืนยัน
                   </button>
@@ -1721,29 +1665,29 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Admin Panel Modal */}
+      {/* Admin Panel Modal — blocks.so style */}
       <AnimatePresence>
         {isAdminModalOpen && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] font-sans">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-zinc-100 overflow-hidden"
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              transition={{ duration: 0.18 }}
+              className="bg-white rounded-2xl max-w-md w-full shadow-xl border border-gray-200 overflow-hidden"
             >
               {/* Header */}
-              <div className="px-6 py-4 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-zinc-700" />
-                  <span className="text-xs font-bold text-zinc-800">
-                    หน้าต่างควบคุมสำหรับผู้ดูแลระบบ (Admin Panel)
+                  <Settings className="w-4 h-4 text-gray-700" />
+                  <span className="text-sm font-semibold text-gray-900">
+                    Admin Panel
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsAdminModalOpen(false)}
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-zinc-400 hover:bg-zinc-100 hover:text-zinc-650 transition-colors cursor-pointer text-xs"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors cursor-pointer text-sm"
                 >
                   ✕
                 </button>
@@ -1752,41 +1696,41 @@ export default function App() {
               {/* Content */}
               <div className="p-6 space-y-4">
                 <div className="space-y-3">
-                  <span className="text-[10px] font-bold text-zinc-400 block uppercase font-mono tracking-wider">
-                    DATABASE CONNECTION / การเชื่อมต่อระบบคลาวด์
-                  </span>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Database Connection
+                  </p>
 
                   {isSupabaseConfigured ? (
-                    <div className="bg-emerald-50/50 border border-emerald-200 p-4 rounded-xl space-y-3">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 animate-pulse">
+                    <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
                           ✓
                         </div>
                         <div className="text-xs">
-                          <span className="block font-bold text-emerald-800">
+                          <span className="block font-semibold text-emerald-800">
                             เชื่อมต่อคลาวด์ Supabase สำเร็จ!
                           </span>
-                          <span className="block text-[10.5px] text-emerald-600/90 leading-relaxed mt-0.5">
+                          <span className="block text-emerald-600 leading-relaxed mt-0.5">
                             ข้อมูลโครงการของคุณถูกสำรองและซิงก์ออนไลน์เรียลไทม์แล้วค่ะ
                           </span>
                         </div>
                       </div>
-                      <div className="bg-white/80 p-2.5 rounded-lg border border-emerald-100 text-[10px] space-y-1 font-mono text-zinc-650 break-all">
-                        <div className="font-semibold text-zinc-400 uppercase text-[8px] tracking-wider">REST Endpoint URL</div>
+                      <div className="bg-white p-2.5 rounded-lg border border-emerald-200 text-[10px] space-y-1 font-mono text-gray-600 break-all">
+                        <div className="font-semibold text-gray-400 uppercase text-[9px] tracking-wider">REST Endpoint URL</div>
                         <div>https://tkcpmtqvdakgxjcwmzdw.supabase.co/rest/v1/</div>
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-2">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-5 h-5 rounded-full bg-zinc-400 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                    <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-2">
+                      <div className="flex items-start gap-3">
+                        <div className="w-5 h-5 rounded-full bg-gray-400 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
                           !
                         </div>
                         <div className="text-xs">
-                          <span className="block font-bold text-zinc-800">
+                          <span className="block font-semibold text-gray-800">
                             ทำงานในโหมด Offline (LocalStorage)
                           </span>
-                          <span className="block text-[10.5px] text-zinc-500 leading-relaxed mt-0.5">
+                          <span className="block text-gray-500 leading-relaxed mt-0.5">
                             ยังไม่ได้เชื่อมต่อกับระบบฐานข้อมูลคลาวด์ ข้อมูลจะถูกจัดเก็บในหน่วยความจำของอุปกรณ์นี้อย่างปลอดภัย
                           </span>
                         </div>
@@ -1795,18 +1739,18 @@ export default function App() {
                   )}
                 </div>
 
-                <div className="bg-amber-50/50 border border-amber-200/60 p-3.5 rounded-xl text-[10.5px] text-amber-800 leading-relaxed space-y-1">
-                  <div className="font-bold">💡 ข้อแนะนำเพิ่มเติมสำหรับผู้ดูแล</div>
-                  <div>ในหน้านี้ ผู้ดูแลสามารถตรวจสอบสถานะการเชื่อมต่อฐานข้อมูลปลายทาง หากพบปัญหาเกี่ยวกับโครงสร้าง ตาราง หรือข้อมูลการเชื่อมต่อ สามารถประสานงานกับทีมผู้พัฒนาระบบเพื่อดูแลรักษาเซิร์ฟเวอร์ต่อไปได้ค่ะ</div>
+                <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-xs text-amber-800 leading-relaxed space-y-1">
+                  <div className="font-semibold">💡 ข้อแนะนำสำหรับผู้ดูแล</div>
+                  <div className="text-amber-700">ตรวจสอบสถานะการเชื่อมต่อฐานข้อมูล หากพบปัญหา กรุณาประสานงานกับทีมผู้พัฒนาระบบค่ะ</div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-3.5 bg-zinc-50/50 border-t border-zinc-100 flex justify-end">
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
                 <button
                   type="button"
                   onClick={() => setIsAdminModalOpen(false)}
-                  className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
                 >
                   ปิดหน้าต่าง
                 </button>
@@ -1816,238 +1760,238 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Master Cost Database Modal */}
+      {/* Master Cost Database Modal — blocks.so style */}
       <AnimatePresence>
         {isCostsModalOpen && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-[9999] font-sans">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 15 }}
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
               transition={{ duration: 0.18 }}
-              className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]"
+              className="bg-white rounded-2xl max-w-2xl w-full shadow-xl border border-gray-200 overflow-hidden flex flex-col max-h-[90vh]"
             >
               {/* Header */}
-              <div className="px-6 py-4 border-b border-zinc-150 bg-zinc-50/50 flex justify-between items-center shrink-0">
-                <div className="flex items-center gap-2">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-2.5">
                   <Coins className="w-4.5 h-4.5 text-amber-500" />
                   <div>
-                    <span className="text-xs font-extrabold text-zinc-900 block uppercase tracking-wider font-mono">
-                      ราคาต้นทุนอุปกรณ์และบริการกลาง (Master Cost Database)
+                    <span className="text-sm font-bold text-gray-900 block">
+                      Master Cost Database
                     </span>
-                    <span className="text-[9.5px] text-zinc-400 font-sans block mt-0.5 leading-none">
-                      แก้ไขราคามาตรฐานต้นทุนสำหรับคำนวณโครงการถัดไป (ไม่มีผลย้อนหลังกับใบเสนอราคาที่เซฟแล้ว)
+                    <span className="text-xs text-gray-500 block mt-0.5">
+                      แก้ไขราคามาตรฐานต้นทุน (ไม่มีผลย้อนหลังกับใบเสนอราคาที่เซฟแล้ว)
                     </span>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsCostsModalOpen(false)}
-                  className="w-7 h-7 rounded-xl flex items-center justify-center text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors cursor-pointer text-xs"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors cursor-pointer text-sm"
                 >
                   ✕
                 </button>
               </div>
 
               {/* Scrollable Content Form */}
-              <div className="overflow-y-auto p-6 space-y-6 max-h-[70vh] scrollbar-thin">
+              <div className="overflow-y-auto p-6 space-y-6 flex-1">
                 
                 {/* Section 1: IP Cameras */}
                 <div className="space-y-3.5">
-                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200 pb-2 flex items-center gap-1.5">
                     <span>📷</span> กล้องวงจรปิด IP Cameras
                   </h5>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">กล้องทรงกระบอก Bullet (บาท)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">กล้องทรงกระบอก Bullet (บาท)</label>
                       <input type="number" min={0} value={tempCosts.camBullet}
                         onChange={(e) => setTempCosts(p => ({ ...p, camBullet: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">กล้องครอบฝ้า Dome (บาท)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">กล้องครอบฝ้า Dome (บาท)</label>
                       <input type="number" min={0} value={tempCosts.camDome}
                         onChange={(e) => setTempCosts(p => ({ ...p, camDome: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">กล้องหมุน PTZ Speed Dome (บาท)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">กล้องหมุน PTZ Speed Dome (บาท)</label>
                       <input type="number" min={0} value={tempCosts.camPtz}
                         onChange={(e) => setTempCosts(p => ({ ...p, camPtz: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">กล้องจานบิน Fisheye 360° (บาท)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">กล้องจานบิน Fisheye 360° (บาท)</label>
                       <input type="number" min={0} value={tempCosts.camFisheye}
                         onChange={(e) => setTempCosts(p => ({ ...p, camFisheye: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 2: Recorders NVR */}
                 <div className="space-y-3.5">
-                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200 pb-2 flex items-center gap-1.5">
                     <span>🗄️</span> เครื่องบันทึกภาพ NVR
                   </h5>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 4CH</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">NVR 4CH</label>
                       <input type="number" min={0} value={tempCosts.nvr4ch}
                         onChange={(e) => setTempCosts(p => ({ ...p, nvr4ch: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 8CH</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">NVR 8CH</label>
                       <input type="number" min={0} value={tempCosts.nvr8ch}
                         onChange={(e) => setTempCosts(p => ({ ...p, nvr8ch: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 16CH</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">NVR 16CH</label>
                       <input type="number" min={0} value={tempCosts.nvr16ch}
                         onChange={(e) => setTempCosts(p => ({ ...p, nvr16ch: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 32CH</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">NVR 32CH</label>
                       <input type="number" min={0} value={tempCosts.nvr32ch}
                         onChange={(e) => setTempCosts(p => ({ ...p, nvr32ch: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">NVR 64CH</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">NVR 64CH</label>
                       <input type="number" min={0} value={tempCosts.nvr64ch}
                         onChange={(e) => setTempCosts(p => ({ ...p, nvr64ch: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 3: HDD Storage */}
                 <div className="space-y-3.5">
-                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200 pb-2 flex items-center gap-1.5">
                     <span>💾</span> ฮาร์ดดิสก์สะสมภาพ
                   </h5>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">HDD ขนาด 4TB (บาท)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">HDD ขนาด 4TB (บาท)</label>
                       <input type="number" min={0} value={tempCosts.hdd4tb}
                         onChange={(e) => setTempCosts(p => ({ ...p, hdd4tb: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">HDD ขนาด 8TB (บาท)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">HDD ขนาด 8TB (บาท)</label>
                       <input type="number" min={0} value={tempCosts.hdd8tb}
                         onChange={(e) => setTempCosts(p => ({ ...p, hdd8tb: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 4: Poles & Support Arms */}
                 <div className="space-y-3.5">
-                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200 pb-2 flex items-center gap-1.5">
                     <span>🗼</span> เสาเหล็กยึดกล้องและอุปกรณ์เสริม
                   </h5>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">เสา 3 เมตร</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">เสา 3 เมตร</label>
                       <input type="number" min={0} value={tempCosts.pole3m}
                         onChange={(e) => setTempCosts(p => ({ ...p, pole3m: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">เสา 4 เมตร</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">เสา 4 เมตร</label>
                       <input type="number" min={0} value={tempCosts.pole4m}
                         onChange={(e) => setTempCosts(p => ({ ...p, pole4m: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">เสา 6 เมตร</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">เสา 6 เมตร</label>
                       <input type="number" min={0} value={tempCosts.pole6m}
                         onChange={(e) => setTempCosts(p => ({ ...p, pole6m: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">เสากัลวาไนซ์</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">เสากัลวาไนซ์</label>
                       <input type="number" min={0} value={tempCosts.poleGalvanized}
                         onChange={(e) => setTempCosts(p => ({ ...p, poleGalvanized: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">แขนยื่น Support</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">แขนยื่น Support</label>
                       <input type="number" min={0} value={tempCosts.supportArm}
                         onChange={(e) => setTempCosts(p => ({ ...p, supportArm: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 5: Cables, Pipes & PoE Switches */}
                 <div className="space-y-3.5">
-                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200 pb-2 flex items-center gap-1.5">
                     <span>🔌</span> อุปกรณ์เชื่อมต่อและ Switch PoE
                   </h5>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">สายสัญญาณแลน LAN CAT6 (บาทต่อเมตร)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">สายสัญญาณแลน LAN CAT6 (บาทต่อเมตร)</label>
                       <input type="number" min={0} value={tempCosts.lanCable}
                         onChange={(e) => setTempCosts(p => ({ ...p, lanCable: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">ท่อร้อยสายสัญญาณ uPVC (บาทต่อท่อ 3 ม.)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">ท่อร้อยสายสัญญาณ uPVC (บาทต่อท่อ 3 ม.)</label>
                       <input type="number" min={0} value={tempCosts.conduit}
                         onChange={(e) => setTempCosts(p => ({ ...p, conduit: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">Switch PoE 4P</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">Switch PoE 4P</label>
                       <input type="number" min={0} value={tempCosts.poe4port}
                         onChange={(e) => setTempCosts(p => ({ ...p, poe4port: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">Switch PoE 8P</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">Switch PoE 8P</label>
                       <input type="number" min={0} value={tempCosts.poe8port}
                         onChange={(e) => setTempCosts(p => ({ ...p, poe8port: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">Switch PoE 16P</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">Switch PoE 16P</label>
                       <input type="number" min={0} value={tempCosts.poe16port}
                         onChange={(e) => setTempCosts(p => ({ ...p, poe16port: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-semibold text-zinc-650 mb-1">Switch PoE 24P</label>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-1">Switch PoE 24P</label>
                       <input type="number" min={0} value={tempCosts.poe24port}
                         onChange={(e) => setTempCosts(p => ({ ...p, poe24port: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 6: Labor Fees */}
                 <div className="space-y-3.5 pb-4">
-                  <h5 className="text-[10px] font-bold text-[#0071e3] uppercase tracking-wider font-mono border-b border-blue-100 pb-1 flex items-center gap-1.5">
+                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200 pb-2 flex items-center gap-1.5">
                     <span>🛠️</span> ค่าบริการงานติดตั้งและเทปูน
                   </h5>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">ค่าบริการแรงงานติดตั้งกล้อง (บาทต่อจุด)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">ค่าบริการแรงงานติดตั้งกล้อง (บาทต่อจุด)</label>
                       <input type="number" min={0} value={tempCosts.laborCamera}
                         onChange={(e) => setTempCosts(p => ({ ...p, laborCamera: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-semibold text-zinc-650 mb-1">ค่าแรงปูนบ่อและเสาเข็มโครงยึด (บาทต่อจุดเสา)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">ค่าแรงปูนบ่อและเสาเข็มโครงยึด (บาทต่อจุดเสา)</label>
                       <input type="number" min={0} value={tempCosts.laborPole}
                         onChange={(e) => setTempCosts(p => ({ ...p, laborPole: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-250 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:bg-white text-xs font-mono font-bold text-zinc-800" />
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
                 </div>
@@ -2055,31 +1999,25 @@ export default function App() {
               </div>
 
               {/* Footer Actions */}
-              <div className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-150 flex justify-between items-center shrink-0">
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center shrink-0">
                 <button
                   type="button"
                   onClick={() => {
                     showConfirm(
                       "🔄 คืนค่าเริ่มต้นโรงงาน",
                       "คุณต้องการคืนค่าคู่มือราคาต้นทุนมาตรฐานของโรงงาน (Factory Defaults) ใช่หรือไม่คะ?",
-                      () => {
-                        setTempCosts(DEFAULT_MASTER_COSTS);
-                      },
-                      {
-                        confirmText: "🔄 ยืนยันคืนค่า",
-                        cancelText: "ยกเลิก"
-                      }
+                      () => { setTempCosts(DEFAULT_MASTER_COSTS); },
+                      { confirmText: "🔄 ยืนยันคืนค่า", cancelText: "ยกเลิก" }
                     );
                   }}
-                  className="px-3.5 py-2 bg-red-50 hover:bg-red-100 active:bg-red-150 text-red-600 border border-red-200 text-xs font-bold rounded-xl transition-all cursor-pointer"
-                >
-                  คืนค่าเริ่มต้นโรงงาน
+                  className="px-4 py-2 bg-white hover:bg-red-50 border border-gray-200 hover:border-red-200 text-gray-600 hover:text-red-600 text-sm font-medium rounded-lg transition-all cursor-pointer">
+                  คืนค่าเริ่มต้น
                 </button>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setIsCostsModalOpen(false)}
-                    className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-250 text-zinc-600 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                    className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg transition-all cursor-pointer"
                   >
                     ยกเลิก
                   </button>
@@ -2118,7 +2056,7 @@ export default function App() {
                       
                       setIsCostsModalOpen(false);
                     }}
-                    className="px-5 py-2 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer"
+                    className="px-5 py-2 bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-all cursor-pointer"
                   >
                     บันทึกต้นทุนใหม่
                   </button>
@@ -2129,50 +2067,50 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* superAdmin User Management Modal */}
+      {/* User Management Modal — blocks.so style */}
       <AnimatePresence>
         {isUserMgmtOpen && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-[9999] font-sans">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 15 }}
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
               transition={{ duration: 0.18 }}
-              className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-zinc-200 overflow-x-hidden flex flex-col max-h-[90vh]"
+              className="bg-white rounded-2xl max-w-4xl w-full shadow-xl border border-gray-200 overflow-x-hidden flex flex-col max-h-[90vh]"
             >
               {/* Header */}
-              <div className="px-6 py-4 border-b border-zinc-150 bg-zinc-50/50 flex justify-between items-center shrink-0">
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-indigo-650" />
+              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <Users className="w-5 h-5 text-gray-700" />
                   <div>
-                    <span className="text-xs font-extrabold text-zinc-900 block uppercase tracking-wider font-mono">
-                      ระบบจัดการผู้ใช้งานและสิทธิ์ความปลอดภัย (User Auth Control Center)
+                    <span className="text-sm font-bold text-gray-900 block">
+                      User Management
                     </span>
-                    <span className="text-[9.5px] text-zinc-400 font-sans block mt-0.5 leading-none">
-                      ( superAdmin Only ) แก้ไขสิทธิ์การเข้าถึงข้อมูลต้นทุนและจัดกลุ่มจังหวัดของพนักงานสำรวจทั้งหมด
+                    <span className="text-xs text-gray-500 block mt-0.5">
+                      จัดการสิทธิ์และกลุ่มจังหวัดของพนักงานสำรวจ (superAdmin Only)
                     </span>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsUserMgmtOpen(false)}
-                  className="w-7 h-7 rounded-xl flex items-center justify-center text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors cursor-pointer text-xs"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors cursor-pointer text-sm"
                 >
                   ✕
                 </button>
               </div>
 
               {/* Scrollable Content */}
-              <div className="overflow-y-auto p-6 max-h-[70vh] scrollbar-thin">
+              <div className="overflow-y-auto p-6 flex-1">
                 <UserManagement />
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-3.5 bg-zinc-50/50 border-t border-zinc-100 flex justify-end shrink-0">
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsUserMgmtOpen(false)}
-                  className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
                 >
                   ปิดหน้าต่างจัดการ
                 </button>

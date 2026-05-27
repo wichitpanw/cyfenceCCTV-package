@@ -116,28 +116,28 @@ export default function ProjectHistory({
   });
 
   return (
-    <div className="bg-white p-4 rounded-2xl border border-zinc-200/75 h-auto flex flex-col justify-between" id="project-history-panel">
+    <div className="bg-white p-4 rounded-xl border border-gray-200 h-auto flex flex-col justify-between" id="project-history-panel">
       <div className="space-y-4">
         {/* Header and Add button */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-zinc-100 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-gray-150 gap-2">
           <div className="flex items-center gap-1.5">
-            <FolderKanban className="w-4 h-4 text-[#0071e3] shrink-0" />
-            <h3 className="font-semibold text-[11px] text-zinc-800 uppercase tracking-wide font-sans leading-none">
+            <FolderKanban className="w-4 h-4 text-gray-700 shrink-0" />
+            <h3 className="font-semibold text-xs text-gray-900 uppercase tracking-wider leading-none">
               ประวัติงานสำรวจ
             </h3>
           </div>
           <button
             type="button"
             onClick={onNewProject}
-            className="p-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-medium transition-all flex flex-col items-center gap-0.5 cursor-pointer leading-tight shrink-0 whitespace-nowrap self-start sm:self-center shadow-xs"
+            className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-xs font-semibold transition-all flex flex-col items-center gap-0.5 cursor-pointer leading-tight shrink-0 whitespace-nowrap self-start sm:self-center"
             title={costLastUpdated ? `ราคาต้นทุนล่าสุด: ${costLastUpdated}` : undefined}
           >
-            <div className="inline-flex items-center gap-1">
+            <div className="inline-flex items-center gap-1.5">
               <PlusCircle className="w-3.5 h-3.5 shrink-0" />
               <span>เปิดไฟล์งานใหม่</span>
             </div>
             {canSeeCost && costLastUpdated && (
-              <span className="text-[7px] text-zinc-400 font-normal">
+              <span className="text-[8px] text-gray-400 font-normal">
                 ราคา ณ {costLastUpdated}
               </span>
             )}
@@ -146,7 +146,7 @@ export default function ProjectHistory({
 
         {/* Search Bar */}
         <div className="relative">
-          <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400">
+          <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-400">
             <Search className="h-3.5 w-3.5" />
           </span>
           <input
@@ -155,18 +155,18 @@ export default function ProjectHistory({
             placeholder="ค้นหาชื่อลูกค้า / ชื่อโครงการ / จังหวัด..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 rounded-lg border text-[11px] bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] transition-all"
+            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 hover:border-gray-400 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/8 rounded-lg text-xs text-gray-900 placeholder-gray-400 outline-none transition-all"
           />
         </div>
 
         {/* Province Filter Dropdown */}
         {uniqueProvinces.length > 1 && (
-          <div className="flex items-center justify-between gap-2 bg-zinc-50/50 p-2 rounded-xl border border-zinc-150 text-[10px] select-none">
-            <span className="text-zinc-500 font-semibold shrink-0">📍 จังหวัด:</span>
+          <div className="flex items-center justify-between gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200 text-xs select-none">
+            <span className="text-gray-600 font-semibold shrink-0">📍 จังหวัด:</span>
             <select
               value={selectedProvince}
               onChange={(e) => setSelectedProvince(e.target.value)}
-              className="grow bg-white border border-zinc-200 rounded px-1.5 py-0.5 text-[10px] focus:outline-none focus:ring-1 focus:ring-[#0071e3] cursor-pointer"
+              className="grow bg-white border border-gray-300 hover:border-gray-400 focus:border-gray-900 rounded px-1.5 py-0.5 text-xs focus:outline-none cursor-pointer"
             >
               <option value="all">ทั้งหมด ({roleFilteredProjects.length})</option>
               {uniqueProvinces
@@ -200,14 +200,16 @@ export default function ProjectHistory({
                 <div
                   key={proj.id}
                   onClick={() => onLoadProject(proj.id)}
-                  className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                  className={`p-3 rounded-lg border text-left cursor-pointer transition-all ${
                     isActive
-                      ? "bg-zinc-50 border-zinc-900 shadow-xs border-l-[3px] border-l-[#0071e3]"
-                      : "bg-white border-zinc-200 hover:bg-zinc-50/50"
+                      ? "bg-gray-900 text-white border-gray-900 shadow-sm"
+                      : "bg-white border-gray-200 hover:bg-gray-50"
                   }`}
                 >
                   <div className="flex justify-between items-start gap-2">
-                    <span className="grow text-[10px] text-[#0071e3] font-sans font-semibold whitespace-normal break-words leading-tight">
+                    <span className={`grow text-xs font-semibold whitespace-normal break-words leading-tight ${
+                      isActive ? "text-white" : "text-gray-900"
+                    }`}>
                       {proj.customerInfo.projectName || "โครงการเว้นว่าง"}
                     </span>
                     <button
@@ -216,53 +218,65 @@ export default function ProjectHistory({
                         e.stopPropagation();
                         onDeleteProject(proj.id);
                       }}
-                      className="p-1 hover:bg-red-50 text-zinc-400 hover:text-red-600 rounded cursor-pointer transition-colors shrink-0"
+                      className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
+                        isActive 
+                          ? "text-gray-400 hover:bg-white/10 hover:text-red-400" 
+                          : "text-gray-400 hover:bg-red-50 hover:text-red-600"
+                      }`}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  <strong className="block text-xs text-zinc-800 font-semibold mt-1 whitespace-normal break-words leading-snug">
+                  <strong className={`block text-xs font-semibold mt-1 whitespace-normal break-words leading-snug ${
+                    isActive ? "text-gray-200" : "text-gray-800"
+                  }`}>
                     {proj.customerInfo.customerName || "ไม่ระบุชื่อบริษัท"}
                   </strong>
 
                   {/* Surveyor info */}
                   {proj.customerInfo.surveyorName && (
-                    <div className="mt-1.5 flex items-center gap-1.5 text-[9.5px] text-zinc-500">
-                      <div className="w-4 h-4 rounded-full bg-[#0071e3]/10 flex items-center justify-center shrink-0">
-                        <span className="text-[#0071e3] font-bold text-[7px] uppercase">
+                    <div className="mt-2 flex items-center gap-1.5 text-xs">
+                      <div className={`w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 text-[8px] font-bold uppercase ${
+                        isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-700 border border-gray-200"
+                      }`}>
+                        <span>
                           {proj.customerInfo.surveyorName.substring(0, 2)}
                         </span>
                       </div>
-                      <span className="truncate font-medium text-zinc-600">
+                      <span className={`truncate font-medium ${isActive ? "text-gray-300" : "text-gray-600"}`}>
                         {proj.customerInfo.surveyorName}
                       </span>
                       {proj.customerInfo.surveyorPhone && (
-                        <span className="shrink-0 text-zinc-400">
+                        <span className={`shrink-0 ${isActive ? "text-gray-400" : "text-gray-400"}`}>
                           · {proj.customerInfo.surveyorPhone}
                         </span>
                       )}
                     </div>
                   )}
                   {proj.customerInfo.surveyorDepartment && (
-                    <div className="mt-0.5 text-[9px] text-zinc-400 pl-5.5">
+                    <div className={`text-[10px] pl-6 ${isActive ? "text-gray-400" : "text-gray-400"}`}>
                       {proj.customerInfo.surveyorDepartment}
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between text-[10px] text-zinc-400 mt-2.5 pt-2.5 border-t border-zinc-100/50">
+                  <div className={`flex items-center justify-between text-xs mt-2.5 pt-2.5 border-t ${
+                    isActive ? "border-white/10 text-gray-400" : "border-gray-100 text-gray-400"
+                  }`}>
                     <span className="flex flex-wrap items-center gap-1.5 font-mono">
-                      <Calendar className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                      <Calendar className="w-3.5 h-3.5 shrink-0" />
                       <span>{proj.createdAt.split("T")[0]}</span>
                       {proj.customerInfo.province && (
-                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-650 text-[8px] font-semibold tracking-wide font-sans shrink-0">
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold tracking-wide font-sans shrink-0 ${
+                          isActive ? "bg-white/15 text-gray-200" : "bg-gray-100 text-gray-600 border border-gray-200"
+                        }`}>
                           {proj.customerInfo.province}
                         </span>
                       )}
                     </span>
                     {/* แสดงราคาต้นทุนเฉพาะ superadmin และ admin เท่านั้น */}
                     {canSeeCost && (
-                      <strong className="text-zinc-900 text-xs font-semibold">
+                      <strong className={`text-xs font-semibold ${isActive ? "text-white" : "text-gray-900"}`}>
                         ฿{subtotal.toLocaleString("th-TH")}
                       </strong>
                     )}
@@ -270,13 +284,17 @@ export default function ProjectHistory({
 
                   {/* ราคารายเดือนที่ลูกค้าต้องจ่าย — แสดงให้ทุก role เห็น */}
                   {monthlyTotal > 0 && (
-                    <div className="mt-2 flex items-center justify-between rounded-lg bg-[#0071e3]/5 border border-[#0071e3]/15 px-2.5 py-1.5">
-                      <span className="text-[9px] text-[#0071e3]/70 font-medium">
+                    <div className={`mt-2.5 flex items-center justify-between rounded-lg px-2.5 py-1.5 border ${
+                      isActive 
+                        ? "bg-white/10 border-white/20" 
+                        : "bg-gray-50 border-gray-200"
+                    }`}>
+                      <span className={`text-[10px] font-medium ${isActive ? "text-gray-300" : "text-gray-600"}`}>
                         💳 ลูกค้าจ่ายต่อเดือน
                       </span>
-                      <strong className="text-[#0071e3] text-[11px] font-bold font-mono">
+                      <strong className={`text-xs font-bold font-mono ${isActive ? "text-white" : "text-gray-900"}`}>
                         ฿{monthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                        <span className="text-[8px] font-normal text-[#0071e3]/60">/เดือน</span>
+                        <span className={`text-[9px] font-normal ${isActive ? "text-gray-400" : "text-gray-500"}`}>/เดือน</span>
                       </strong>
                     </div>
                   )}
@@ -284,7 +302,7 @@ export default function ProjectHistory({
               );
             })
           ) : (
-            <div className="p-6 text-center text-zinc-400 border border-dashed rounded-xl border-zinc-200 text-[11px]">
+            <div className="p-6 text-center text-gray-400 border border-dashed rounded-lg border-gray-200 text-xs">
               {userRole === "user"
                 ? "ยังไม่มีใบงานที่คุณสร้างไว้ค่ะ กดปุ่ม 'เปิดไฟล์งานใหม่' เพื่อเริ่มต้น"
                 : "ยังไม่มีใบงานใดบันทึกไว้ในเบราว์เซอร์นี้"}

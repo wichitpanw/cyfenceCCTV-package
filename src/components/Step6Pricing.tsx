@@ -250,8 +250,8 @@ export default function Step6Pricing({
     @page { size: A4; margin: 16mm 14mm; }
     body { font-family: 'Noto Sans Thai', 'TH Sarabun New', sans-serif; font-size: 11pt; color: #111; background: #fff; }
 
-    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #0071e3; margin-bottom: 14px; }
-    .company-name { font-size: 17pt; font-weight: 800; color: #0071e3; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #111827; margin-bottom: 14px; }
+    .company-name { font-size: 17pt; font-weight: 800; color: #111827; }
     .company-sub { font-size: 8.5pt; color: #555; margin-top: 2px; }
     .doc-info { text-align: right; }
     .doc-title { font-size: 14pt; font-weight: 700; color: #111; }
@@ -260,12 +260,12 @@ export default function Step6Pricing({
 
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     .info-box { border: 1px solid #ddd; border-radius: 6px; padding: 9px 12px; background: #fafafa; }
-    .info-box-title { font-size: 7.5pt; font-weight: 700; color: #0071e3; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
+    .info-box-title { font-size: 7.5pt; font-weight: 700; color: #111827; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
     .info-row { font-size: 9.5pt; color: #333; margin-bottom: 2px; }
     .info-row span { font-weight: 600; color: #111; }
 
     table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 9.5pt; }
-    thead tr { background: #0071e3; color: #fff; }
+    thead tr { background: #111827; color: #fff; }
     thead th { padding: 7px 9px; text-align: left; font-weight: 700; font-size: 8.5pt; }
     thead th.center { text-align: center; }
     thead th.right { text-align: right; }
@@ -282,7 +282,7 @@ export default function Step6Pricing({
     .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 12px; font-size: 9pt; white-space: nowrap; }
     .summary-row span { white-space: nowrap; }
     .summary-row:nth-child(odd) { background: #f8f9fc; }
-    .summary-row.total { background: #0071e3; color: #fff; font-size: 10pt; font-weight: 800; }
+    .summary-row.total { background: #111827; color: #fff; font-size: 10pt; font-weight: 800; }
 
     .remark-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 6px; padding: 10px 14px; margin-top: 8px; }
     .remark-title { font-size: 8pt; font-weight: 700; color: #92400e; margin-bottom: 4px; }
@@ -350,7 +350,7 @@ export default function Step6Pricing({
 
   ${cameraPoints.length > 0 ? `
   <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 14px; margin-bottom: 14px;">
-    <div style="font-size: 10pt; font-weight: 700; color: #0071e3; margin-bottom: 6px;">🗺️ แผนผังพิกัดและจุดติดตั้งกล้องจริงโครงการ</div>
+    <div style="font-size: 10pt; font-weight: 700; color: #111827; margin-bottom: 6px;">🗺️ แผนผังพิกัดและจุดติดตั้งกล้องจริงโครงการ</div>
     <div id="print-map" style="width: 100%; height: 320px; border-radius: 8px; border: 1px solid #ddd; background: #fafafa;"></div>
   </div>
   ` : ""}
@@ -387,9 +387,9 @@ export default function Step6Pricing({
               display: flex;
               align-items: center;
               justify-content: center;
-              background-color: #0071e3;
+              background-color: #111827;
               border: 2.5px solid white;
-              box-shadow: 0 2px 6px rgba(0, 113, 227, 0.4);
+              box-shadow: 0 2px 6px rgba(17, 24, 39, 0.4);
               box-sizing: border-box;
             ">
               <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
@@ -409,7 +409,7 @@ export default function Step6Pricing({
         const bounds = L.latLngBounds([centerLat, centerLng]);
         
         points.forEach((pt, idx) => {
-          const colorHex = pt.type === "Dome" ? "#0071e3" : pt.type === "PTZ" ? "#bf5af2" : "#30d158";
+          const colorHex = pt.type === "Dome" ? "#111827" : pt.type === "PTZ" ? "#bf5af2" : "#30d158";
           const camIcon = L.divIcon({
             html: \`
               <div style="
@@ -477,10 +477,10 @@ export default function Step6Pricing({
     <div className="space-y-6" id="pricing-step-container">
       <div className="space-y-6">
         {/* MAIN PANEL (Full Width): Main pricing items list grid */}
-        <div className="w-full bg-white border border-zinc-200 rounded-2xl p-5 shadow-2xs space-y-4">
-          <div className="flex justify-between items-center pb-2 border-b border-zinc-150">
+        <div className="w-full bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-4">
+          <div className="flex justify-between items-center pb-2 border-b border-gray-150">
             <div>
-              <span className="text-[10px] font-bold text-zinc-455 uppercase tracking-wider font-mono">SPECIFICATION ITEMS / รายละเอียดผลิตภัณฑ์และค่าแรง</span>
+              <span className="text-[10px] font-bold text-gray-550 uppercase tracking-wider font-mono">SPECIFICATION ITEMS / รายละเอียดผลิตภัณฑ์และค่าแรง</span>
               <p className="text-[11px] text-zinc-400">แก้ไขจำนวน ราคาหน่วย หรือลบ/เพิ่มตัวเลือกในใบประเมิน</p>
             </div>
             <div className="flex gap-2">
@@ -492,7 +492,7 @@ export default function Step6Pricing({
                   className={`px-2.5 py-1.5 text-[10px] font-semibold rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
                     showCostsAdmin
                       ? "bg-amber-50 border-amber-300 text-amber-800"
-                      : "bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-300"
+                      : "bg-gray-50 hover:bg-zinc-200 text-gray-700 border-zinc-300"
                   }`}
                 >
                   <span>{showCostsAdmin ? "👁️" : "🙈"}</span> {showCostsAdmin ? "ซ่อนต้นทุนอุปกรณ์" : "แสดงต้นทุนอุปกรณ์ (Admin)"}
@@ -503,7 +503,7 @@ export default function Step6Pricing({
                 <button
                   type="button"
                   onClick={onVerifyAdmin}
-                  className="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-2.5 py-1.5 bg-gray-50 hover:bg-zinc-200 text-gray-700 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer flex items-center gap-1"
                 >
                   <span>🔐</span> แสดงต้นทุนอุปกรณ์
                 </button>
@@ -511,7 +511,7 @@ export default function Step6Pricing({
               <button
                 type="button"
                 onClick={() => handleAddNewItem("other")}
-                className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold rounded-lg transition-colors cursor-pointer"
+                className="blocks-btn-primary py-1.5 text-[10px] font-semibold"
               >
                 + เพิ่มรายการส่งมอบอื่นๆ
               </button>
@@ -521,13 +521,13 @@ export default function Step6Pricing({
           {/* === MOBILE CARD LIST (portrait) — block on mobile, hidden on md+ === */}
           <div className="block md:hidden space-y-2">
             {pricingItems.map((item) => (
-              <div key={item.id} className="bg-zinc-50/60 border border-zinc-200 rounded-xl p-3 space-y-2">
+              <div key={item.id} className="bg-white/60 border border-gray-200 rounded-xl p-3 space-y-2">
                 <div className="flex items-start gap-2">
                   <span className={`mt-0.5 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase shrink-0 ${
                     item.category === "hardware" ? "bg-blue-50 text-blue-700 border border-blue-200" :
                     item.category === "accessory" ? "bg-green-50 text-green-700 border border-green-200" :
                     item.category === "labor" ? "bg-orange-50 text-orange-700 border border-orange-200" :
-                    "bg-zinc-100 text-zinc-500 border border-zinc-200"
+                    "bg-gray-50 text-gray-400 border border-gray-200"
                   }`}>
                     {item.category === "hardware" ? "HW" : item.category === "accessory" ? "ACC" : item.category === "labor" ? "LAB" : "ETC"}
                   </span>
@@ -535,7 +535,7 @@ export default function Step6Pricing({
                     value={item.name}
                     onChange={(e) => handleUpdateItemName(item.id, e.target.value)}
                     rows={2}
-                    className="flex-1 bg-transparent font-semibold text-zinc-800 border-none focus:outline-none focus:ring-1 focus:ring-zinc-300 rounded px-1 -mx-1 resize-none leading-snug text-xs"
+                    className="flex-1 bg-transparent font-semibold text-gray-900 border-none focus:outline-none focus:ring-1 focus:ring-zinc-300 rounded px-1 -mx-1 resize-none leading-snug text-xs"
                   />
                   <button type="button" onClick={() => handleDeleteItem(item.id)} className="p-1.5 text-zinc-350 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
@@ -546,13 +546,13 @@ export default function Step6Pricing({
                     <div className="font-mono text-[8px] text-zinc-400 tracking-wide uppercase">จำนวน</div>
                     <input type="number" min={0.1} step="any" value={item.quantity}
                       onChange={(e) => handleItemValueChange(item.id, "quantity", e.target.value)}
-                      className="w-full px-1.5 py-1.5 rounded-lg border text-center text-xs font-bold bg-white font-mono border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
+                      className="w-full px-1.5 py-1.5 blocks-input px-1.5 py-1 text-center font-bold font-mono" />
                   </div>
                   <div className="space-y-0.5">
                     <div className="font-mono text-[8px] text-zinc-400 tracking-wide uppercase">หน่วย</div>
                     <input type="text" value={item.unit}
                       onChange={(e) => handleUpdateItemUnit(item.id, e.target.value)}
-                      className="w-full px-1.5 py-1.5 border border-zinc-300 text-xs text-center rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20" />
+                      className="blocks-input px-1.5 py-1.5 text-center" />
                   </div>
                   {showCostsAdmin && isAdminVerified && (
                     <>
@@ -577,13 +577,13 @@ export default function Step6Pricing({
 
           {/* === DESKTOP TABLE — hidden on mobile, shown on md+ === */}
           <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-left text-xs text-zinc-700">
+            <table className="w-full text-left text-xs text-gray-700">
               <thead>
-                <tr className="bg-zinc-50 text-zinc-500 uppercase font-mono text-[9px] border-b border-zinc-200">
+                <tr className="bg-white text-gray-400 uppercase font-mono text-[9px] border-b border-gray-200">
                   <th className="py-2.5 px-3">รายการอุปกรณ์และงานบริการ</th>
                   <th className="py-2.5 px-3 w-16 text-center">ประเภท</th>
                   <th className="py-2.5 px-3 w-16 text-center">จำนวน</th>
-                  <th className="py-2.5 px-3 w-16 text-center">หน่วย</th>
+                  <th className="py-2.5 px-3 w-20 text-center">หน่วย</th>
                   {showCostsAdmin && isAdminVerified && (
                     <>
                       <th className="py-2.5 px-3 w-24 text-right hidden md:table-cell">ราคาหน่วย (฿)</th>
@@ -595,21 +595,21 @@ export default function Step6Pricing({
               </thead>
               <tbody className="divide-y divide-zinc-200">
                 {pricingItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-zinc-50/50">
+                  <tr key={item.id} className="hover:bg-white/50">
                     <td className="py-3 px-3">
                       <textarea
                         value={item.name}
                         onChange={(e) => handleUpdateItemName(item.id, e.target.value)}
                         rows={2}
-                        className="w-full bg-transparent font-semibold text-zinc-800 border-none focus:outline-none focus:ring-1 focus:ring-zinc-400 rounded px-1 -mx-1 resize-none leading-normal text-xs transition-all whitespace-normal break-words py-1"
+                        className="w-full bg-transparent font-semibold text-gray-900 border-none focus:outline-none focus:ring-1 focus:ring-zinc-400 rounded px-1 -mx-1 resize-none leading-normal text-xs transition-all whitespace-normal break-words py-1"
                       />
                     </td>
                     <td className="py-3 px-3 text-center">
                       <span className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase ${
-                        item.category === "hardware" ? "bg-zinc-150 text-zinc-800 border border-zinc-250" :
-                        item.category === "accessory" ? "bg-zinc-100 text-zinc-650 border border-zinc-200" :
-                        item.category === "labor" ? "bg-zinc-200 text-zinc-800 font-semibold" :
-                        "bg-zinc-50 text-zinc-500 border border-zinc-200"
+                        item.category === "hardware" ? "bg-gray-100 text-gray-900 border border-gray-200" :
+                        item.category === "accessory" ? "bg-gray-50 text-gray-550 border border-gray-200" :
+                        item.category === "labor" ? "bg-zinc-200 text-gray-900 font-semibold" :
+                        "bg-white text-gray-400 border border-gray-200"
                       }`}>
                         {item.category === "hardware" ? "HW" :
                          item.category === "accessory" ? "ACC" :
@@ -623,7 +623,7 @@ export default function Step6Pricing({
                         step="any"
                         value={item.quantity}
                         onChange={(e) => handleItemValueChange(item.id, "quantity", e.target.value)}
-                        className="w-14 px-1 py-1 rounded-lg border text-center font-bold bg-zinc-50 font-mono text-zinc-800 border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                        className="w-14 px-1 py-1 rounded-lg border text-center font-bold bg-white font-mono text-gray-900 border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                       />
                     </td>
                     <td className="py-3 px-3 text-center">
@@ -631,7 +631,7 @@ export default function Step6Pricing({
                         type="text"
                         value={item.unit}
                         onChange={(e) => handleUpdateItemUnit(item.id, e.target.value)}
-                        className="w-12 px-1.5 py-1 border border-zinc-300 text-xs text-center rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                        className="blocks-input w-20 px-1.5 py-1 text-center"
                       />
                     </td>
                     {showCostsAdmin && isAdminVerified && (
@@ -642,7 +642,7 @@ export default function Step6Pricing({
                             min={0}
                             value={item.unitPrice}
                             onChange={(e) => handleItemValueChange(item.id, "unitPrice", e.target.value)}
-                            className="w-24 px-1.5 py-1 rounded-lg border text-right font-bold bg-zinc-50 font-mono text-zinc-800 border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                            className="w-24 px-1.5 py-1 rounded-lg border text-right font-bold bg-white font-mono text-gray-900 border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                           />
                         </td>
                         <td className="py-3 px-3 text-right font-mono font-bold text-zinc-900">
@@ -654,7 +654,7 @@ export default function Step6Pricing({
                       <button
                         type="button"
                         onClick={() => handleDeleteItem(item.id)}
-                        className="p-1 hover:bg-zinc-100 text-zinc-400 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
+                        className="p-1 hover:bg-gray-50 text-zinc-400 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
                         title="ลบแถวสินค้า"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -667,23 +667,23 @@ export default function Step6Pricing({
           </div>
 
           {/* Quick buttons to inject standard components */}
-          <div className="flex flex-wrap gap-2 pt-2 border-t border-zinc-150">
-            <span className="text-[10px] text-zinc-455 w-full mb-1 uppercase tracking-wider font-mono">ทางเลือกเพิ่มประเภทรายการด่วน:</span>
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-150">
+            <span className="text-[10px] text-gray-550 w-full mb-1 uppercase tracking-wider font-mono">ทางเลือกเพิ่มประเภทรายการด่วน:</span>
             <button
               onClick={() => handleAddNewItem("hardware")}
-              className="px-2.5 py-1 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
+              className="px-2.5 py-1 bg-white hover:bg-gray-50 text-gray-900 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
             >
               + สิ้นค้าแท่นหลักกล้องและฮาร์ดแวร์
             </button>
             <button
               onClick={() => handleAddNewItem("accessory")}
-              className="px-2.5 py-1 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
+              className="px-2.5 py-1 bg-white hover:bg-gray-50 text-gray-900 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
             >
               + ท่อร้อยสาย/สายสัญญาณ/ข้อต่อ
             </button>
             <button
               onClick={() => handleAddNewItem("labor")}
-              className="px-2.5 py-1 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
+              className="px-2.5 py-1 bg-white hover:bg-gray-50 text-gray-900 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
             >
               + ค่าบริการเซ็ตอัพระบบ/ติดตั้งเสา
             </button>
@@ -691,9 +691,9 @@ export default function Step6Pricing({
         </div>
 
       {/* NT Carrier Ethernet Lite (Leased Line Calculator Widget) */}
-      <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-2xs space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-zinc-150">
-          <div className="w-8 h-8 rounded-lg bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
+      <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-gray-150">
+          <div className="w-8 h-8 rounded-lg bg-[#0071e3]/10 flex items-center justify-center text-gray-950">
             <Calculator className="w-4 h-4" />
           </div>
           <div>
@@ -706,45 +706,45 @@ export default function Step6Pricing({
 
         {/* Calculations metrics grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
-          <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200/60 space-y-1">
-            <span className="text-[9px] uppercase font-bold text-zinc-450 block font-mono">จำนวนกล้องรวมทั้งสิ้น</span>
-            <div className="text-base font-black text-zinc-800 font-mono">
-              {totalCamsCount} <span className="text-xs font-normal text-zinc-500 font-sans">ตัว</span>
+          <div className="bg-white p-3.5 rounded-xl border border-gray-200/60 space-y-1">
+            <span className="text-[9px] uppercase font-bold text-gray-450 block font-mono">จำนวนกล้องรวมทั้งสิ้น</span>
+            <div className="text-base font-black text-gray-900 font-mono">
+              {totalCamsCount} <span className="text-xs font-normal text-gray-400 font-sans">ตัว</span>
             </div>
           </div>
 
-          <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200/60 space-y-1">
-            <span className="text-[9px] uppercase font-bold text-zinc-450 block font-mono">แบนด์วิดท์รวมที่ศูนย์ควบคุม</span>
-            <div className="text-base font-black text-zinc-800 font-mono">
-              {speed} <span className="text-xs font-semibold text-[#0071e3] font-mono">Mbps</span>
+          <div className="bg-white p-3.5 rounded-xl border border-gray-200/60 space-y-1">
+            <span className="text-[9px] uppercase font-bold text-gray-450 block font-mono">แบนด์วิดท์รวมที่ศูนย์ควบคุม</span>
+            <div className="text-base font-black text-gray-900 font-mono">
+              {speed} <span className="text-xs font-semibold text-gray-950 font-mono">Mbps</span>
             </div>
           </div>
 
-          <div className="bg-[#0071e3]/5 p-3.5 rounded-xl border border-[#0071e3]/15 space-y-1">
-            <span className="text-[9px] uppercase font-bold text-[#0071e3] block font-mono">ลิงก์ต้นทางห้องควบคุม (NT)</span>
-            <div className="text-base font-black text-[#0071e3] font-mono">
+          <div className="bg-gray-950 p-3.5 rounded-xl text-white space-y-1">
+            <span className="text-[9px] uppercase font-bold !text-zinc-300 block font-mono">ลิงก์ต้นทางห้องควบคุม (NT)</span>
+            <div className="text-base font-black !text-white font-mono">
               {centerTier.speed} Mbps (฿{centerTier.price}/เดือน)
             </div>
           </div>
         </div>
 
         {/* Link details summary details */}
-        <div className="p-4 bg-zinc-50 rounded-xl border border-zinc-200/70 text-xs text-zinc-650 space-y-2.5">
+        <div className="p-4 bg-white rounded-xl border border-gray-200/70 text-xs text-gray-550 space-y-2.5">
           <div className="flex justify-between items-center">
             <span>ค่าบริการลิงก์ปลายทางรายจุด (Field Sites Link):</span>
-            <span className="font-mono font-bold text-zinc-800">
+            <span className="font-mono font-bold text-gray-900">
               ฿{totalFieldLinksPrice.toLocaleString("th-TH")}/เดือน ({pointsList.length} จุด)
             </span>
           </div>
-          <div className="flex justify-between items-center pt-2 border-t border-zinc-200/50">
+          <div className="flex justify-between items-center pt-2 border-t border-gray-200/50">
             <span>ค่าบริการลิงก์ต้นทางห้องควบคุม (Monitor Site Link):</span>
-            <span className="font-mono font-bold text-zinc-800">
+            <span className="font-mono font-bold text-gray-900">
               ฿{centerTier.price.toLocaleString("th-TH")}/เดือน
             </span>
           </div>
-          <div className="flex justify-between items-center pt-2 border-t border-zinc-250 text-xs font-bold text-zinc-800">
-            <span className="text-[#0071e3]">รวมประมาณการค่าบริการ NT Leased Line ทั้งโครงการ:</span>
-            <span className="font-mono text-[#0071e3] text-sm">
+          <div className="flex justify-between items-center pt-2 border-t border-gray-200 text-xs font-bold text-gray-900">
+            <span className="text-gray-950">รวมประมาณการค่าบริการ NT Leased Line ทั้งโครงการ:</span>
+            <span className="font-mono text-gray-950 text-sm">
               ฿{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน
             </span>
           </div>
@@ -754,16 +754,16 @@ export default function Step6Pricing({
         {/* BOTTOM PANEL (Aligned to Right): Recoded values + Tax Invoice Summary Card */}
         <div className="flex justify-end">
           <div className="w-full md:max-w-md shrink-0 space-y-4">
-          <div className="bg-zinc-50 border border-zinc-200 rounded-3xl p-6 shadow-2xs space-y-5 select-none">
-            <h4 className="text-[10px] font-bold text-zinc-500 font-mono uppercase tracking-wider">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-5 select-none">
+            <h4 className="text-[10px] font-bold text-gray-400 font-mono uppercase tracking-wider">
               PRICING PREVIEW / สรุปงบระบบ (เช่า 3 ปี)
             </h4>
 
             {/* Price values summary stack */}
-            <div className="space-y-4 text-xs text-zinc-700 font-sans border-b border-zinc-200 pb-5">
+            <div className="space-y-4 text-xs text-gray-700 font-sans border-b border-gray-200 pb-5">
               {isAdminVerified && (
                 <>
-                  <div className="flex justify-between items-center text-zinc-650 font-medium">
+                  <div className="flex justify-between items-center text-gray-550 font-medium">
                     <span>มูลค่าอุปกรณ์และบริการ (Subtotal):</span>
                     <span className="font-mono font-bold text-sm text-zinc-900">
                       ฿{calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
@@ -771,41 +771,41 @@ export default function Step6Pricing({
                   </div>
 
                   {/* Discount inputs */}
-                  <div className="space-y-1 bg-zinc-100 p-3 rounded-2xl border border-zinc-250">
+                  <div className="space-y-1 bg-gray-50 p-3 rounded-xl border border-gray-200">
                     <div className="flex justify-between items-center">
-                      <span className="text-zinc-650 font-medium">ส่วนลดพิเศษโครงการ (฿):</span>
+                      <span className="text-gray-550 font-medium">ส่วนลดพิเศษโครงการ (฿):</span>
                       <input
                         type="number"
                         min={0}
                         value={discount}
                         onChange={(e) => onUpdateDiscount(parseFloat(e.target.value) || 0)}
-                        className="w-24 text-right px-2 py-1 rounded-lg font-mono font-bold bg-white text-zinc-800 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                        className="w-24 text-right px-2 py-1 rounded-lg font-mono font-bold bg-white text-gray-900 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                       />
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center text-zinc-550">
+                  <div className="flex justify-between items-center text-gray-500">
                     <span>ยอดจัดเช่าอุปกรณ์ต้นทุนสุทธิ์:</span>
-                    <span className="font-mono font-bold text-zinc-800">
+                    <span className="font-mono font-bold text-gray-900">
                       ฿{calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center text-zinc-500 border-t border-zinc-200/50 pt-2">
+                  <div className="flex justify-between items-center text-gray-400 border-t border-gray-200/50 pt-2">
                     <span>บวก กำไรโครงการ (+40%):</span>
                     <span className="font-mono font-semibold text-zinc-750">
                       ฿{(calBeforeVat * 0.4).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center text-zinc-500">
+                  <div className="flex justify-between items-center text-gray-400">
                     <span>บวก ดอกเบี้ยจัดเช่า 8%/ปี (3 ปี = 24%):</span>
                     <span className="font-mono font-semibold text-zinc-750">
                       ฿{leaseInterest.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center text-zinc-800 font-bold border-t border-zinc-200/50 pt-2">
+                  <div className="flex justify-between items-center text-gray-900 font-bold border-t border-gray-200/50 pt-2">
                     <span>รวมมูลค่าระบบจัดเช่าอุปกรณ์:</span>
                     <span className="font-mono text-zinc-900">
                       ฿{leaseTotalAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
@@ -815,9 +815,9 @@ export default function Step6Pricing({
               )}
 
               {/* VAT toggler and selection */}
-              <div className="space-y-2 bg-zinc-100 p-3 rounded-2xl border border-zinc-250">
+              <div className="space-y-2 bg-gray-50 p-3 rounded-xl border border-gray-200">
                 <div className="flex justify-between items-center">
-                  <label htmlFor="vat-toggle" className="text-zinc-650 font-medium flex items-center gap-1 cursor-pointer">
+                  <label htmlFor="vat-toggle" className="text-gray-550 font-medium flex items-center gap-1 cursor-pointer">
                     คำนวณภาษีมูลค่าเพิ่ม (VAT 7%):
                   </label>
                   <input
@@ -828,13 +828,13 @@ export default function Step6Pricing({
                       setIsVatEnabled(e.target.checked);
                       onUpdateVatRate(e.target.checked ? 7 : 0);
                     }}
-                    className="w-4 h-4 rounded text-[#0071e3] cursor-pointer"
+                    className="w-4 h-4 rounded text-gray-950 cursor-pointer"
                   />
                 </div>
                 {isVatEnabled && (
-                  <div className="flex justify-between items-center border-t border-zinc-200/50 pt-1.5 mt-1.5">
-                    <span className="text-[10px] text-zinc-500">มูลค่าภาษี VAT รายเดือน:</span>
-                    <span className="font-mono text-zinc-700 font-semibold">
+                  <div className="flex justify-between items-center border-t border-gray-200/50 pt-1.5 mt-1.5">
+                    <span className="text-[10px] text-gray-400">มูลค่าภาษี VAT รายเดือน:</span>
+                    <span className="font-mono text-gray-700 font-semibold">
                       ฿{calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน
                     </span>
                   </div>
@@ -843,54 +843,54 @@ export default function Step6Pricing({
             </div>
 
             {/* Grand Total output showcase */}
-            <div className="space-y-4 border-t border-zinc-200/60 pt-3">
+            <div className="space-y-4 border-t border-gray-200/60 pt-3">
               {/* ค่าเช่าระบบอุปกรณ์ต่อเดือน (36 งวด) */}
               <div className="space-y-1">
-                <span className="text-zinc-550 text-[9px] uppercase font-bold font-mono tracking-wider block">
+                <span className="text-gray-500 text-[9px] uppercase font-bold font-mono tracking-wider block">
                   ค่าเช่าระบบอุปกรณ์ต่อเดือน (36 งวด)
                 </span>
                 <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between">
-                  <span className="text-zinc-500 font-sans text-xs">ก่อน VAT:</span>
-                  <span className="text-[#0071e3]">฿{leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <span className="text-gray-400 font-sans text-xs">ก่อน VAT:</span>
+                  <span className="text-gray-950">฿{leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                 </div>
                 {isVatEnabled && (
-                  <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-zinc-100 pt-1">
-                    <span className="text-zinc-500 font-sans text-xs">รวม VAT (7%):</span>
-                    <span className="text-[#0071e3]">฿{(leaseMonthlyPayment * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-gray-150 pt-1">
+                    <span className="text-gray-400 font-sans text-xs">รวม VAT (7%):</span>
+                    <span className="text-gray-950">฿{(leaseMonthlyPayment * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}
               </div>
 
               {/* ค่าเช่าวงจรเครือข่ายรายเดือน (NT LINKS) */}
-              <div className="space-y-1 pt-3 border-t border-zinc-200/40">
-                <span className="text-zinc-550 text-[9px] uppercase font-bold font-mono tracking-wider block">
+              <div className="space-y-1 pt-3 border-t border-gray-200/40">
+                <span className="text-gray-500 text-[9px] uppercase font-bold font-mono tracking-wider block">
                   ค่าเช่าวงจรเครือข่ายรายเดือน (NT LINKS)
                 </span>
                 <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between">
-                  <span className="text-zinc-500 font-sans text-xs">ก่อน VAT:</span>
-                  <span className="text-[#0071e3]">฿{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <span className="text-gray-400 font-sans text-xs">ก่อน VAT:</span>
+                  <span className="text-gray-950">฿{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                 </div>
                 {isVatEnabled && (
-                  <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-zinc-100 pt-1">
-                    <span className="text-zinc-500 font-sans text-xs">รวม VAT (7%):</span>
-                    <span className="text-[#0071e3]">฿{(totalMonthlyPrice * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-gray-150 pt-1">
+                    <span className="text-gray-400 font-sans text-xs">รวม VAT (7%):</span>
+                    <span className="text-gray-950">฿{(totalMonthlyPrice * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}
               </div>
 
               {/* ค่าเช่ารวมรายเดือนทั้งสิ้น (GRAND TOTAL MONTHLY) */}
-              <div className="space-y-1 pt-3 border-t-2 border-dashed border-zinc-250">
-                <span className="text-[#0071e3] text-[9.5px] uppercase font-bold font-mono tracking-wider block">
+              <div className="space-y-1 pt-3 border-t-2 border-dashed border-gray-200">
+                <span className="text-gray-950 text-[9.5px] uppercase font-bold font-mono tracking-wider block">
                   ค่าเช่ารวมรายเดือนทั้งสิ้น (GRAND TOTAL)
                 </span>
                 <div className="text-sm font-bold font-mono text-zinc-900 flex justify-between">
-                  <span className="text-zinc-500 font-sans text-xs">ก่อน VAT:</span>
-                  <span className="text-[#0071e3]">฿{grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <span className="text-gray-400 font-sans text-xs">ก่อน VAT:</span>
+                  <span className="text-gray-950">฿{grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                 </div>
                 {isVatEnabled && (
-                  <div className="text-lg font-black font-mono text-zinc-900 flex justify-between border-t border-zinc-200/60 pt-1.5">
-                    <span className="text-zinc-650 font-sans text-xs font-bold">รวม VAT (7%):</span>
-                    <span className="text-[#0071e3]">฿{grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <div className="text-lg font-black font-mono text-zinc-900 flex justify-between border-t border-gray-200/60 pt-1.5">
+                    <span className="text-gray-550 font-sans text-xs font-bold">รวม VAT (7%):</span>
+                    <span className="text-gray-950">฿{grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}
               </div>
@@ -901,7 +901,7 @@ export default function Step6Pricing({
               <button
                 type="button"
                 onClick={handleSave}
-                className="w-full py-2.5 font-bold text-xs bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 font-bold text-xs bg-gray-900 hover:bg-gray-800 text-white rounded-xl shadow-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Save className="w-4 h-4" />
                 {successSaved ? "✓ บันทึกสำเร็จแล้ว!" : "บันทึกโครงการเข้าระบบคลาวด์"}
@@ -910,7 +910,7 @@ export default function Step6Pricing({
               <button
                 type="button"
                 onClick={handlePrintPDF}
-                className="w-full py-2 bg-zinc-105 border border-zinc-300 hover:bg-zinc-200 text-zinc-800 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2 bg-zinc-105 border border-zinc-300 hover:bg-zinc-200 text-gray-900 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <FileText className="w-4 h-4" />
                 📄 พิมพ์ / ส่งออก PDF ใบเสนอราคา
@@ -921,20 +921,20 @@ export default function Step6Pricing({
       </div>
       </div>
 
-      <div className="border-t border-zinc-150 pt-6"></div>
+      <div className="border-t border-gray-150 pt-6"></div>
 
       {/* Navigation action bars */}
       <div className="flex justify-between" id="step6-actions-bar">
         <button
           type="button"
           onClick={onPrev}
-          className="inline-flex items-center gap-1 px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-medium rounded-xl border border-zinc-250 transition-all cursor-pointer"
+          className="inline-flex items-center gap-1 px-4 py-2 bg-gray-50 hover:bg-zinc-200 text-gray-900 text-xs font-medium rounded-xl border border-gray-200 transition-all cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           ย้อนกลับปรับสเปค
         </button>
 
-        <div className="hidden sm:block p-2 px-4 bg-zinc-50 border border-zinc-200 rounded-xl text-[11px] text-zinc-500">
+        <div className="hidden sm:block p-2 px-4 bg-white border border-gray-200 rounded-xl text-[11px] text-gray-400">
           ✓ คุณสามารถพิมพ์สเปกหรือกดจัดเก็บบันทึกประวัติโครงงานเรียบร้อยแล้วค่ะ 👓
         </div>
       </div>

@@ -50,13 +50,15 @@ function EditableGroupCell({ userId, initialValue, onSave }: EditableGroupCellPr
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder="ระบุกลุ่ม/ส่วนงาน..."
-        className={`w-full px-2.5 py-1 bg-white border border-zinc-250 rounded-lg text-[10.5px] font-semibold text-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#0071e3] transition-all shadow-2xs ${
-          isEditing ? "border-[#0071e3] ring-1 ring-[#0071e3]/30" : "hover:border-zinc-350 cursor-text"
+        className={`w-full px-2.5 py-1.5 bg-white border rounded-lg text-xs font-semibold text-gray-800 outline-none transition-all ${
+          isEditing 
+            ? "border-gray-900 ring-2 ring-gray-900/8" 
+            : "border-gray-300 hover:border-gray-400 cursor-text"
         }`}
         disabled={loading}
       />
       {loading && (
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] animate-pulse">
+        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs animate-pulse">
           ⏳
         </span>
       )}
@@ -206,16 +208,16 @@ export default function UserManagement() {
   return (
     <div className="space-y-4">
       {/* Subheader info */}
-      <div className="flex justify-between items-center bg-zinc-50 p-4.5 rounded-2xl border border-zinc-200/60">
+      <div className="flex justify-between items-center bg-gray-50 p-4.5 rounded-xl border border-gray-200">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100 shrink-0">
-            <Users className="w-5 h-5 text-indigo-650" />
+          <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center border border-gray-200 shrink-0">
+            <Users className="w-5 h-5 text-gray-700" />
           </div>
           <div>
-            <h4 className="text-[11px] font-black text-zinc-900 uppercase tracking-wider font-mono">
+            <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
               แผงควบคุมสิทธิ์บัญชีผู้ใช้ระบบ (User Authentication Management)
             </h4>
-            <p className="text-[9.5px] text-zinc-400 mt-0.5 leading-none">
+            <p className="text-xs text-gray-500 mt-0.5 leading-none">
               จัดการสิทธิ์การเข้าถึง ดูข้อมูลต้นทุน และจัดกลุ่มจังหวัดให้กับทีมช่าง/ทีมเซลส์ NT
             </p>
           </div>
@@ -223,32 +225,32 @@ export default function UserManagement() {
         <button
           type="button"
           onClick={fetchUsersList}
-          className="p-1.5 px-3 bg-white hover:bg-zinc-50 border border-zinc-250 rounded-xl text-[10px] font-bold text-zinc-650 flex items-center gap-1 shadow-2xs hover:shadow-xs cursor-pointer transition-all shrink-0"
+          className="blocks-btn-secondary py-1.5 px-3 inline-flex items-center gap-1.5 text-xs"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-indigo-650" : ""}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-gray-900" : ""}`} />
           <span>ดึงข้อมูลล่าสุด</span>
         </button>
       </div>
 
       {/* Notifications */}
       {errorMsg && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-[10.5px] flex items-center gap-2">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-xl text-[10.5px] flex items-center gap-2">
-          <UserCheck className="w-4 h-4 text-green-500 shrink-0" />
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-lg text-xs flex items-center gap-2">
+          <UserCheck className="w-4 h-4 text-emerald-500 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {/* ฟอร์มเพิ่มผู้ใช้ใหม่ */}
-      <form onSubmit={handleCreateUser} className="bg-zinc-50 border border-zinc-200/60 p-4 rounded-2xl space-y-3 shadow-2xs">
-        <h5 className="text-[10px] font-black text-indigo-950 uppercase tracking-wider font-mono flex items-center gap-1.5 leading-none">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 block animate-pulse"></span>
+      <form onSubmit={handleCreateUser} className="bg-white border border-gray-200 p-4 rounded-xl space-y-4 shadow-sm">
+        <h5 className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 block animate-pulse"></span>
           ➕ เพิ่มบัญชีผู้ใช้งานระบบรายใหม่
         </h5>
         
@@ -256,20 +258,20 @@ export default function UserManagement() {
         <div className="grid grid-cols-3 gap-3">
           {/* Username Input */}
           <div className="space-y-1">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">ชื่อผู้ใช้ (Username)</label>
+            <label className="block text-xs font-semibold text-gray-700">ชื่อผู้ใช้ (Username)</label>
             <input
               type="text"
               required
               placeholder="username"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-mono text-zinc-800 shadow-2xs"
+              className="blocks-input font-mono"
             />
           </div>
 
           {/* Password Input */}
           <div className="space-y-1">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">รหัสผ่าน</label>
+            <label className="block text-xs font-semibold text-gray-700">รหัสผ่าน</label>
             <div className="relative">
               <input
                 type={showNewPassword ? "text" : "password"}
@@ -277,28 +279,28 @@ export default function UserManagement() {
                 placeholder="ตั้งรหัสผ่าน"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-2.5 pr-8 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-mono text-zinc-800 shadow-2xs"
+                className="blocks-input pr-10 font-mono"
               />
               <button
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute inset-y-0 right-0 pr-2 flex items-center text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-650 cursor-pointer"
               >
-                {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
           {/* Name Input */}
           <div className="space-y-1">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">ชื่อ-นามสกุลจริง</label>
+            <label className="block text-xs font-semibold text-gray-700">ชื่อ-นามสกุลจริง</label>
             <input
               type="text"
               required
               placeholder="เช่น สมชาย ใจดี"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-medium text-zinc-800 shadow-2xs"
+              className="blocks-input"
             />
           </div>
         </div>
@@ -307,11 +309,11 @@ export default function UserManagement() {
         <div className="grid grid-cols-3 gap-3 items-end">
           {/* Role Select */}
           <div className="space-y-1">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">ระดับสิทธิ์</label>
+            <label className="block text-xs font-semibold text-gray-700">ระดับสิทธิ์</label>
             <select
               value={newRole}
               onChange={(e) => setNewRole(e.target.value as any)}
-              className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-bold text-zinc-700 shadow-2xs cursor-pointer"
+              className="blocks-input font-semibold cursor-pointer"
             >
               <option value="user">👤 USER</option>
               <option value="head_user">👥 HEAD USER</option>
@@ -322,13 +324,13 @@ export default function UserManagement() {
 
           {/* Group/Province */}
           <div className="space-y-1">
-            <label className="block text-[9px] font-bold text-zinc-550 uppercase">กลุ่ม / ส่วนงาน</label>
+            <label className="block text-xs font-semibold text-gray-700">กลุ่ม / ส่วนงาน</label>
             <input
               type="text"
               placeholder="เช่น อุดรธานี"
               value={newProvince}
               onChange={(e) => setNewProvince(e.target.value)}
-              className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-semibold text-zinc-800 shadow-2xs"
+              className="blocks-input"
             />
           </div>
 
@@ -337,7 +339,7 @@ export default function UserManagement() {
             <button
               type="submit"
               disabled={isCreating}
-              className="w-full py-1.5 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 disabled:bg-zinc-400 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-2xs"
+              className="blocks-btn-primary w-full py-2.5 text-xs flex items-center justify-center gap-1.5"
             >
               {isCreating ? "กำลังเพิ่ม..." : "➕ เพิ่มบัญชีผู้ใช้"}
             </button>
@@ -348,7 +350,7 @@ export default function UserManagement() {
 
       {/* Search Input Filter */}
       <div className="relative">
-        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
           <Search className="h-4 w-4" />
         </span>
         <input
@@ -356,16 +358,16 @@ export default function UserManagement() {
           placeholder="ค้นหาตามรายชื่อ อีเมล ระดับสิทธิ์ หรือกลุ่มงาน..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 border border-zinc-250 rounded-xl bg-zinc-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] text-xs font-medium text-zinc-800 transition-all shadow-2xs"
+          className="w-full pl-10 pr-3 py-2.5 border border-gray-300 hover:border-gray-400 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/8 bg-white rounded-lg text-xs font-medium text-gray-900 transition-all outline-none"
         />
       </div>
 
       {/* Users Table */}
-      <div className="border border-zinc-200/80 rounded-2xl overflow-hidden shadow-2xs bg-white">
+      <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-zinc-50 border-b border-zinc-150 text-[10px] font-bold text-zinc-500 uppercase tracking-wide">
+              <tr className="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-550 uppercase tracking-wide">
                 <th className="px-4 py-3">รายละเอียดผู้ใช้งาน</th>
                 <th className="px-4 py-3">UUID บัญชี</th>
                 <th className="px-4 py-3">กลุ่ม / ส่วนงาน</th>
@@ -373,29 +375,29 @@ export default function UserManagement() {
                 <th className="px-4 py-3 text-right">ปรับระดับสิทธิ์</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 text-xs">
+            <tbody className="divide-y divide-gray-100 text-xs text-gray-700">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((u) => {
-                  let roleBadgeStyle = "bg-zinc-100 text-zinc-650";
-                  if (u.role === "superadmin") roleBadgeStyle = "bg-red-50 border border-red-200 text-red-600";
-                  else if (u.role === "admin") roleBadgeStyle = "bg-amber-50 border border-amber-200 text-amber-600";
-                  else if (u.role === "head_user") roleBadgeStyle = "bg-teal-50 border border-teal-200 text-teal-600";
+                  let roleBadgeStyle = "bg-gray-100 text-gray-700 border border-gray-200";
+                  if (u.role === "superadmin") roleBadgeStyle = "bg-purple-50 border border-purple-200 text-purple-700";
+                  else if (u.role === "admin") roleBadgeStyle = "bg-blue-50 border border-blue-200 text-blue-700";
+                  else if (u.role === "head_user") roleBadgeStyle = "bg-amber-50 border border-amber-200 text-amber-700";
 
                   return (
-                    <tr key={u.id} className="hover:bg-zinc-50/45 transition-colors">
+                    <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
-                            <User className="w-4 h-4 text-zinc-500" />
+                          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 border border-gray-250">
+                            <User className="w-4 h-4 text-gray-500" />
                           </div>
                           <div>
-                            <span className="font-bold text-zinc-800 block">{u.display_name || "ไม่ระบุชื่อ"}</span>
-                            {u.email && <span className="text-[9.5px] text-indigo-650 font-mono block leading-none my-0.5">{u.email}</span>}
-                            <span className="text-[9px] text-zinc-400 block font-sans">อัปเดตเมื่อ: {new Date(u.updated_at).toLocaleString("th-TH")}</span>
+                            <span className="font-bold text-gray-900 block">{u.display_name || "ไม่ระบุชื่อ"}</span>
+                            {u.email && <span className="text-[10px] text-gray-500 font-mono block leading-none my-0.5">{u.email}</span>}
+                            <span className="text-[9px] text-gray-400 block font-sans">อัปเดตเมื่อ: {new Date(u.updated_at).toLocaleString("th-TH")}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 font-mono text-[9px] text-zinc-400 select-all">
+                      <td className="px-4 py-3.5 font-mono text-[10px] text-gray-450 select-all">
                         {u.id}
                       </td>
                       <td className="px-4 py-3.5">
@@ -406,7 +408,7 @@ export default function UserManagement() {
                         />
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className={`px-2.5 py-0.8 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wide ${roleBadgeStyle}`}>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${roleBadgeStyle}`}>
                           {u.role === "head_user" ? "HEAD USER" : u.role || "user"}
                         </span>
                       </td>
@@ -414,7 +416,7 @@ export default function UserManagement() {
                         <select
                           value={u.role || "user"}
                           onChange={(e) => handleRoleChange(u.id, e.target.value as any)}
-                          className="px-2 py-1 bg-white border border-zinc-250 rounded-lg text-[10.5px] font-bold text-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#0071e3] hover:border-zinc-350 cursor-pointer shadow-2xs"
+                          className="px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:border-gray-900 hover:border-gray-400 cursor-pointer shadow-sm"
                         >
                           <option value="user">👤 USER (ผู้สำรวจทั่วไป)</option>
                           <option value="head_user">👥 HEAD USER (หัวหน้าภาค)</option>
@@ -427,7 +429,7 @@ export default function UserManagement() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-zinc-400 text-xs font-medium">
+                  <td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-xs font-medium">
                     {loading ? "กำลังค้นหาข้อมูลผู้ใช้ในระบบ..." : "ไม่พบรายชื่อผู้ใช้งานใดๆ ตามเงื่อนไขค้นหาค่ะ"}
                   </td>
                 </tr>

@@ -119,18 +119,18 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
         {/* Left Column: Client primary details */}
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
               จังหวัดติดตั้ง <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                 <MapPin className="h-4 w-4" />
               </span>
               <select
                 id="province-select"
                 value={data.province || ""}
                 onChange={(e) => onChange({ ...data, province: e.target.value })}
-                className={`w-full pl-9 pr-8 py-2.5 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] appearance-none transition-all cursor-pointer ${
+                className={`blocks-input appearance-none pl-9 pr-10 py-2.5 transition-all cursor-pointer ${
                   errorObj.province ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
               >
@@ -141,9 +141,6 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
                   </option>
                 ))}
               </select>
-              <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-zinc-400 text-xs">
-                ▼
-              </span>
             </div>
             {errorObj.province && (
               <p className="text-red-500 text-[11px] mt-1 font-medium">{errorObj.province}</p>
@@ -151,11 +148,11 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
               ชื่อลูกค้า / บริษัท <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                 <Building className="h-4 w-4" />
               </span>
               <input
@@ -164,7 +161,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
                 placeholder="เช่น บริษัท ยอดรัก อุตสาหกรรม จำกัด"
                 value={data.customerName}
                 onChange={(e) => onChange({ ...data, customerName: e.target.value })}
-                className={`w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all ${
+                className={`w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all ${
                   errorObj.customerName ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
               />
@@ -175,11 +172,11 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
               ชื่อโครงการ <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                 <Building className="h-4 w-4" />
               </span>
               <input
@@ -188,7 +185,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
                 placeholder="เช่น โครงการติดตั้งกล้องโรงงานเฟสแรก"
                 value={data.projectName}
                 onChange={(e) => onChange({ ...data, projectName: e.target.value })}
-                className={`w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all ${
+                className={`w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all ${
                   errorObj.projectName ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
               />
@@ -200,11 +197,11 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+              <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
                 บุคคลที่ติดต่อได้
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                   <User className="h-4 w-4" />
                 </span>
                 <input
@@ -213,17 +210,17 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
                   placeholder="เดฟ / จัดซื้อ"
                   value={data.contactPerson}
                   onChange={(e) => onChange({ ...data, contactPerson: e.target.value })}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+              <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
                 เบอร์โทรศัพท์ติดต่อ
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                   <Phone className="h-4 w-4" />
                 </span>
                 <input
@@ -232,7 +229,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
                   placeholder="เช่น 02-xxx-xxxx"
                   value={data.contactPhone}
                   onChange={(e) => onChange({ ...data, contactPhone: e.target.value })}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
                 />
               </div>
             </div>
@@ -242,11 +239,11 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
         {/* Right Column: Address and GIS geolocation */}
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
               สถานที่ตั้งหน้างาน / ที่อยู่ติดตั้ง
             </label>
             <div className="relative">
-              <span className="absolute top-2.5 left-3 flex items-start pointer-events-none text-zinc-400">
+              <span className="absolute top-2.5 left-3 flex items-start pointer-events-none text-gray-400">
                 <MapPin className="h-4 w-4" />
               </span>
               <textarea
@@ -255,14 +252,14 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
                 placeholder="เลขที่ หมู่บ้าน ซอย ถนน แขวง เขต จังหวัด..."
                 value={data.address}
                 onChange={(e) => onChange({ ...data, address: e.target.value })}
-                className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
+                className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
               />
             </div>
           </div>
 
-          <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200">
+          <div className="bg-white p-4 rounded-xl border border-gray-200">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-[#0071e3]" />
                 พิกัดภูมิศาสตร์ (GIS GPS)
               </span>
@@ -277,25 +274,25 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[9px] text-zinc-400 mb-1 font-mono uppercase tracking-wide">Latitude (ละติจูด)</label>
+                <label className="block text-[9px] text-gray-400 mb-1 font-mono uppercase tracking-wide">Latitude (ละติจูด)</label>
                 <input
                   id="latitude-input"
                   type="text"
                   placeholder="13.7563"
                   value={data.latitude}
                   onChange={(e) => onChange({ ...data, latitude: e.target.value })}
-                  className="w-full px-3 py-1.5 rounded-lg border text-xs font-mono bg-white border-zinc-200 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                  className="w-full px-3 py-1.5 rounded-lg border text-xs font-mono bg-white border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
                 />
               </div>
               <div>
-                <label className="block text-[9px] text-zinc-400 mb-1 font-mono uppercase tracking-wide">Longitude (ลองจิจูด)</label>
+                <label className="block text-[9px] text-gray-400 mb-1 font-mono uppercase tracking-wide">Longitude (ลองจิจูด)</label>
                 <input
                   id="longitude-input"
                   type="text"
                   placeholder="100.5018"
                   value={data.longitude}
                   onChange={(e) => onChange({ ...data, longitude: e.target.value })}
-                  className="w-full px-3 py-1.5 rounded-lg border text-xs font-mono bg-white border-zinc-200 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
+                  className="w-full px-3 py-1.5 rounded-lg border text-xs font-mono bg-white border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0071e3]"
                 />
               </div>
             </div>
@@ -303,16 +300,16 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
         </div>
       </div>
 
-      <div className="border-t border-zinc-100 pt-6"></div>
+      <div className="border-t border-gray-150 pt-6"></div>
 
       {/* Surveyor responsibility details */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+          <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
             พนักงานผู้รับผิดชอบ / ผู้สำรวจ <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
               <User className="h-4 w-4" />
             </span>
             <input
@@ -321,7 +318,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
               placeholder="ชื่อ-นามสกุล พนักงาน"
               value={data.surveyorName}
               onChange={(e) => onChange({ ...data, surveyorName: e.target.value })}
-              className={`w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all ${
+              className={`w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all ${
                 errorObj.surveyorName ? "border-red-500 ring-1 ring-red-500" : ""
               }`}
             />
@@ -332,11 +329,11 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+          <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
             เบอร์โทรพนักงาน
           </label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
               <Phone className="h-4 w-4" />
             </span>
             <input
@@ -345,17 +342,17 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
               placeholder="เช่น 081-234-5678"
               value={data.surveyorPhone || ""}
               onChange={(e) => onChange({ ...data, surveyorPhone: e.target.value })}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+          <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
             ส่วนงาน / แผนก
           </label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
               <Building className="h-4 w-4" />
             </span>
             <input
@@ -364,7 +361,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
               placeholder="เช่น ฝ่ายขาย / วิศวกรรม"
               value={data.surveyorDepartment || ""}
               onChange={(e) => onChange({ ...data, surveyorDepartment: e.target.value })}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
             />
           </div>
         </div>
@@ -373,11 +370,11 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-0">
         <div />
         <div>
-          <label className="block text-xs font-semibold text-zinc-600 mb-1 uppercase tracking-wide">
+          <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
             วันที่สำรวจ / สรุปความต้องการ
           </label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
               <Calendar className="h-4 w-4" />
             </span>
             <input
@@ -385,7 +382,7 @@ export default function Step1BasicInfo({ data, onChange, onNext, onAutofillFullT
               type="date"
               value={data.surveyDate}
               onChange={(e) => onChange({ ...data, surveyDate: e.target.value })}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-zinc-50 border-zinc-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm bg-white border-gray-200 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all"
             />
           </div>
         </div>
