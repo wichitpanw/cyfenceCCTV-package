@@ -664,7 +664,7 @@ export default function App() {
   const loadSavedProjects = async () => {
     if (isSupabaseConfigured) {
       try {
-        let query = supabase.from("projects").select("*, profiles:created_by(display_name)");
+        let query = supabase.from("projects").select("*, profiles:created_by(display_name, role)");
         if (currentUser && userProfile) {
           if (userProfile.role === "head_user") {
             if (userProfile.province) {
@@ -744,6 +744,7 @@ export default function App() {
               createdAt: row.created_at || new Date().toISOString(),
               createdBy: row.created_by || null,
               creatorName: row.profiles?.display_name || null,
+              creatorRole: row.profiles?.role || null,
               cameraPoints: cams.map((c: any) => ({
                 id: c.id.replace(`${row.id}-`, ""),
                 name: c.name || "",

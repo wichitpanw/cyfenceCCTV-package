@@ -216,6 +216,23 @@ export default function ProjectHistory({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
+                        
+                        // กฎความปลอดภัย: ป้องกันสิทธิ์ระดับต่ำกว่าลบงานที่สร้างโดยสิทธิ์ระดับสูงกว่า
+                        const rolePriority: Record<string, number> = {
+                          "superadmin": 4,
+                          "admin": 3,
+                          "head_user": 2,
+                          "user": 1
+                        };
+                        
+                        const currentUserPriority = rolePriority[userRole] || 1;
+                        const creatorUserPriority = rolePriority[proj.creatorRole || "user"] || 1;
+                        
+                        if (currentUserPriority < creatorUserPriority) {
+                          alert(`⚠️ ปฏิเสธการทำงาน\nคุณไม่สามารถลบใบงานที่ถูกสร้างโดยผู้ใช้งานสิทธิ์ระดับสูงกว่า (${proj.creatorRole}) ได้ค่ะ!`);
+                          return;
+                        }
+
                         onDeleteProject(proj.id);
                       }}
                       className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
