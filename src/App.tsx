@@ -2122,7 +2122,7 @@ export default function App() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 15 }}
               transition={{ duration: 0.18 }}
-              className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]"
+              className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-zinc-200 overflow-x-hidden flex flex-col max-h-[90vh]"
             >
               {/* Header */}
               <div className="px-6 py-4 border-b border-zinc-150 bg-zinc-50/50 flex justify-between items-center shrink-0">

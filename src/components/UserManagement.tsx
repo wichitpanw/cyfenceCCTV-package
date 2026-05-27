@@ -252,9 +252,10 @@ export default function UserManagement() {
           ➕ เพิ่มบัญชีผู้ใช้งานระบบรายใหม่
         </h5>
         
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+        {/* แถวที่ 1: Username, Password, ชื่อ-นามสกุล */}
+        <div className="grid grid-cols-3 gap-3">
           {/* Username Input */}
-          <div className="space-y-1 md:col-span-3">
+          <div className="space-y-1">
             <label className="block text-[9px] font-bold text-zinc-550 uppercase">ชื่อผู้ใช้ (Username)</label>
             <input
               type="text"
@@ -267,7 +268,7 @@ export default function UserManagement() {
           </div>
 
           {/* Password Input */}
-          <div className="space-y-1 md:col-span-2">
+          <div className="space-y-1">
             <label className="block text-[9px] font-bold text-zinc-550 uppercase">รหัสผ่าน</label>
             <div className="relative">
               <input
@@ -289,7 +290,7 @@ export default function UserManagement() {
           </div>
 
           {/* Name Input */}
-          <div className="space-y-1 md:col-span-3">
+          <div className="space-y-1">
             <label className="block text-[9px] font-bold text-zinc-550 uppercase">ชื่อ-นามสกุลจริง</label>
             <input
               type="text"
@@ -300,9 +301,12 @@ export default function UserManagement() {
               className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-medium text-zinc-800 shadow-2xs"
             />
           </div>
+        </div>
 
+        {/* แถวที่ 2: Role, กลุ่มงาน, ปุ่มเพิ่ม */}
+        <div className="grid grid-cols-3 gap-3 items-end">
           {/* Role Select */}
-          <div className="space-y-1 md:col-span-2">
+          <div className="space-y-1">
             <label className="block text-[9px] font-bold text-zinc-550 uppercase">ระดับสิทธิ์</label>
             <select
               value={newRole}
@@ -316,30 +320,30 @@ export default function UserManagement() {
             </select>
           </div>
 
-          {/* Group/Province + Submit */}
-          <div className="space-y-1 md:col-span-2">
+          {/* Group/Province */}
+          <div className="space-y-1">
             <label className="block text-[9px] font-bold text-zinc-550 uppercase">กลุ่ม / ส่วนงาน</label>
-            <div className="flex gap-2 items-center">
-              <input
-                type="text"
-                placeholder="เช่น อุดรธานี"
-                value={newProvince}
-                onChange={(e) => setNewProvince(e.target.value)}
-                className="grow px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-semibold text-zinc-800 shadow-2xs"
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="เช่น อุดรธานี"
+              value={newProvince}
+              onChange={(e) => setNewProvince(e.target.value)}
+              className="w-full px-2.5 py-1.5 border border-zinc-250 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-[#0071e3] text-xs font-semibold text-zinc-800 shadow-2xs"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex items-end">
+            <button
+              type="submit"
+              disabled={isCreating}
+              className="w-full py-1.5 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 disabled:bg-zinc-400 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-2xs"
+            >
+              {isCreating ? "กำลังเพิ่ม..." : "➕ เพิ่มบัญชีผู้ใช้"}
+            </button>
           </div>
         </div>
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={isCreating}
-            className="px-5 py-1.5 bg-[#0071e3] hover:bg-blue-650 active:bg-blue-700 disabled:bg-zinc-400 text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
-          >
-            {isCreating ? "กำลังเพิ่ม..." : "➕ เพิ่มบัญชีผู้ใช้"}
-          </button>
-        </div>
       </form>
 
       {/* Search Input Filter */}
