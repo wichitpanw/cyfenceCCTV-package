@@ -81,8 +81,20 @@ export default function ProjectHistory({
   // สิทธิ์ที่มองเห็นราคาต้นทุนได้
   const canSeeCost = userRole === "superadmin" || userRole === "admin";
 
-  // ให้ทุกคนมองเห็นใบงานทั้งหมดจากฐานข้อมูล Supabase ได้ครบถ้วน 100% ตามความต้องการของคุณบีมค่ะ
-  const roleFilteredProjects = projects;
+  // กรองโปรเจคตามสิทธิ์ผู้ใช้ (Frontend filter เพิ่มเติม ป้องกันกรณี RLS ถูก disable)
+  const roleFilteredProjects = canSeeAllProjects
+    ? projects
+    : userRole === "head_user"
+    ? projects // head_user: Backend กรองด้วย province แล้ว แสดงทั้งหมดที่ได้รับมา
+    : projects.filter((p) => {
+        // user: เห็นเฉพาะงานที่ตัวเองสร้างเท่านั้น (ตรวจจาก createdBy field)
+        if (!currentUserId) return false;
+        const proj = p as any;
+        if (proj.createdBy) return proj.createdBy === currentUserId;
+        if (proj.created_by) return proj.created_by === currentUserId;
+        // ถ้าไม่มีข้อมูล createdBy เลย (งานเก่า) ให้ซ่อนไปก่อนเพื่อความปลอดภัย
+        return false;
+      });
 
   // Extract unique provinces present in history list
   const uniqueProvinces = [
@@ -204,23 +216,6 @@ export default function ProjectHistory({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        
-                        // กฎความปลอดภัย: ป้องกันสิทธิ์ระดับต่ำกว่าลบงานที่สร้างโดยสิทธิ์ระดับสูงกว่า
-                        const rolePriority: Record<string, number> = {
-                          "superadmin": 4,
-                          "admin": 3,
-                          "head_user": 2,
-                          "user": 1
-                        };
-                        
-                        const currentUserPriority = rolePriority[userRole] || 1;
-                        const creatorUserPriority = rolePriority[proj.creatorRole || "user"] || 1;
-                        
-                        if (currentUserPriority < creatorUserPriority) {
-                          alert(`⚠️ ปฏิเสธการทำงาน\nคุณไม่สามารถลบใบงานที่ถูกสร้างโดยผู้ใช้งานสิทธิ์ระดับสูงกว่า (${proj.creatorRole}) ได้ค่ะ!`);
-                          return;
-                        }
-
                         onDeleteProject(proj.id);
                       }}
                       className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
@@ -257,6 +252,13 @@ export default function ProjectHistory({
                           · {proj.customerInfo.surveyorPhone}
                         </span>
                       )}
+                      {canSeeAllProjects && proj.createdByEmail && (
+                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-mono shrink-0 uppercase tracking-tight ml-auto ${
+                          isActive ? "bg-white/20 text-zinc-100" : "bg-zinc-100 text-zinc-600 border border-zinc-200"
+                        }`} title={`ผู้สร้าง: ${proj.createdByEmail}`}>
+                          👤 {proj.createdByEmail.split("@")[0]}
+                        </span>
+                      )}
                     </div>
                   )}
                   {proj.customerInfo.surveyorDepartment && (
@@ -276,13 +278,6 @@ export default function ProjectHistory({
                           isActive ? "bg-white/15 text-gray-200" : "bg-gray-100 text-gray-600 border border-gray-200"
                         }`}>
                           {proj.customerInfo.province}
-                        </span>
-                      )}
-                      {canSeeAllProjects && proj.creatorName && (
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide font-sans shrink-0 ${
-                          isActive ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                        }`} title={`สร้างโดย ID: ${proj.createdBy || "Unknown"}`}>
-                          👤 {proj.creatorName} {proj.creatorEmail ? `(${proj.creatorEmail})` : ""}
                         </span>
                       )}
                     </span>
@@ -316,8 +311,8 @@ export default function ProjectHistory({
           ) : (
             <div className="p-6 text-center text-gray-400 border border-dashed rounded-lg border-gray-200 text-xs">
               {userRole === "user"
-                ? "ยังไม่มีใบงานที่คุณสร้างไว้ในระบบคลาวด์ค่ะ กดปุ่ม 'เปิดไฟล์งานใหม่' เพื่อเริ่มต้น"
-                : "ยังไม่มีประวัติใบงานบันทึกไว้ในระบบคลาวด์ในขณะนี้ค่ะ"}
+                ? "ยังไม่มีใบงานที่คุณสร้างไว้ค่ะ กดปุ่ม 'เปิดไฟล์งานใหม่' เพื่อเริ่มต้น"
+                : "ยังไม่มีใบงานใดบันทึกไว้ในเบราว์เซอร์นี้"}
             </div>
           )}
         </div>

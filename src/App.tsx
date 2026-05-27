@@ -664,9 +664,21 @@ export default function App() {
   const loadSavedProjects = async () => {
     if (isSupabaseConfigured) {
       try {
-        let query = supabase.from("projects").select("*, profiles:created_by!left(display_name, role, email)");
-        // ดึงข้อมูลโครงการทั้งหมดมาแสดงผลโดยตรงโดยไม่มีการคัดกรองซ่อน เพื่อแสดงให้ครบถ้วน 100%
-        // (และ superadmin/admin จะเห็นป้ายบอกชื่อผู้สร้างชัดเจนค่ะ)
+        // Fetch projects with related camera_points and pricing_items
+        // ดึงข้อมูลอีเมลผู้สร้างงานมาด้วย โดยการทำ join หรือ fetch profiles เพิ่มเติม
+        let query = supabase.from("projects").select("*");
+        if (currentUser && userProfile) {
+          if (userProfile.role === "head_user") {
+            if (userProfile.province) {
+              query = query.or(`created_by.eq.${currentUser.id},province.eq.${userProfile.province}`);
+            } else {
+              query = query.eq("created_by", currentUser.id);
+            }
+          } else if (userProfile.role === "user") {
+            query = query.eq("created_by", currentUser.id);
+          }
+          // superadmin และ admin มองเห็นงานได้ทั้งหมด
+        }
         const { data: projectsData, error: projectsError } = await query
           .order("created_at", { ascending: false });
 
@@ -678,6 +690,13 @@ export default function App() {
             return;
           }
           const projectIds = projectsData.map((p: any) => p.id);
+
+          // ดึงข้อมูลผู้ใช้งานระบบทั้งหมด (profiles) เพื่อเอาอีเมลมาแสดง
+          const { data: profilesData } = await supabase
+            .from("profiles")
+            .select("id, email");
+
+          const profileMap = new Map((profilesData || []).map(p => [p.id, p.email]));
 
           // Fetch all camera_points for these projects
           const { data: camsData } = await supabase
@@ -733,9 +752,7 @@ export default function App() {
               status: row.status || "draft",
               createdAt: row.created_at || new Date().toISOString(),
               createdBy: row.created_by || null,
-              creatorName: row.profiles?.display_name || null,
-              creatorRole: row.profiles?.role || null,
-              creatorEmail: row.profiles?.email || null,
+              createdByEmail: row.created_by ? profileMap.get(row.created_by) : undefined,
               cameraPoints: cams.map((c: any) => ({
                 id: c.id.replace(`${row.id}-`, ""),
                 name: c.name || "",
