@@ -104,10 +104,10 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             <img src="/cyfence_logo.png" alt="Cyfence Logo" className="w-full h-full object-contain" />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-balance text-2xl font-black text-white tracking-wide uppercase font-mono">
+            <h1 className="text-balance text-2.5xl font-black text-white tracking-wide uppercase font-mono">
               NT CYFENCE CCTV
             </h1>
-            <p className="text-pretty text-xs text-zinc-400 font-medium leading-normal max-w-[280px] mx-auto">
+            <p className="text-pretty text-xs text-zinc-300 font-medium leading-normal max-w-[280px] mx-auto">
               ระบบจัดทำใบเสนอราคาและรายงานสำรวจแพ็คเกจกล้องวงจรปิด NT
             </p>
           </div>
@@ -116,7 +116,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         {/* Sleek Minimalist Form (Directly on Background, no white card, pure premium styling) */}
         <div className="space-y-6">
           <div className="text-center">
-            <h2 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
+            <h2 className="text-[11px] font-bold text-zinc-200 uppercase tracking-widest">
               เข้าสู่ระบบเพื่อเริ่มใช้งาน
             </h2>
           </div>
@@ -126,7 +126,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
             {/* Username Input */}
             <div className="space-y-2">
-              <label htmlFor="username" className="block text-[10px] font-bold text-zinc-400 tracking-wider uppercase">
+              <label htmlFor="username" className="block text-[10px] font-bold text-zinc-300 tracking-wider uppercase">
                 ชื่อผู้ใช้งาน (USERNAME)
               </label>
               <div className="relative">
@@ -137,9 +137,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   placeholder="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full ps-10 pe-4 py-2.5 bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] focus:border-blue-500 focus:bg-white/[0.05] rounded-xl text-sm font-mono text-white placeholder-zinc-600 transition-all outline-none focus:ring-1 focus:ring-blue-500/30 peer"
+                  className="w-full ps-10 pe-4 py-2.5 bg-white/[0.04] border border-white/[0.12] hover:border-white/[0.22] focus:border-blue-500 focus:bg-white/[0.06] rounded-xl text-sm font-mono text-white placeholder-zinc-500 transition-all outline-none focus:ring-1 focus:ring-blue-500/30 peer"
                 />
-                <div className="text-zinc-500 absolute inset-y-0 start-0 flex items-center justify-center ps-3.5 peer-focus:text-blue-500 transition-colors pointer-events-none">
+                <div className="text-zinc-400 absolute inset-y-0 start-0 flex items-center justify-center ps-3.5 peer-focus:text-blue-400 transition-colors pointer-events-none">
                   <User size={16} aria-hidden="true" />
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
             {/* Password Input */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-[10px] font-bold text-zinc-400 tracking-wider uppercase">
+              <label htmlFor="password" className="block text-[10px] font-bold text-zinc-300 tracking-wider uppercase">
                 รหัสผ่าน (PASSWORD)
               </label>
               <div className="relative">
@@ -158,15 +158,15 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full ps-10 pe-10 py-2.5 bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] focus:border-blue-500 focus:bg-white/[0.05] rounded-xl text-sm font-mono text-white placeholder-zinc-600 transition-all outline-none focus:ring-1 focus:ring-blue-500/30 peer"
+                  className="w-full ps-10 pe-10 py-2.5 bg-white/[0.04] border border-white/[0.12] hover:border-white/[0.22] focus:border-blue-500 focus:bg-white/[0.06] rounded-xl text-sm font-mono text-white placeholder-zinc-500 transition-all outline-none focus:ring-1 focus:ring-blue-500/30 peer"
                 />
-                <div className="text-zinc-500 absolute inset-y-0 start-0 flex items-center justify-center ps-3.5 peer-focus:text-blue-500 transition-colors pointer-events-none">
+                <div className="text-zinc-400 absolute inset-y-0 start-0 flex items-center justify-center ps-3.5 peer-focus:text-blue-400 transition-colors pointer-events-none">
                   <Lock size={16} aria-hidden="true" />
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-zinc-500 hover:text-zinc-300 absolute inset-y-0 end-0 flex h-full w-10 items-center justify-center rounded-e-xl transition-colors outline-none cursor-pointer"
+                  className="text-zinc-400 hover:text-zinc-200 absolute inset-y-0 end-0 flex h-full w-10 items-center justify-center rounded-e-xl transition-colors outline-none cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -180,14 +180,14 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
             {/* Notifications */}
             {errorMsg && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-200 p-3.5 rounded-xl text-xs leading-relaxed flex items-start gap-2.5 animate-shake">
+              <div className="bg-red-500/15 border border-red-500/35 text-red-100 p-3.5 rounded-xl text-xs leading-relaxed flex items-start gap-2.5 animate-shake">
                 <ShieldAlert className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
                 <span>{errorMsg}</span>
               </div>
             )}
 
             {successMsg && (
-              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-200 p-3.5 rounded-xl text-xs leading-relaxed flex items-start gap-2.5">
+              <div className="bg-emerald-500/15 border border-emerald-500/35 text-emerald-100 p-3.5 rounded-xl text-xs leading-relaxed flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
                 <span>{successMsg}</span>
               </div>
@@ -214,16 +214,16 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           </form>
 
           {/* Support/Admin Contact Notice */}
-          <div className="pt-5 border-t border-white/[0.05] text-center text-xs text-zinc-500 leading-relaxed space-y-1">
-            <span className="block text-[11px] text-zinc-500">🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน</span>
-            <span className="block text-zinc-400">
+          <div className="pt-5 border-t border-white/[0.08] text-center text-xs text-zinc-400 leading-relaxed space-y-1">
+            <span className="block text-[11px] text-zinc-450">🔑 หากลืมรหัสผ่าน หรือต้องการสิทธิ์เข้าใช้งาน</span>
+            <span className="block text-zinc-350">
               กรุณาติดต่อแอดมิน (คุณบีม) โทร. <a href="tel:095-662-5871" className="font-bold text-blue-400 hover:underline">095-662-5871</a>
             </span>
           </div>
         </div>
 
         {/* Footer Credit info */}
-        <div className="text-center pt-4 text-[9.5px] text-zinc-650 font-mono tracking-wider">
+        <div className="text-center pt-4 text-[10px] text-zinc-500 font-mono tracking-wider">
           Powered by Warapon Wichitpan &copy; 2026 &middot; NT Cyfence
         </div>
       </div>
