@@ -664,7 +664,7 @@ export default function App() {
   const loadSavedProjects = async () => {
     if (isSupabaseConfigured) {
       try {
-        let query = supabase.from("projects").select("*, profiles:created_by(display_name, role, email)");
+        let query = supabase.from("projects").select("*, profiles:created_by!left(display_name, role, email)");
         // ดึงข้อมูลโครงการทั้งหมดมาแสดงผลโดยตรงโดยไม่มีการคัดกรองซ่อน เพื่อแสดงให้ครบถ้วน 100%
         // (และ superadmin/admin จะเห็นป้ายบอกชื่อผู้สร้างชัดเจนค่ะ)
         const { data: projectsData, error: projectsError } = await query
