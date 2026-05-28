@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle } from "lucide-react";
+import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle, Pencil } from "lucide-react";
 import { ProjectSurvey, CameraPoint } from "../types";
 
 // ฟังก์ชันคำนวณค่าใช้จ่ายรายเดือนที่ลูกค้าต้องจ่าย (เหมือนกับ Step6Pricing)
@@ -53,6 +53,7 @@ function calcMonthlyTotal(proj: ProjectSurvey): number {
 interface ProjectHistoryProps {
   projects: ProjectSurvey[];
   onLoadProject: (id: string) => void;
+  onEditProject?: (id: string) => void;
   onDeleteProject: (id: string) => void;
   onNewProject: () => void;
   currentProjectId: string | null;
@@ -68,6 +69,7 @@ interface ProjectHistoryProps {
 export default function ProjectHistory({
   projects,
   onLoadProject,
+  onEditProject,
   onDeleteProject,
   onNewProject,
   currentProjectId,
@@ -247,6 +249,25 @@ export default function ProjectHistory({
                           title="เปลี่ยนสถานะเป็น 'ส่งมอบงานแล้ว'"
                         >
                           <CheckCircle className={`w-3.5 h-3.5 ${isActive ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-600 hover:text-emerald-500"}`} />
+                        </button>
+                      )}
+                      
+                      {/* ปุ่มแก้ไขสเปกโครงการ */}
+                      {onEditProject && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEditProject(proj.id);
+                          }}
+                          className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
+                            isActive 
+                              ? "text-gray-400 hover:bg-white/10 hover:text-amber-400" 
+                              : "text-gray-400 hover:bg-amber-50 hover:text-amber-600"
+                          }`}
+                          title="แก้ไขรายละเอียดและสเปกโครงการ"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
                         </button>
                       )}
                       

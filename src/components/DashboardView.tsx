@@ -333,32 +333,66 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               </div>
             </div>
 
-            {/* Camera Type Distribution */}
+            {/* Project Status Ratio - Presented vs Delivered */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center gap-1.5 pb-1">
                 <PieChart className="w-4 h-4 text-gray-700" />
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📸 สรุปสถิติจำนวนกล้องตามประเภท</h3>
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📊 สัดส่วนสถานะโครงการ</h3>
               </div>
-              <div className="space-y-3">
-                {Object.entries(cameraTypeCounts).map(([name, count], index) => {
-                  const totalCams = Object.values(cameraTypeCounts).reduce((a, b) => a + b, 0);
-                  const percent = totalCams > 0 ? (count / totalCams) * 100 : 0;
-                  return (
-                    <div key={index} className="space-y-1">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-semibold text-gray-900">{name}</span>
-                        <span className="font-bold text-gray-500 font-mono">{count} ตัว ({percent.toFixed(0)}%)</span>
-                      </div>
-                      <div className="bg-gray-100 rounded-full h-2.5 overflow-hidden border border-gray-200">
-                        <div 
-                          className="bg-gray-900 h-full rounded-full"
-                          style={{ width: `${percent}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              
+              {(() => {
+                const presentedCount = projects.filter(p => p.status !== "delivered").length;
+                const deliveredCount = projects.filter(p => p.status === "delivered").length;
+                const total = presentedCount + deliveredCount;
+                const presentedPercent = total > 0 ? (presentedCount / total) * 100 : 0;
+                const deliveredPercent = total > 0 ? (deliveredCount / total) * 100 : 0;
+
+                // Color configuration
+                const presentedColor = "#3f3f46"; // zinc-700
+                const deliveredColor = "#10b981"; // emerald-500
+
+                return (
+                  <div className="flex flex-col items-center justify-center gap-4 py-1">
+                    {total > 0 ? (
+                      <>
+                        {/* Premium Pie Chart Container via conic-gradient */}
+                        <div className="relative w-32 h-32 rounded-full flex items-center justify-center shadow-inner border border-gray-200/50"
+                             style={{
+                               background: `conic-gradient(${deliveredColor} 0% ${deliveredPercent}%, ${presentedColor} ${deliveredPercent}% 100%)`
+                             }}
+                        >
+                          {/* Inner white circle for donut style */}
+                          <div className="w-20 h-20 rounded-full bg-white flex flex-col items-center justify-center shadow-xs">
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">ทั้งหมด</span>
+                            <span className="text-xl font-extrabold text-gray-900 font-mono leading-none">{total}</span>
+                          </div>
+                        </div>
+
+                        {/* Legends with statistics */}
+                        <div className="w-full space-y-2 pt-2">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="flex items-center gap-1.5 font-semibold text-gray-700">
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: presentedColor }} />
+                              📢 นำเสนอ (Presented)
+                            </span>
+                            <span className="font-bold text-gray-900 font-mono">{presentedCount} โครงการ ({presentedPercent.toFixed(0)}%)</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="flex items-center gap-1.5 font-semibold text-gray-700">
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: deliveredColor }} />
+                              📦 ส่งมอบงานแล้ว (Delivered)
+                            </span>
+                            <span className="font-bold text-gray-900 font-mono">{deliveredCount} โครงการ ({deliveredPercent.toFixed(0)}%)</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-xs text-gray-400 text-center py-10 w-full">ยังไม่มีโครงการในระบบ</p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
           </div>

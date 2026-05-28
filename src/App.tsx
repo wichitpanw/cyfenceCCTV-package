@@ -1747,7 +1747,17 @@ export default function App() {
             projects={projectsList}
             onLoadProject={(id) => {
               const proj = projectsList.find(p => p.id === id);
-              if (proj) loadProject(proj);
+              if (proj) {
+                loadProject(proj);
+                setStep(4); // ดูสรุปโครงการ (หน้ารายการอุปกรณ์ BOM) แทนการเข้าไปแก้ไขโดยตรง
+              }
+            }}
+            onEditProject={(id) => {
+              const proj = projectsList.find(p => p.id === id);
+              if (proj) {
+                loadProject(proj);
+                setStep(5); // เข้าหน้าแก้ไขราคาประเมินและสเปกส่วนกลาง
+              }
             }}
             onDeleteProject={handleDeleteProject}
             onNewProject={handleNewProject}
@@ -1818,7 +1828,10 @@ export default function App() {
               onBack={() => setIsViewingDashboard(false)}
               onLoadProject={(id) => {
                 const proj = projectsList.find(p => p.id === id);
-                if (proj) loadProject(proj);
+                if (proj) {
+                  loadProject(proj);
+                  setStep(4); // เมื่อกดจากหน้า dashboard ให้สลับไปดูใบสรุปอุปกรณ์ BOM เช่นกัน
+                }
               }}
             />
           ) : (
