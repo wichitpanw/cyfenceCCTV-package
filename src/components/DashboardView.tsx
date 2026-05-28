@@ -256,8 +256,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               </div>
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-1 text-[10px] text-gray-500 min-w-0">
-            <span className="whitespace-nowrap shrink-0">📊 รวมใบงานในระบบ</span>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-end">
             <WindowSwitcher value={totalProjFilter} onChange={setTotalProjFilter} />
           </div>
         </div>
@@ -283,9 +282,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               <PieChart className="w-4.5 h-4.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
-            <span>📊 อัตรางานส่งมอบสะสม</span>
-            <span className="text-[9px] font-mono bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold">delivered</span>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-end">
+            <span className="text-[9px] font-sans bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold">delivered</span>
           </div>
         </div>
 
@@ -302,8 +300,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               <TrendingUp className="w-4.5 h-4.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-1 text-[10px] text-gray-500 min-w-0">
-            <span className="whitespace-nowrap shrink-0">💳 ยอดเช่ารายเดือนรวม</span>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-end">
             <WindowSwitcher value={totalMonthlyFilter} onChange={setTotalMonthlyFilter} />
           </div>
         </div>
@@ -321,8 +318,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               <Layers className="w-4.5 h-4.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-1 text-[10px] text-gray-500 min-w-0">
-            <span className="whitespace-nowrap shrink-0">📏 ยอดเช่าเฉลี่ยรายโครงการ</span>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-end">
             <WindowSwitcher value={avgMonthlyFilter} onChange={setAvgMonthlyFilter} />
           </div>
         </div>
@@ -339,7 +335,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             <div className="flex items-center justify-between pb-1 border-b border-gray-100">
               <div className="flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-gray-700" />
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📍 สัดส่วนความต้องการรายจังหวัด</h3>
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-sans">📍 สัดส่วนรายจังหวัด</h3>
               </div>
               <WindowSwitcher value={provinceFilter} onChange={setProvinceFilter} />
             </div>
@@ -395,7 +391,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               <div className="flex items-center justify-between pb-1 border-b border-gray-100">
                 <div className="flex items-center gap-1.5">
                   <Boxes className="w-4 h-4 text-gray-700" />
-                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">🏷️ แบรนด์กล้องยอดนิยม</h3>
+                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-sans">🏷️ แบรนด์ยอดนิยม</h3>
                 </div>
                 <WindowSwitcher value={brandFilter} onChange={setBrandFilter} />
               </div>
@@ -431,7 +427,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               <div className="flex items-center justify-between pb-1 border-b border-gray-100">
                 <div className="flex items-center gap-1.5">
                   <Camera className="w-4 h-4 text-gray-700" />
-                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📹 เฉลี่ยกล้องต่อโครงการ</h3>
+                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-sans">📹 เฉลี่ยต่อโครงการ</h3>
                 </div>
                 <WindowSwitcher value={avgCamFilter} onChange={setAvgCamFilter} />
               </div>
@@ -459,7 +455,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             <div className="flex items-center justify-between pb-1 border-b border-gray-100">
               <div className="flex items-center gap-1.5">
                 <BarChart3 className="w-4 h-4 text-gray-700" />
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📅 โครงการล่าสุด</h3>
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-sans">📅 โครงการล่าสุด</h3>
               </div>
               <WindowSwitcher value={recentFilter} onChange={setRecentFilter} />
             </div>
