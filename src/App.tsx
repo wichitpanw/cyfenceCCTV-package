@@ -161,7 +161,7 @@ function generatePricingItems(
     if (bullets > 0) {
       items.push({
         id: "bom-cam-bullet",
-        name: `กล้อง CCTV Bullet IP Camera 4MP (${brand})`,
+        name: `กล้อง CCTV Bullet IP Camera 5MP (${brand})`,
         quantity: bullets,
         unit: "ตัว",
         unitPrice: costs.camBullet,
@@ -171,7 +171,7 @@ function generatePricingItems(
     if (domes > 0) {
       items.push({
         id: "bom-cam-dome",
-        name: `กล้อง CCTV Dome IP Camera 4MP (${brand})`,
+        name: `กล้อง CCTV Dome IP Camera 5MP (${brand})`,
         quantity: domes,
         unit: "ตัว",
         unitPrice: costs.camDome,
@@ -201,7 +201,7 @@ function generatePricingItems(
   } else {
     items.push({
       id: "bom-cam-bullet",
-      name: `กล้อง CCTV Bullet IP Camera 4MP (${brand})`,
+      name: `กล้อง CCTV Bullet IP Camera 5MP (${brand})`,
       quantity: totalCams,
       unit: "ตัว",
       unitPrice: costs.camBullet,
