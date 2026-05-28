@@ -23,6 +23,7 @@ import Step4SurveyReport from "./components/Step4SurveyReport";
 import Step5Summary from "./components/Step5Summary";
 import Step6Pricing from "./components/Step6Pricing";
 import ProjectHistory from "./components/ProjectHistory";
+import DashboardView from "./components/DashboardView";
 import LoginScreen from "./components/LoginScreen";
 import UserManagement from "./components/UserManagement";
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
@@ -607,6 +608,7 @@ function generatePricingItems(
 
 export default function App() {
   const [step, setStep] = useState<number>(1);
+  const [isViewingDashboard, setIsViewingDashboard] = useState<boolean>(false);
   const [projectsList, setProjectsList] = useState<ProjectSurvey[]>([]);
   
   // Authentication & RBAC states
@@ -1259,6 +1261,7 @@ export default function App() {
     setDiscount(proj.discount);
     setVatRate(proj.vatRate);
     setStep(5); // switch to the summary/pricing screen so the user can view results immediately
+    setIsViewingDashboard(false);
   };
 
   // Create a brand new workspace draft
@@ -1293,6 +1296,7 @@ export default function App() {
     setDiscount(0);
     setVatRate(7);
     setStep(1);
+    setIsViewingDashboard(false);
   };
 
   // Save/Update main project to list and database/LocalStorage
@@ -1706,129 +1710,144 @@ export default function App() {
             costLastUpdated={formattedCostTimestamp}
             userRole={userProfile?.role || "user"}
             currentUserId={currentUser?.id || null}
+            onToggleDashboard={() => setIsViewingDashboard(!isViewingDashboard)}
+            isViewingDashboard={isViewingDashboard}
           />
         </section>
 
         {/* WORKSPACE AREA (COL 9): Wizard steps and components */}
         <section className="grow flex flex-col min-w-0">
           {/* Stepper / Steps Indicator — blocks.so Sidebar02 style */}
-          {(() => {
-            const sidebarSteps = STAGE_STEPS.map((stepUnit) => {
-              const isPassed = stepUnit.number < step;
-              const isCurrent = stepUnit.number === step;
-              const isSurveyIgnored = (stepUnit.number === 4) && !hasSurveyReport;
-              const isClickable = (isPassed || isCurrent) || !!activeProjectId;
-              return {
-                number: stepUnit.number,
-                label: stepUnit.label,
-                isPassed,
-                isCurrent,
-                isClickable,
-                isIgnored: isSurveyIgnored,
-              };
-            });
-            return (
-              <Sidebar02 
-                steps={sidebarSteps} 
-                onStepSelect={setStep} 
-                className="mb-5 flex flex-col md:flex-row gap-2 bg-white p-2.5 rounded-xl border border-gray-200 shadow-sm md:items-center space-y-0"
-              />
-            );
-          })()}
+          {isViewingDashboard ? (
+            <DashboardView
+              projects={projectsList}
+              onBack={() => setIsViewingDashboard(false)}
+              onLoadProject={(id) => {
+                const proj = projectsList.find(p => p.id === id);
+                if (proj) loadProject(proj);
+              }}
+            />
+          ) : (
+            <>
+              {(() => {
+                const sidebarSteps = STAGE_STEPS.map((stepUnit) => {
+                  const isPassed = stepUnit.number < step;
+                  const isCurrent = stepUnit.number === step;
+                  const isSurveyIgnored = (stepUnit.number === 4) && !hasSurveyReport;
+                  const isClickable = (isPassed || isCurrent) || !!activeProjectId;
+                  return {
+                    number: stepUnit.number,
+                    label: stepUnit.label,
+                    isPassed,
+                    isCurrent,
+                    isClickable,
+                    isIgnored: isSurveyIgnored,
+                  };
+                });
+                return (
+                  <Sidebar02 
+                    steps={sidebarSteps} 
+                    onStepSelect={setStep} 
+                    className="mb-5 flex flex-col md:flex-row gap-2 bg-white p-2.5 rounded-xl border border-gray-200 shadow-sm md:items-center space-y-0"
+                  />
+                );
+              })()}
 
-          {/* Active Step Panel */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 md:p-7 shadow-sm grow">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.12 }}
-                className="h-full"
-              >
-                {step === 1 && (
-                  <Step1BasicInfo
-                    data={customerInfo}
-                    onChange={setCustomerInfo}
-                    onNext={handleNextStep}
-                    onAutofillFullTemplate={handleAutofillFullTemplate}
-                  />
-                )}
-                
-                {step === 2 && (
-                  <Step4SurveyReport
-                    cameraPoints={cameraPoints}
-                    cameraCount={requirements.cameraCount}
-                    onChange={setCameraPoints}
-                    onNext={handleNextStep}
-                    onPrev={handlePrevStep}
-                    customerInfo={customerInfo}
-                    requirements={requirements}
-                    onUpdateCameraBrand={(brand) => setRequirements(p => ({ ...p, cameraBrand: brand }))}
-                    showConfirm={showConfirm}
-                    onUpdateCustomerInfo={setCustomerInfo}
-                  />
-                )}
+              {/* Active Step Panel */}
+              <div className="bg-white border border-gray-200 rounded-xl p-5 md:p-7 shadow-sm grow">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={step}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.12 }}
+                    className="h-full"
+                  >
+                    {step === 1 && (
+                      <Step1BasicInfo
+                        data={customerInfo}
+                        onChange={setCustomerInfo}
+                        onNext={handleNextStep}
+                        onAutofillFullTemplate={handleAutofillFullTemplate}
+                      />
+                    )}
+                    
+                    {step === 2 && (
+                      <Step4SurveyReport
+                        cameraPoints={cameraPoints}
+                        cameraCount={requirements.cameraCount}
+                        onChange={setCameraPoints}
+                        onNext={handleNextStep}
+                        onPrev={handlePrevStep}
+                        customerInfo={customerInfo}
+                        requirements={requirements}
+                        onUpdateCameraBrand={(brand) => setRequirements(p => ({ ...p, cameraBrand: brand }))}
+                        showConfirm={showConfirm}
+                        onUpdateCustomerInfo={setCustomerInfo}
+                      />
+                    )}
 
-                {step === 3 && (
-                  <Step2CameraRequirements
-                    data={requirements}
-                    onChange={setRequirements}
-                    onNext={handleNextStep}
-                    onPrev={handlePrevStep}
-                    cameraCount={cameraPoints.reduce((sum, pt) => {
-                      let ptCams = 1;
-                      if (pt.selectedSet === "Set 1") ptCams = 1;
-                      else if (pt.selectedSet === "Set 2") ptCams = 2;
-                      else if (pt.selectedSet === "Set 3") ptCams = 3;
-                      else if (pt.selectedSet === "Set 4") ptCams = 4;
-                      return sum + ptCams;
-                    }, 0)}
-                    cameraPoints={cameraPoints}
-                  />
-                )}
+                    {step === 3 && (
+                      <Step2CameraRequirements
+                        data={requirements}
+                        onChange={setRequirements}
+                        onNext={handleNextStep}
+                        onPrev={handlePrevStep}
+                        cameraCount={cameraPoints.reduce((sum, pt) => {
+                          let ptCams = 1;
+                          if (pt.selectedSet === "Set 1") ptCams = 1;
+                          else if (pt.selectedSet === "Set 2") ptCams = 2;
+                          else if (pt.selectedSet === "Set 3") ptCams = 3;
+                          else if (pt.selectedSet === "Set 4") ptCams = 4;
+                          return sum + ptCams;
+                        }, 0)}
+                        cameraPoints={cameraPoints}
+                      />
+                    )}
 
-                {step === 4 && (
-                  <Step5Summary
-                    customerInfo={customerInfo}
-                    requirements={requirements}
-                    hasSurveyReport={hasSurveyReport}
-                    cameraPoints={cameraPoints}
-                    pricingItems={pricingItems}
-                    onNext={handleNextStep}
-                    onPrev={handlePrevStep}
-                  />
-                )}
+                    {step === 4 && (
+                      <Step5Summary
+                        customerInfo={customerInfo}
+                        requirements={requirements}
+                        hasSurveyReport={hasSurveyReport}
+                        cameraPoints={cameraPoints}
+                        pricingItems={pricingItems}
+                        onNext={handleNextStep}
+                        onPrev={handlePrevStep}
+                      />
+                    )}
 
-                {step === 5 && (
-                  <Step6Pricing
-                    pricingItems={pricingItems}
-                    discount={discount}
-                    vatRate={vatRate}
-                    onUpdateDiscount={setDiscount}
-                    onUpdateVatRate={setVatRate}
-                    onUpdateItems={setPricingItems}
-                    onSaveProject={handleSaveProject}
-                    onPrev={handlePrevStep}
-                    customerName={customerInfo.customerName}
-                    customerInfo={customerInfo}
-                    requirements={requirements}
-                    showConfirm={showConfirm}
-                    onGoToStep1={() => setStep(1)}
-                    cameraPoints={cameraPoints}
-                    isAdminVerified={userProfile?.role === "admin" || userProfile?.role === "superadmin"}
-                    onVerifyAdmin={(userProfile?.role === "user" || userProfile?.role === "head_user") ? undefined : () => {
-                      setAdminPinInput("");
-                      setAdminPinError("");
-                      setAdminPinPurpose("pricing_admin");
-                      setIsAdminPinModalOpen(true);
-                    }}
-                  />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+                    {step === 5 && (
+                      <Step6Pricing
+                        pricingItems={pricingItems}
+                        discount={discount}
+                        vatRate={vatRate}
+                        onUpdateDiscount={setDiscount}
+                        onUpdateVatRate={setVatRate}
+                        onUpdateItems={setPricingItems}
+                        onSaveProject={handleSaveProject}
+                        onPrev={handlePrevStep}
+                        customerName={customerInfo.customerName}
+                        customerInfo={customerInfo}
+                        requirements={requirements}
+                        showConfirm={showConfirm}
+                        onGoToStep1={() => setStep(1)}
+                        cameraPoints={cameraPoints}
+                        isAdminVerified={userProfile?.role === "admin" || userProfile?.role === "superadmin"}
+                        onVerifyAdmin={(userProfile?.role === "user" || userProfile?.role === "head_user") ? undefined : () => {
+                          setAdminPinInput("");
+                          setAdminPinError("");
+                          setAdminPinPurpose("pricing_admin");
+                          setIsAdminPinModalOpen(true);
+                        }}
+                      />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </>
+          )}
         </section>
 
       </main>

@@ -508,13 +508,6 @@ export default function Step6Pricing({
                   <span>🔐</span> แสดงต้นทุนอุปกรณ์
                 </button>
               )}
-              <button
-                type="button"
-                onClick={() => handleAddNewItem("other")}
-                className="blocks-btn-primary py-1.5 text-[10px] font-semibold"
-              >
-                + เพิ่มรายการส่งมอบอื่นๆ
-              </button>
             </div>
           </div>
 
@@ -664,29 +657,6 @@ export default function Step6Pricing({
                 ))}
               </tbody>
             </table>
-          </div>
-
-          {/* Quick buttons to inject standard components */}
-          <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-150">
-            <span className="text-[10px] text-gray-550 w-full mb-1 uppercase tracking-wider font-mono">ทางเลือกเพิ่มประเภทรายการด่วน:</span>
-            <button
-              onClick={() => handleAddNewItem("hardware")}
-              className="px-2.5 py-1 bg-white hover:bg-gray-50 text-gray-900 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
-            >
-              + สิ้นค้าแท่นหลักกล้องและฮาร์ดแวร์
-            </button>
-            <button
-              onClick={() => handleAddNewItem("accessory")}
-              className="px-2.5 py-1 bg-white hover:bg-gray-50 text-gray-900 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
-            >
-              + ท่อร้อยสาย/สายสัญญาณ/ข้อต่อ
-            </button>
-            <button
-              onClick={() => handleAddNewItem("labor")}
-              className="px-2.5 py-1 bg-white hover:bg-gray-50 text-gray-900 text-[10px] font-semibold rounded-lg border border-zinc-300 transition-colors cursor-pointer"
-            >
-              + ค่าบริการเซ็ตอัพระบบ/ติดตั้งเสา
-            </button>
           </div>
         </div>
 

@@ -60,6 +60,8 @@ interface ProjectHistoryProps {
   costLastUpdated?: string;
   userRole?: string;
   currentUserId?: string | null;
+  onToggleDashboard?: () => void;
+  isViewingDashboard?: boolean;
 }
 
 export default function ProjectHistory({
@@ -72,6 +74,8 @@ export default function ProjectHistory({
   costLastUpdated,
   userRole = "user",
   currentUserId = null,
+  onToggleDashboard,
+  isViewingDashboard = false,
 }: ProjectHistoryProps) {
   const [search, setSearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("all");
@@ -143,6 +147,21 @@ export default function ProjectHistory({
             )}
           </button>
         </div>
+
+        {/* Toggle Dashboard Mode Button */}
+        {onToggleDashboard && (
+          <button
+            type="button"
+            onClick={onToggleDashboard}
+            className={`w-full py-2 px-3 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              isViewingDashboard
+                ? "bg-gray-100 text-gray-900 border-gray-300 hover:bg-gray-200"
+                : "bg-gray-900 text-white border-gray-900 hover:bg-gray-800"
+            }`}
+          >
+            <span>{isViewingDashboard ? "📋 กลับไปหน้าเสนอราคาโครงการ" : "📊 สลับไปดู Dashboard ภาพรวม"}</span>
+          </button>
+        )}
 
         {/* Search Bar */}
         <div className="relative">
