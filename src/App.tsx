@@ -647,7 +647,7 @@ export default function App() {
     const saved = localStorage.getItem("CCTV_MASTER_COSTS");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        return { ...DEFAULT_MASTER_COSTS, ...JSON.parse(saved) };
       } catch (e) {
         console.error(e);
       }
@@ -848,7 +848,7 @@ export default function App() {
         
         if (data && data.length > 0 && data[0].costs) {
           console.log("Loaded master costs from Supabase:", data[0].costs);
-          setMasterCosts(data[0].costs);
+          setMasterCosts({ ...DEFAULT_MASTER_COSTS, ...data[0].costs });
         } else {
           console.log("No master costs record found on Supabase. Table is empty. Initializing...");
           // Gracefully initialize the row with masterCosts (either from localStorage or defaults)
