@@ -1069,7 +1069,7 @@ export default function Step4SurveyReport({
                         disabled
                         className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-xs font-medium focus:outline-none text-gray-500 cursor-not-allowed"
                       >
-                        <option value="Bullet">Bullet (กล้องทรงกระบอกกันน้ำภายนอก)</option>
+                        <option value="Bullet">Bullet</option>
                       </select>
                     </div>
 

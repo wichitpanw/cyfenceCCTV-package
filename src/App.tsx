@@ -159,7 +159,7 @@ function generatePricingItems(
     if (bullets > 0) {
       items.push({
         id: "bom-cam-bullet",
-        name: `กล้อง CCTV ทรงกระบอกกันน้ำภายนอก Bullet IP Camera 4MP (${brand})`,
+        name: `กล้อง CCTV Bullet IP Camera 4MP (${brand})`,
         quantity: bullets,
         unit: "ตัว",
         unitPrice: costs.camBullet,
@@ -169,7 +169,7 @@ function generatePricingItems(
     if (domes > 0) {
       items.push({
         id: "bom-cam-dome",
-        name: `กล้อง CCTV ครอบฝ้าเพดานภายใน Dome IP Camera 4MP (${brand})`,
+        name: `กล้อง CCTV Dome IP Camera 4MP (${brand})`,
         quantity: domes,
         unit: "ตัว",
         unitPrice: costs.camDome,
@@ -179,7 +179,7 @@ function generatePricingItems(
     if (ptzs > 0) {
       items.push({
         id: "bom-cam-ptz",
-        name: `กล้อง CCTV หมุนรอบซูมระยะไกล PTZ Speed Dome (${brand})`,
+        name: `กล้อง CCTV PTZ Speed Dome (${brand})`,
         quantity: ptzs,
         unit: "ตัว",
         unitPrice: costs.camPtz,
@@ -189,7 +189,7 @@ function generatePricingItems(
     if (fisheyes > 0) {
       items.push({
         id: "bom-cam-fisheye",
-        name: `กล้อง CCTV จานบินมุมกว้างพาโนรามา Fisheye 360° (${brand})`,
+        name: `กล้อง CCTV Fisheye 360° (${brand})`,
         quantity: fisheyes,
         unit: "ตัว",
         unitPrice: costs.camFisheye,
@@ -199,7 +199,7 @@ function generatePricingItems(
   } else {
     items.push({
       id: "bom-cam-bullet",
-      name: `กล้อง CCTV ทรงกระบอกกันน้ำภายนอก Bullet IP Camera 4MP (${brand})`,
+      name: `กล้อง CCTV Bullet IP Camera 4MP (${brand})`,
       quantity: totalCams,
       unit: "ตัว",
       unitPrice: costs.camBullet,
