@@ -192,13 +192,50 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
           <p className="text-xs text-gray-400 pl-8">วิเคราะห์ข้อมูลความต้องการและการส่งมอบระบบ CCTV ในระบบคลาวด์แยกตามแต่ละหน้าต่างย่อย</p>
         </div>
         
-        <button
-          onClick={onBack}
-          className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer self-start md:self-center"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>กลับไปหน้าออกแบบ</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5 self-start md:self-center">
+          {/* Quick sync all switcher */}
+          <div className="bg-gray-150 p-1 rounded-xl flex items-center gap-1.5 border border-gray-250 text-[10px] font-bold">
+            <span className="text-gray-500 pl-1">⚡ สลับทั้งหมด:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setTotalProjFilter("delivered");
+                setAvgCamFilter("delivered");
+                setTotalMonthlyFilter("delivered");
+                setAvgMonthlyFilter("delivered");
+                setProvinceFilter("delivered");
+                setBrandFilter("delivered");
+                setRecentFilter("delivered");
+              }}
+              className="px-2 py-1 bg-white text-emerald-600 hover:text-emerald-700 rounded-lg shadow-2xs border border-gray-200 cursor-pointer"
+            >
+              📦 ส่งมอบ
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTotalProjFilter("presented");
+                setAvgCamFilter("presented");
+                setTotalMonthlyFilter("presented");
+                setAvgMonthlyFilter("presented");
+                setProvinceFilter("presented");
+                setBrandFilter("presented");
+                setRecentFilter("presented");
+              }}
+              className="px-2 py-1 bg-white text-gray-700 hover:text-gray-900 rounded-lg shadow-2xs border border-gray-200 cursor-pointer"
+            >
+              📢 นำเสนอ
+            </button>
+          </div>
+
+          <button
+            onClick={onBack}
+            className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>กลับไปหน้าออกแบบ</span>
+          </button>
+        </div>
       </div>
 
       {/* 4 Stats Cards Row */}

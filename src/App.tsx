@@ -1805,7 +1805,7 @@ export default function App() {
             onToggleDashboard={() => setIsViewingDashboard(!isViewingDashboard)}
             isViewingDashboard={isViewingDashboard}
             onUpdateProjectStatus={async (id, newStatus, deliveryDate) => {
-              // Update state locally
+              // Update state locally first
               const updated = projectsList.map(p => {
                 if (p.id === id) {
                   const updatedProj = {
@@ -1844,6 +1844,7 @@ export default function App() {
                     .eq("id", id);
                   if (error) {
                     console.error("Failed to update status in Supabase:", error.message);
+                    showAlert("❌ อัปเดตล้มเหลว", "เกิดข้อผิดพลาดในการบันทึกฐานข้อมูล: " + error.message);
                   } else {
                     // Refetch projects list to confirm exact database sync
                     await loadSavedProjects();
@@ -1853,7 +1854,7 @@ export default function App() {
                 }
               }
               
-              showAlert("📦 อัปเดตสถานะสำเร็จ", "เปลี่ยนสถานะโครงการเป็น 'ส่งมอบงานแล้ว' เรียบร้อยค่ะ! ✨");
+              showAlert("📦 อัปเดตสถานะสำเร็จ", `เปลี่ยนสถานะโครงการเป็น '${newStatus === "delivered" ? "ส่งมอบงานแล้ว" : "นำเสนอ"}' เรียบร้อยค่ะ! ✨`);
             }}
           />
         </section>

@@ -288,8 +288,11 @@ export default function ProjectHistory({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const todayStr = new Date().toISOString().split("T")[0];
-                            onUpdateProjectStatus(proj.id, "delivered", todayStr);
+                            const confirmDelivery = window.confirm(`📦 คุณบีมต้องการยืนยันการส่งมอบงานโครงการ "${proj.customerInfo.projectName || proj.customerInfo.customerName}" หรือไม่คะ?`);
+                            if (confirmDelivery) {
+                              const todayStr = new Date().toISOString().split("T")[0];
+                              onUpdateProjectStatus(proj.id, "delivered", todayStr);
+                            }
                           }}
                           className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center`}
                           title="เปลี่ยนสถานะเป็น 'ส่งมอบงานแล้ว'"
@@ -297,9 +300,27 @@ export default function ProjectHistory({
                           <CheckCircle className={`w-3.5 h-3.5 ${isActive ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-600 hover:text-emerald-500"}`} />
                         </button>
                       )}
+
+                      {/* ปุ่มย้อนสถานะกลับเป็นนำเสนอ */}
+                      {onUpdateProjectStatus && proj.status === "delivered" && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const confirmRevert = window.confirm(`📢 คุณบีมต้องการย้อนสถานะโครงการ "${proj.customerInfo.projectName || proj.customerInfo.customerName}" กลับเป็น 'นำเสนอ' ใช่ไหมคะ?\n(ปุ่มแก้ไขสเปก ✏️ จะกลับมาแสดงผลให้ใช้งานอีกครั้งค่ะ)`);
+                            if (confirmRevert) {
+                              onUpdateProjectStatus(proj.id, "presented", undefined);
+                            }
+                          }}
+                          className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center`}
+                          title="ย้อนสถานะกลับเป็น 'นำเสนอ'"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${isActive ? "text-amber-400 hover:text-amber-300" : "text-amber-600"}`} />
+                        </button>
+                      )}
                       
-                      {/* ปุ่มแก้ไขสเปกโครงการ */}
-                      {onEditProject && (
+                      {/* ปุ่มแก้ไขสเปกโครงการ (เฉพาะเมื่อโครงการยังไม่ได้ถูกส่งมอบ) */}
+                      {onEditProject && proj.status !== "delivered" && (
                         <button
                           type="button"
                           onClick={(e) => {
