@@ -193,13 +193,13 @@ export default function ProjectHistory({
         </div>
 
         {/* Status Filter Tab Buttons inside Sidebar */}
-        <div className="bg-gray-50 p-1.5 rounded-lg border border-gray-250 flex items-center justify-between gap-1 text-[11px] font-bold font-mono">
-          <span className="text-gray-500 font-semibold px-1 font-sans">📁 กรองสถานะ:</span>
-          <div className="flex gap-0.5">
+        <div className="bg-gray-50 p-2 rounded-xl border border-gray-200 flex flex-col gap-1.5 text-xs font-sans">
+          <span className="text-gray-500 font-semibold px-0.5 select-none">📁 กรองสถานะโครงการ</span>
+          <div className="grid grid-cols-3 gap-1 w-full">
             <button
               type="button"
               onClick={() => setSidebarStatusFilter("all")}
-              className={`px-2 py-1 rounded transition-all cursor-pointer ${
+              className={`py-1.5 px-1 rounded-lg text-center transition-all cursor-pointer font-medium whitespace-nowrap shrink-0 ${
                 sidebarStatusFilter === "all"
                   ? "bg-gray-900 text-white shadow-xs"
                   : "bg-white text-gray-500 hover:text-gray-900 border border-gray-200"
@@ -210,7 +210,7 @@ export default function ProjectHistory({
             <button
               type="button"
               onClick={() => setSidebarStatusFilter("presented")}
-              className={`px-2 py-1 rounded transition-all cursor-pointer ${
+              className={`py-1.5 px-1 rounded-lg text-center transition-all cursor-pointer font-medium whitespace-nowrap shrink-0 ${
                 sidebarStatusFilter === "presented"
                   ? "bg-gray-800 text-white shadow-xs"
                   : "bg-white text-gray-500 hover:text-gray-900 border border-gray-200"
@@ -221,10 +221,10 @@ export default function ProjectHistory({
             <button
               type="button"
               onClick={() => setSidebarStatusFilter("delivered")}
-              className={`px-2 py-1 rounded transition-all cursor-pointer ${
+              className={`py-1.5 px-1 rounded-lg text-center transition-all cursor-pointer font-medium whitespace-nowrap shrink-0 ${
                 sidebarStatusFilter === "delivered"
                   ? "bg-emerald-600 text-white shadow-xs"
-                  : "bg-white text-gray-500 hover:text-gray-900 border border-gray-200"
+                  : "bg-white text-emerald-600 hover:text-emerald-700 border border-gray-200"
               }`}
             >
               📦 ส่งมอบ

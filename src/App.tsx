@@ -1859,6 +1859,8 @@ export default function App() {
                     if (fallbackError) {
                       console.error("Fallback update also failed:", fallbackError.message);
                       showAlert("❌ อัปเดตล้มเหลว", "เกิดข้อผิดพลาดในการบันทึกฐานข้อมูล: " + fallbackError.message);
+                      // Rollback local state to match database state immediately
+                      await loadSavedProjects();
                     } else {
                       await loadSavedProjects();
                     }

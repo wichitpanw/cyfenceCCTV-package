@@ -146,13 +146,13 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
     value: "delivered" | "presented", 
     onChange: (val: "delivered" | "presented") => void 
   }) => (
-    <div className="bg-gray-100 p-0.5 rounded-lg border border-gray-200 flex items-center gap-0.5 text-[9px] font-bold font-mono ml-2 shrink-0">
+    <div className="bg-gray-100 p-0.5 rounded-lg border border-gray-200 flex items-center gap-0.5 text-[10px] font-semibold font-sans ml-2 shrink-0 select-none">
       <button
         type="button"
         onClick={() => onChange("delivered")}
-        className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+        className={`px-2 py-0.5 rounded transition-all cursor-pointer whitespace-nowrap shrink-0 ${
           value === "delivered" 
-            ? "bg-white text-emerald-600 shadow-2xs border border-gray-200" 
+            ? "bg-white text-emerald-600 shadow-2xs border border-gray-200 font-bold" 
             : "text-gray-400 hover:text-gray-600"
         }`}
       >
@@ -161,9 +161,9 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
       <button
         type="button"
         onClick={() => onChange("presented")}
-        className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+        className={`px-2 py-0.5 rounded transition-all cursor-pointer whitespace-nowrap shrink-0 ${
           value === "presented" 
-            ? "bg-white text-gray-800 shadow-2xs border border-gray-200" 
+            ? "bg-white text-gray-800 shadow-2xs border border-gray-200 font-bold" 
             : "text-gray-400 hover:text-gray-600"
         }`}
       >
@@ -256,8 +256,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               </div>
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
-            <span>📊 รวมใบงานในระบบ</span>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-1 text-[10px] text-gray-500 min-w-0">
+            <span className="whitespace-nowrap shrink-0">📊 รวมใบงานในระบบ</span>
             <WindowSwitcher value={totalProjFilter} onChange={setTotalProjFilter} />
           </div>
         </div>
@@ -302,8 +302,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               <TrendingUp className="w-4.5 h-4.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
-            <span>💳 ยอดเช่ารายเดือนรวม</span>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-1 text-[10px] text-gray-500 min-w-0">
+            <span className="whitespace-nowrap shrink-0">💳 ยอดเช่ารายเดือนรวม</span>
             <WindowSwitcher value={totalMonthlyFilter} onChange={setTotalMonthlyFilter} />
           </div>
         </div>
@@ -321,8 +321,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               <Layers className="w-4.5 h-4.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
-            <span>📏 ยอดเช่าเฉลี่ยรายโครงการ</span>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-1 text-[10px] text-gray-500 min-w-0">
+            <span className="whitespace-nowrap shrink-0">📏 ยอดเช่าเฉลี่ยรายโครงการ</span>
             <WindowSwitcher value={avgMonthlyFilter} onChange={setAvgMonthlyFilter} />
           </div>
         </div>
@@ -344,14 +344,14 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               <WindowSwitcher value={provinceFilter} onChange={setProvinceFilter} />
             </div>
             
-            <div className="overflow-x-auto">
+            <div className="overflow-y-auto max-h-[300px] pr-1.5 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
               <table className="w-full text-xs text-left text-gray-700">
-                <thead>
-                  <tr className="border-b border-gray-100 text-gray-400 font-mono text-[9px] uppercase tracking-wider">
-                    <th className="py-2.5">จังหวัด</th>
-                    <th className="py-2.5 text-center">จำนวนโครงการ</th>
-                    <th className="py-2.5 text-right">ยอดเช่าต่อเดือนรวม</th>
-                    <th className="py-2.5 text-right w-36">สัดส่วนเปอร์เซ็นต์</th>
+                <thead className="sticky top-0 bg-white z-10">
+                  <tr className="border-b border-gray-200 text-gray-400 font-sans text-[9px] uppercase tracking-wider bg-white">
+                    <th className="py-2.5 text-left font-semibold whitespace-nowrap">จังหวัด</th>
+                    <th className="py-2.5 text-center font-semibold whitespace-nowrap">จำนวนโครงการ</th>
+                    <th className="py-2.5 text-right font-semibold whitespace-nowrap">ยอดเช่าต่อเดือนรวม</th>
+                    <th className="py-2.5 text-right w-36 font-semibold whitespace-nowrap">สัดส่วนเปอร์เซ็นต์</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 font-medium">
