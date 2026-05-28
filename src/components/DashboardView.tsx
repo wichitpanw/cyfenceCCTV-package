@@ -8,9 +8,57 @@ import {
   ArrowLeft,
   Briefcase,
   Layers,
-  MapPin
+  MapPin,
+  PieChart
 } from "lucide-react";
-import { ProjectSurvey } from "../types";
+import { ProjectSurvey, CameraPoint } from "../types";
+
+// Helper function to calculate monthly payments (matching ProjectHistory.tsx)
+function calcMonthlyTotal(proj: ProjectSurvey): number {
+  const subtotal = proj.pricingItems.reduce((acc, curr) => acc + curr.quantity * curr.unitPrice, 0);
+  const beforeVat = Math.max(0, subtotal - proj.discount);
+
+  // ค่าผ่อนอุปกรณ์ 3 ปี (กำไร 40% + ดอกเบี้ยแฟลต 8%/ปี)
+  const leasePrincipal = beforeVat * 1.4;
+  const leaseInterest = leasePrincipal * 0.08 * 3;
+  const leaseMonthlyPayment = (leasePrincipal + leaseInterest) / 36;
+
+  // ค่าเช่าวงจร NT Links รายเดือน
+  const pointsList: CameraPoint[] = proj.cameraPoints || [];
+  const totalFieldLinksPrice = pointsList.reduce((sum, pt) => {
+    let cams = 1;
+    if (pt.selectedSet === "Set 2") cams = 2;
+    else if (pt.selectedSet === "Set 3") cams = 3;
+    else if (pt.selectedSet === "Set 4") cams = 4;
+    const speed = cams * 5;
+    const tier = [
+      { speed: 10, price: 640 }, { speed: 20, price: 720 },
+      { speed: 30, price: 770 }, { speed: 50, price: 860 },
+      { speed: 100, price: 1150 },
+    ].find(t => t.speed >= speed) || { price: 640 };
+    return sum + tier.price;
+  }, 0);
+
+  const totalCams = pointsList.reduce((sum, pt) => {
+    if (pt.selectedSet === "Set 2") return sum + 2;
+    if (pt.selectedSet === "Set 3") return sum + 3;
+    if (pt.selectedSet === "Set 4") return sum + 4;
+    return sum + 1;
+  }, 0);
+  const speed = (totalCams > 0 ? totalCams : 1) * 5;
+  const centerTier = [
+    { speed: 10, price: 640 }, { speed: 20, price: 720 },
+    { speed: 30, price: 770 }, { speed: 50, price: 860 },
+    { speed: 100, price: 1150 }, { speed: 150, price: 1440 },
+    { speed: 200, price: 1730 }, { speed: 300, price: 2310 },
+    { speed: 400, price: 2750 }, { speed: 500, price: 3180 },
+  ].find(t => t.speed >= speed) || { speed: 500, price: 3180 };
+
+  const totalMonthlyPrice = totalFieldLinksPrice + centerTier.price;
+  const grandMonthlyBeforeVat = leaseMonthlyPayment + totalMonthlyPrice;
+  const vatAmount = proj.vatRate > 0 ? grandMonthlyBeforeVat * (proj.vatRate / 100) : 0;
+  return grandMonthlyBeforeVat + vatAmount;
+}
 
 interface DashboardViewProps {
   projects: ProjectSurvey[];
@@ -37,14 +85,14 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
     return acc + (proj.requirements?.cameraCount || 0);
   }, 0);
 
-  // Total BOM value
-  const totalValue = projects.reduce((acc, proj) => {
-    const subtotal = proj.pricingItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-    return acc + Math.max(0, subtotal - proj.discount);
-  }, 0);
+  // Average cameras per project
+  const avgCameras = totalProjects > 0 ? totalCameras / totalProjects : 0;
 
-  // Average Project Value
-  const avgValue = totalProjects > 0 ? totalValue / totalProjects : 0;
+  // Total monthly rental across all projects
+  const totalMonthlyValue = projects.reduce((acc, proj) => acc + calcMonthlyTotal(proj), 0);
+
+  // Average monthly rental per project
+  const avgMonthlyValue = totalProjects > 0 ? totalMonthlyValue / totalProjects : 0;
 
   // 2. Province distribution
   const provinceCounts: Record<string, number> = {};
@@ -54,9 +102,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
     const prov = proj.customerInfo.province || "ไม่ระบุจังหวัด";
     provinceCounts[prov] = (provinceCounts[prov] || 0) + 1;
     
-    const subtotal = proj.pricingItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-    const value = Math.max(0, subtotal - proj.discount);
-    provinceValues[prov] = (provinceValues[prov] || 0) + value;
+    const monthlyTotal = calcMonthlyTotal(proj);
+    provinceValues[prov] = (provinceValues[prov] || 0) + monthlyTotal;
   });
 
   const sortedProvinces = Object.entries(provinceCounts)
@@ -74,21 +121,29 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
     brandCounts[brand] = (brandCounts[brand] || 0) + 1;
   });
 
-  // 4. Pole Types distribution
-  const poleCounts: Record<string, number> = {
-    "เสาเหล็ก 4 เมตร": 0,
-    "เสาปูน 8 เมตร": 0,
-    "ไม่ติดตั้งเสา": 0
+  // 4. Camera Type distribution across all projects
+  const cameraTypeCounts: Record<string, number> = {
+    "Bullet (กล้องทรงกระบอก)": 0,
+    "Dome (กล้องครอบโดม)": 0,
+    "PTZ (กล้องหมุนรอบตัว)": 0,
+    "Fisheye (กล้องตาปลา)": 0
   };
   projects.forEach(proj => {
     const pointsList = proj.cameraPoints || [];
     pointsList.forEach(pt => {
-      if (pt.poleType === "เสาเหล็กกัลวาไนซ์ 4 เมตร") {
-        poleCounts["เสาเหล็ก 4 เมตร"]++;
-      } else if (pt.poleType === "เสาปูน 8 เมตร") {
-        poleCounts["เสาปูน 8 เมตร"]++;
+      let qty = 1;
+      if (pt.selectedSet === "Set 2") qty = 2;
+      else if (pt.selectedSet === "Set 3") qty = 3;
+      else if (pt.selectedSet === "Set 4") qty = 4;
+
+      if (pt.type === "Dome") {
+        cameraTypeCounts["Dome (กล้องครอบโดม)"] += qty;
+      } else if (pt.type === "PTZ" || pt.type === "Speed Dome") {
+        cameraTypeCounts["PTZ (กล้องหมุนรอบตัว)"] += qty;
+      } else if (pt.type === "Fisheye") {
+        cameraTypeCounts["Fisheye (กล้องตาปลา)"] += qty;
       } else {
-        poleCounts["ไม่ติดตั้งเสา"]++;
+        cameraTypeCounts["Bullet (กล้องทรงกระบอก)"] += qty;
       }
     });
   });
@@ -141,13 +196,13 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
           </div>
         </div>
 
-        {/* Total proposed Cameras */}
+        {/* Avg proposed Cameras */}
         <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all hover:shadow-sm">
           <div className="flex justify-between items-start">
             <div className="space-y-1.5">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">กล้องสะสมทั้งหมด</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">เฉลี่ยกล้องต่อโครงการ</span>
               <span className="text-3xl font-extrabold text-gray-900 tracking-tight block font-mono">
-                {totalCameras}
+                {avgCameras.toFixed(1)}
               </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
@@ -155,17 +210,17 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
-            📹 รวมทุกจุดติดตั้งกล้องย่อยปลายทาง
+            📹 เฉลี่ยจำนวนกล้องต่อหนึ่งใบงานสำรวจ
           </div>
         </div>
 
-        {/* Total proposed Value */}
+        {/* Total proposed Monthly lease */}
         <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all hover:shadow-sm">
           <div className="flex justify-between items-start">
             <div className="space-y-1.5">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">มูลค่าเสนอราคารวม</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">ยอดเช่าต่อเดือนรวมทั้งหมด</span>
               <span className="text-2xl font-extrabold text-gray-900 tracking-tight block font-mono">
-                ฿{totalValue.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
+                ฿{totalMonthlyValue.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
               </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
@@ -173,17 +228,17 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
-            💰 มูลค่าฮาร์ดแวร์และค่าติดตั้งรวมทั้งหมด
+            💳 รวมค่าเช่ารายเดือนที่เสนอทั้งหมดในระบบ
           </div>
         </div>
 
-        {/* Average Project Value */}
+        {/* Average proposed Monthly lease per project */}
         <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all hover:shadow-sm">
           <div className="flex justify-between items-start">
             <div className="space-y-1.5">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">ค่าเฉลี่ยโครงการ</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">ค่าเฉลี่ยยอดเช่าต่อเดือน</span>
               <span className="text-2xl font-extrabold text-gray-900 tracking-tight block font-mono">
-                ฿{avgValue.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
+                ฿{avgMonthlyValue.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
               </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
@@ -191,7 +246,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
-            📏 ขนาดงบประมาณเฉลี่ยต่อหนึ่งโครงการ
+            📏 เฉลี่ยค่าบริการรายเดือนต่อหนึ่งโครงการ
           </div>
         </div>
       </div>
@@ -215,7 +270,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                   <tr className="border-b border-gray-100 text-gray-400 font-mono text-[9px] uppercase tracking-wider">
                     <th className="py-2.5">จังหวัด</th>
                     <th className="py-2.5 text-center">จำนวนโครงการ</th>
-                    <th className="py-2.5 text-right">งบประมาณรวมเสนอราคา</th>
+                    <th className="py-2.5 text-right">ยอดเช่าต่อเดือนรวม</th>
                     <th className="py-2.5 text-right w-36">สัดส่วนเปอร์เซ็นต์</th>
                   </tr>
                 </thead>
@@ -226,7 +281,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                       <tr key={index} className="hover:bg-gray-50/50 transition-colors">
                         <td className="py-3 font-semibold text-gray-900">{prov.name}</td>
                         <td className="py-3 text-center font-mono font-bold text-gray-800">{prov.count}</td>
-                        <td className="py-3 text-right font-mono text-gray-800">฿{prov.value.toLocaleString("th-TH", { maximumFractionDigits: 0 })}</td>
+                        <td className="py-3 text-right font-mono text-gray-800">฿{prov.value.toLocaleString("th-TH", { maximumFractionDigits: 0 })}/เดือน</td>
                         <td className="py-3 text-right">
                           <div className="flex items-center gap-2">
                             <div className="grow bg-gray-100 rounded-full h-2 overflow-hidden border border-gray-200">
@@ -286,21 +341,21 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               </div>
             </div>
 
-            {/* Pole Installation Distribution */}
+            {/* Camera Type Distribution */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center gap-1.5 pb-1">
-                <Globe className="w-4 h-4 text-gray-700" />
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">🗼 การปักเสาอุปกรณ์ปลายทาง</h3>
+                <PieChart className="w-4 h-4 text-gray-700" />
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📸 สรุปสถิติจำนวนกล้องตามประเภท</h3>
               </div>
               <div className="space-y-3">
-                {Object.entries(poleCounts).map(([name, count], index) => {
-                  const totalPoles = Object.values(poleCounts).reduce((a, b) => a + b, 0);
-                  const percent = totalPoles > 0 ? (count / totalPoles) * 100 : 0;
+                {Object.entries(cameraTypeCounts).map(([name, count], index) => {
+                  const totalCams = Object.values(cameraTypeCounts).reduce((a, b) => a + b, 0);
+                  const percent = totalCams > 0 ? (count / totalCams) * 100 : 0;
                   return (
                     <div key={index} className="space-y-1">
                       <div className="flex justify-between items-center text-xs">
                         <span className="font-semibold text-gray-900">{name}</span>
-                        <span className="font-bold text-gray-500 font-mono">{count} ต้น ({percent.toFixed(0)}%)</span>
+                        <span className="font-bold text-gray-500 font-mono">{count} ตัว ({percent.toFixed(0)}%)</span>
                       </div>
                       <div className="bg-gray-100 rounded-full h-2.5 overflow-hidden border border-gray-200">
                         <div 
@@ -328,8 +383,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             
             <div className="space-y-3.5 max-h-[400px] overflow-y-auto pr-1">
               {projects.slice(0, 5).map((proj) => {
-                const subtotal = proj.pricingItems.reduce((acc, curr) => acc + curr.quantity * curr.unitPrice, 0);
-                const beforeVat = Math.max(0, subtotal - proj.discount);
+                const monthlyTotal = calcMonthlyTotal(proj);
                 return (
                   <div
                     key={proj.id}
@@ -351,9 +405,9 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                     </div>
                     
                     <div className="pt-2 border-t border-gray-100 flex justify-between items-center">
-                      <span className="text-[9px] text-gray-400 font-mono">BOM Subtotal:</span>
+                      <span className="text-[9px] text-gray-400 font-mono">ลูกค้าจ่ายต่อเดือน:</span>
                       <strong className="text-xs font-extrabold text-gray-800 font-mono">
-                        ฿{beforeVat.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
+                        ฿{monthlyTotal.toLocaleString("th-TH", { maximumFractionDigits: 0 })}/เดือน
                       </strong>
                     </div>
                   </div>
