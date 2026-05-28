@@ -91,30 +91,51 @@ export interface ProjectSurvey {
 }
 
 export interface MasterCostDb {
+  // --- ปลายทาง (Hardware & Accessory) ---
   camBullet: number;
   camDome: number;
   camPtz: number;
   camFisheye: number;
-  nvr4ch: number;
+  poe4port: number; // Switch POE 4 Port Industrial Grade
+  ups800va: number; // Ups 800 VA
+  outdoorCabinet: number; // ตู้ Outdoor Cabinet แบบมีพัดลม
+  sdCard128: number; // SDcard 128G
+  supportArm: number; // แขน Support
+  thw16sqmm: number; // ค่าสายไฟฟ้า THW IEC 16 sq.mm. 50 เมตร (ราคาต่อชุด 50 เมตร หรือต่อเมตรก็ได้ ในที่นี้กำหนดราคาต่อชุด 50 เมตร)
+
+  // --- เสา ---
+  poleSteel4m: number; // เสาเหล็ก 4 เมตร
+  poleCement8m: number; // เสาปูน 8 เมตร
+
+  // --- ต้นทาง ---
   nvr8ch: number;
   nvr16ch: number;
   nvr32ch: number;
-  nvr64ch: number;
-  hdd4tb: number;
-  hdd8tb: number;
-  pole3m: number;
-  pole4m: number;
-  pole6m: number;
-  poleGalvanized: number;
-  supportArm: number;
-  lanCable: number;
-  conduit: number;
-  poe4port: number;
-  poe8port: number;
-  poe16port: number;
-  poe24port: number;
-  laborCamera: number;
-  laborPole: number;
+  hdd8tb: number; // HDD 8TB
+  rack6u: number; // rack 19 นิ้ว 6U
+  rack16u: number; // rack 19 นิ้ว 16U
+  rack42u: number; // rack 19 นิ้ว 42U
+  monitor27: number; // จอ 27 นิ้ว
+  tv55: number; // TV 55 นิ้ว
+  ups1kva: number; // UPS 1Kva
+  ups2kva: number; // UPS 2Kva
+
+  // --- ค่าติดตั้งปลายทาง ---
+  laborCctv: number; // ค่าติดตั้ง กล้อง CCTV (ค่าเดินสาย LAN 25 เมตรในท่อเฟล็กซ์อ่อนภายนอก + ติดตั้งกล้อง)
+  laborSupportArm: number; // ค่าติดตั้ง แขน Support
+  laborCabinet: number; // ค่าติดตั้งตู้ Outdoor cabinet (พัดลม 2 ตัว, ปลั๊กไฟ, Breaker)
+  laborGroundRod: number; // ค่าติดตั้ง Ground Rod (ขุดเจาะบ่อกราวด์)
+  laborPoleCement8m: number; // ค่าติดตั้งเสาปูน 8 เมตร (ปักเสาปูนพร้อมฐานราก)
+  laborPoleSteel4m: number; // ค่าติดตั้งเสาเหล็กเสาเหล็กกัลวาไนซ์ สูง 4 เมตร (ติดตั้งพร้อมฐานราก)
+  laborPowerThw: number; // ค่าติดตั้ง สายไฟฟ้า (สาย THW 16 sq.mm. 50 เมตร + ค่าแรกเข้ามิเตอร์ไฟ)
+
+  // --- ค่าติดตั้งต้นทาง ---
+  laborMonitor: number; // ค่าติดตั้งจอ Monitor (อุปกรณ์จับยึด, สาย HDMI)
+  laborRack: number; // ค่าติดตั้งตู้ Rack (พัดลม, รางปลั๊กไฟ, UPS)
+  laborNvr: number; // ค่าติดตั้ง NVR (เมาส์ไร้สาย, Config ดูภาพได้)
+  laborRouter: number; // ค่าติดตั้ง Router (Config ให้ระบบทำงานได้)
+  laborPowerVct: number; // ค่าเดินสายไฟฟ้าต้นทาง (สาย vct 30 เมตร, Breaker 16 A)
+
   lastUpdated: string;
 }
 

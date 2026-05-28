@@ -12,11 +12,9 @@ interface Step2Props {
 }
 
 const suggestedChannels = (count: number) => {
-  if (count <= 4) return 4;
   if (count <= 8) return 8;
   if (count <= 16) return 16;
-  if (count <= 32) return 32;
-  return 64;
+  return 32;
 };
 
 export default function Step2CameraRequirements({ data, onChange, onNext, onPrev, cameraCount, cameraPoints }: Step2Props) {
@@ -26,11 +24,9 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
   };
 
   const handleNvrChannels = (channels: number) => {
-    const pkg = channels <= 4 ? "HDD 4TB (มาตรฐานราชการ 4CH)" 
-              : channels <= 8 ? "HDD 8TB (มาตรฐานราชการ 8CH)" 
+    const pkg = channels <= 8 ? "HDD 8TB (มาตรฐานราชการ 8CH)" 
               : channels <= 16 ? "HDD 16TB (8TB x 2 ลูก มาตรฐานราชการ)" 
-              : channels <= 32 ? "HDD 32TB (8TB x 4 ลูก มาตรฐานราชการ)" 
-              : "HDD 64TB (8TB x 8 ลูก มาตรฐานราชการ)";
+              : "HDD 32TB (8TB x 4 ลูก มาตรฐานราชการ)";
     onChange({ 
       ...data, 
       nvrChannels: channels,
@@ -53,8 +49,8 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
           <p className="text-[11px] text-gray-400 mb-1 leading-normal">
             ช่องเชื่อมต่อแชนแนลหลัก (แนะนำ: <strong className="text-gray-900 font-mono">{suggestedChannels(cameraCount)}CH</strong> สำหรับกล้อง {cameraCount} ตัว)
           </p>
-          <div className="grid grid-cols-5 gap-1.5 font-mono">
-            {[4, 8, 16, 32, 64].map((ch) => {
+          <div className="grid grid-cols-3 gap-1.5 font-mono">
+            {[8, 16, 32].map((ch) => {
               const isSelected = data.nvrChannels === ch;
               const isRecommended = ch === suggestedChannels(cameraCount);
               return (
@@ -116,7 +112,7 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
           <div className="bg-white p-3.5 rounded-xl border border-gray-150">
             <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-wider font-mono">รวมขนาดความจุที่ต้องใช้</span>
             <span className="text-sm font-bold text-gray-900 mt-1 block">
-              {data.nvrChannels <= 4 ? "4TB" : data.nvrChannels <= 8 ? "8TB" : data.nvrChannels <= 16 ? "16TB (8TB x 2 ลูก)" : data.nvrChannels <= 32 ? "32TB (8TB x 4 ลูก)" : "64TB (8TB x 8 ลูก)"}
+              {data.nvrChannels <= 8 ? "8TB" : data.nvrChannels <= 16 ? "16TB (8TB x 2 ลูก)" : "32TB (8TB x 4 ลูก)"}
             </span>
           </div>
         </div>
