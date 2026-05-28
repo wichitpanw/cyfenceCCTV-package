@@ -261,29 +261,21 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
           </div>
         </div>
 
-        {/* Project Status Ratio - Overall (Moved to top row) */}
+        {/* Average Cameras per Project (Stat Card) */}
         <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all hover:shadow-sm">
           <div className="flex justify-between items-start">
-            <div className="space-y-1.5 grow">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">สัดส่วนสถานะโครงการ</span>
-              {(() => {
-                const presentedCount = projects.filter(p => p.status !== "delivered").length;
-                const deliveredCount = projects.filter(p => p.status === "delivered").length;
-                const total = presentedCount + deliveredCount;
-                const deliveredPercent = total > 0 ? (deliveredCount / total) * 100 : 0;
-                return (
-                  <span className="text-3xl font-extrabold text-emerald-600 tracking-tight block font-mono">
-                    {deliveredPercent.toFixed(0)}% <span className="text-xs font-normal text-gray-400">ส่งมอบแล้ว ({deliveredCount}/{total})</span>
-                  </span>
-                );
-              })()}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">เฉลี่ยกล้องต่อโครงการ</span>
+              <span className="text-3xl font-extrabold text-gray-900 tracking-tight block font-mono">
+                {avgCameras.toFixed(1)}
+              </span>
             </div>
             <div className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
-              <PieChart className="w-4.5 h-4.5" />
+              <Camera className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-end">
-            <span className="text-[9px] font-sans bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold">delivered</span>
+            <WindowSwitcher value={avgCamFilter} onChange={setAvgCamFilter} />
           </div>
         </div>
 
@@ -406,27 +398,65 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               </div>
             </div>
 
-            {/* Avg proposed Cameras (Moved from top row) */}
+            {/* Project Status Ratio (Pie Chart) */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between pb-1 border-b border-gray-100">
                 <div className="flex items-center gap-1.5">
-                  <Camera className="w-4 h-4 text-gray-400" />
-                  <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block font-sans">📹 เฉลี่ยต่อโครงการ</h3>
+                  <PieChart className="w-4 h-4 text-gray-400" />
+                  <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block font-sans">📊 สัดส่วนสถานะโครงการ</h3>
                 </div>
-                <WindowSwitcher value={avgCamFilter} onChange={setAvgCamFilter} />
+                <span className="text-[9px] font-sans bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold">delivered</span>
               </div>
               
-              <div className="flex flex-col items-center justify-center py-6 space-y-2">
-                <span className="text-5xl font-extrabold text-gray-900 tracking-tight font-mono">
-                  {avgCameras.toFixed(1)}
-                </span>
-                <span className="text-[11px] text-gray-400 font-medium">กล้อง cctv ต่อหนึ่งใบงานสำรวจ</span>
-                <div className="w-full pt-4 text-center">
-                  <span className="text-[10px] text-gray-500 bg-gray-50 border border-gray-150 rounded-lg px-2.5 py-1.5 inline-block font-medium">
-                    📹 รวมจำนวนกล้องในสถานะนี้: <strong className="font-mono text-gray-800">{avgCamCount} ตัว</strong>
-                  </span>
-                </div>
-              </div>
+              {(() => {
+                const presentedCount = projects.filter(p => p.status !== "delivered").length;
+                const deliveredCount = projects.filter(p => p.status === "delivered").length;
+                const total = presentedCount + deliveredCount;
+                const presentedPercent = total > 0 ? (presentedCount / total) * 100 : 0;
+                const deliveredPercent = total > 0 ? (deliveredCount / total) * 100 : 0;
+
+                const presentedColor = "#3f3f46"; // zinc-700
+                const deliveredColor = "#10b981"; // emerald-500
+
+                return (
+                  <div className="flex flex-col items-center justify-center gap-4 py-1 pt-2">
+                    {total > 0 ? (
+                      <>
+                        <div className="relative w-24 h-24 rounded-full flex items-center justify-center shadow-inner border border-gray-200/50"
+                             style={{
+                                background: `conic-gradient(${deliveredColor} 0% ${deliveredPercent}%, ${presentedColor} ${deliveredPercent}% 100%)`
+                             }}
+                        >
+                          <div className="w-16 h-16 rounded-full bg-white flex flex-col items-center justify-center shadow-xs">
+                            <span className="text-[8px] text-gray-400 font-bold uppercase tracking-wider">ทั้งหมด</span>
+                            <span className="text-md font-extrabold text-gray-900 font-mono leading-none">{total}</span>
+                          </div>
+                        </div>
+
+                        <div className="w-full space-y-1.5 pt-2">
+                          <div className="flex justify-between items-center text-[11px]">
+                            <span className="flex items-center gap-1.5 font-semibold text-gray-700">
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: presentedColor }} />
+                              📢 นำเสนอ (Presented)
+                            </span>
+                            <span className="font-bold text-gray-900 font-mono">{presentedCount} ({presentedPercent.toFixed(0)}%)</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center text-[11px]">
+                            <span className="flex items-center gap-1.5 font-semibold text-gray-700">
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: deliveredColor }} />
+                              📦 ส่งมอบแล้ว (Delivered)
+                            </span>
+                            <span className="font-bold text-gray-900 font-mono">{deliveredCount} ({deliveredPercent.toFixed(0)}%)</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-xs text-gray-400 text-center py-10 w-full">ยังไม่มีโครงการในระบบ</p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
           </div>
