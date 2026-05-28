@@ -122,7 +122,7 @@ export interface MasterCostDb {
   tv55: number; // TV 55 นิ้ว
   ups1kva: number; // UPS 1Kva
   ups2kva: number; // UPS 2Kva
-  routerHw: number; // Router VPN/Firewall
+  routerHw: number; // Router VPN
   
 
   // --- ค่าติดตั้งปลายทาง ---

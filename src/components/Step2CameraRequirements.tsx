@@ -188,7 +188,7 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
                 className="w-3.5 h-3.5 text-gray-900 border-gray-300 rounded focus:ring-gray-900 cursor-pointer"
               />
               <span className={`text-gray-700 leading-tight ${data.hasRouter !== false ? "font-semibold text-gray-900" : ""}`}>
-                Router VPN/Firewall
+                Router VPN
               </span>
             </label>
           </div>
