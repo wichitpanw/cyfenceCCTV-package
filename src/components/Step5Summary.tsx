@@ -254,7 +254,7 @@ export default function Step5Summary({
           <div className="text-xs space-y-2">
             <div className="flex justify-between items-center text-xs py-1.5 bg-gray-100 px-2.5 rounded-lg border border-gray-200">
               <span className="text-gray-700 font-medium">การติดตั้งกล้องทั้งหมด:</span>
-              <strong className="text-[#0071e3] font-mono text-base">{totalCamerasCount} ตัว</strong>
+              <strong className="text-[#0071e3] font-mono text-base">{totalCamerasCount} จุด</strong>
             </div>
             <div className="grid grid-cols-2 gap-2 mt-1">
               <div>
@@ -328,7 +328,7 @@ export default function Step5Summary({
                 <th className="py-2 px-3">ลำดับ</th>
                 <th className="py-2 px-3">รายการวัสดุอุปกรณ์</th>
                 <th className="py-2 px-3 text-center">ประเภท</th>
-                <th className="py-2 px-3 text-right">จำนวนประมาณการ</th>
+                <th className="py-2 px-3 text-right">จำนวน</th>
                 <th className="py-2 px-3 text-center">หน่วย</th>
               </tr>
             </thead>
