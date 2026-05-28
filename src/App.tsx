@@ -295,18 +295,15 @@ function generatePricingItems(
     category: "accessory"
   });
 
-  // 6. PoE Switch/Power
-  const poePorts = camCount <= 4 ? 4 : camCount <= 8 ? 8 : camCount <= 16 ? 16 : 24;
-  let poeUnitPrice = costs.poe4port;
-  if (camCount <= 4) poeUnitPrice = costs.poe4port;
-  else if (camCount <= 8) poeUnitPrice = costs.poe8port;
-  else if (camCount <= 16) poeUnitPrice = costs.poe16port;
-  else poeUnitPrice = costs.poe24port;
+  // 6. PoE Switch/Power (ใช้แบบ 4 Ports กระจายตามจุดติดตั้งปลายทาง: 1 จุดต่อ 1 เครื่อง)
+  const poePorts = 4;
+  const poeUnitPrice = costs.poe4port;
+  const poeQuantity = (hasSurvey && cameraPoints.length > 0) ? cameraPoints.length : Math.max(1, Math.ceil(camCount / 4));
 
   items.push({
     id: "bom-poe",
     name: `สวิตช์จ่ายไฟผ่านสายแลน PoE Switch Giga Speed เกรดอุสาหกรรม (${poePorts} Ports)`,
-    quantity: Math.max(1, Math.ceil(camCount / poePorts)),
+    quantity: poeQuantity,
     unit: "เครื่อง",
     unitPrice: poeUnitPrice,
     category: "hardware"
