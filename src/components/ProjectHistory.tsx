@@ -83,6 +83,7 @@ export default function ProjectHistory({
 }: ProjectHistoryProps) {
   const [search, setSearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("all");
+  const [sidebarStatusFilter, setSidebarStatusFilter] = useState<"all" | "presented" | "delivered">("all");
 
   // สิทธิ์ที่แสดงได้ทั้งหมด
   const canSeeAllProjects = userRole === "superadmin" || userRole === "admin";
@@ -120,7 +121,12 @@ export default function ProjectHistory({
     const matchesProvince =
       selectedProvince === "all" || p.customerInfo.province === selectedProvince;
 
-    return matchesSearch && matchesProvince;
+    const matchesStatus =
+      sidebarStatusFilter === "all" ||
+      (sidebarStatusFilter === "delivered" && p.status === "delivered") ||
+      (sidebarStatusFilter === "presented" && p.status !== "delivered");
+
+    return matchesSearch && matchesProvince && matchesStatus;
   });
 
   return (
@@ -180,6 +186,46 @@ export default function ProjectHistory({
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 hover:border-gray-400 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/8 rounded-lg text-xs text-gray-900 placeholder-gray-400 outline-none transition-all"
           />
+        </div>
+
+        {/* Status Filter Tab Buttons inside Sidebar */}
+        <div className="bg-gray-50 p-1.5 rounded-lg border border-gray-250 flex items-center justify-between gap-1 text-[11px] font-bold font-mono">
+          <span className="text-gray-500 font-semibold px-1 font-sans">📁 กรองสถานะ:</span>
+          <div className="flex gap-0.5">
+            <button
+              type="button"
+              onClick={() => setSidebarStatusFilter("all")}
+              className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                sidebarStatusFilter === "all"
+                  ? "bg-gray-900 text-white shadow-xs"
+                  : "bg-white text-gray-500 hover:text-gray-900 border border-gray-200"
+              }`}
+            >
+              ทั้งหมด
+            </button>
+            <button
+              type="button"
+              onClick={() => setSidebarStatusFilter("presented")}
+              className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                sidebarStatusFilter === "presented"
+                  ? "bg-gray-800 text-white shadow-xs"
+                  : "bg-white text-gray-500 hover:text-gray-900 border border-gray-200"
+              }`}
+            >
+              📢 นำเสนอ
+            </button>
+            <button
+              type="button"
+              onClick={() => setSidebarStatusFilter("delivered")}
+              className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                sidebarStatusFilter === "delivered"
+                  ? "bg-emerald-600 text-white shadow-xs"
+                  : "bg-white text-gray-500 hover:text-gray-900 border border-gray-200"
+              }`}
+            >
+              📦 ส่งมอบ
+            </button>
+          </div>
         </div>
 
         {/* Province Filter Dropdown */}

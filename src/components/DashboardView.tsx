@@ -67,11 +67,27 @@ interface DashboardViewProps {
 }
 
 export default function DashboardView({ projects, onBack, onLoadProject }: DashboardViewProps) {
-  // 1. Calculate General Stats
-  const totalProjects = projects.length;
+  // Independent toggles for each component window on the dashboard (default is "delivered")
+  const [totalProjFilter, setTotalProjFilter] = React.useState<"delivered" | "presented">("delivered");
+  const [avgCamFilter, setAvgCamFilter] = React.useState<"delivered" | "presented">("delivered");
+  const [totalMonthlyFilter, setTotalMonthlyFilter] = React.useState<"delivered" | "presented">("delivered");
+  const [avgMonthlyFilter, setAvgMonthlyFilter] = React.useState<"delivered" | "presented">("delivered");
   
-  // Total proposed cameras
-  const totalCameras = projects.reduce((acc, proj) => {
+  const [provinceFilter, setProvinceFilter] = React.useState<"delivered" | "presented">("delivered");
+  const [brandFilter, setBrandFilter] = React.useState<"delivered" | "presented">("delivered");
+  const [recentFilter, setRecentFilter] = React.useState<"delivered" | "presented">("delivered");
+
+  // Helper helper to filter list by status
+  const filterByStatus = (list: ProjectSurvey[], status: "delivered" | "presented") => {
+    return list.filter(p => status === "delivered" ? p.status === "delivered" : p.status !== "delivered");
+  };
+
+  // 1. Calculate General Stats independently
+  const totalProjList = filterByStatus(projects, totalProjFilter);
+  const totalProjCount = totalProjList.length;
+
+  const avgCamList = filterByStatus(projects, avgCamFilter);
+  const avgCamCount = avgCamList.reduce((acc, proj) => {
     const pointsList = proj.cameraPoints || [];
     if (pointsList.length > 0) {
       const cams = pointsList.reduce((sum, pt) => {
@@ -84,28 +100,25 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
     }
     return acc + (proj.requirements?.cameraCount || 0);
   }, 0);
+  const avgCameras = avgCamList.length > 0 ? avgCamCount / avgCamList.length : 0;
 
-  // Average cameras per project
-  const avgCameras = totalProjects > 0 ? totalCameras / totalProjects : 0;
+  const totalMonthlyList = filterByStatus(projects, totalMonthlyFilter);
+  const totalMonthlyValue = totalMonthlyList.reduce((acc, proj) => acc + calcMonthlyTotal(proj), 0);
 
-  // Total monthly rental across all projects
-  const totalMonthlyValue = projects.reduce((acc, proj) => acc + calcMonthlyTotal(proj), 0);
-
-  // Average monthly rental per project
-  const avgMonthlyValue = totalProjects > 0 ? totalMonthlyValue / totalProjects : 0;
+  const avgMonthlyList = filterByStatus(projects, avgMonthlyFilter);
+  const avgMonthlyValue = avgMonthlyList.length > 0 
+    ? avgMonthlyList.reduce((acc, proj) => acc + calcMonthlyTotal(proj), 0) / avgMonthlyList.length 
+    : 0;
 
   // 2. Province distribution
+  const provinceList = filterByStatus(projects, provinceFilter);
   const provinceCounts: Record<string, number> = {};
   const provinceValues: Record<string, number> = {};
-  
-  projects.forEach(proj => {
+  provinceList.forEach(proj => {
     const prov = proj.customerInfo.province || "ไม่ระบุจังหวัด";
     provinceCounts[prov] = (provinceCounts[prov] || 0) + 1;
-    
-    const monthlyTotal = calcMonthlyTotal(proj);
-    provinceValues[prov] = (provinceValues[prov] || 0) + monthlyTotal;
+    provinceValues[prov] = (provinceValues[prov] || 0) + calcMonthlyTotal(proj);
   });
-
   const sortedProvinces = Object.entries(provinceCounts)
     .map(([name, count]) => ({
       name,
@@ -115,35 +128,54 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
     .sort((a, b) => b.count - a.count);
 
   // 3. Brand distribution
+  const brandList = filterByStatus(projects, brandFilter);
   const brandCounts: Record<string, number> = {};
-  projects.forEach(proj => {
+  brandList.forEach(proj => {
     const brand = proj.requirements?.cameraBrand || "Hikvision";
     brandCounts[brand] = (brandCounts[brand] || 0) + 1;
   });
 
-  // 4. Camera Type distribution across all projects (Only Bullet is active/sold currently)
-  const cameraTypeCounts: Record<string, number> = {
-    "Bullet (กล้องทรงกระบอก)": 0
-  };
-  projects.forEach(proj => {
-    const pointsList = proj.cameraPoints || [];
-    if (pointsList.length > 0) {
-      pointsList.forEach(pt => {
-        let qty = 1;
-        if (pt.selectedSet === "Set 2") qty = 2;
-        else if (pt.selectedSet === "Set 3") qty = 3;
-        else if (pt.selectedSet === "Set 4") qty = 4;
-        cameraTypeCounts["Bullet (กล้องทรงกระบอก)"] += qty;
-      });
-    } else {
-      cameraTypeCounts["Bullet (กล้องทรงกระบอก)"] += proj.requirements?.cameraCount || 0;
-    }
-  });
+  // Recent Projects requests
+  const recentList = filterByStatus(projects, recentFilter);
+
+  // Mini Switcher component for premium micro-interactions inside windows
+  const WindowSwitcher = ({ 
+    value, 
+    onChange 
+  }: { 
+    value: "delivered" | "presented", 
+    onChange: (val: "delivered" | "presented") => void 
+  }) => (
+    <div className="bg-gray-100 p-0.5 rounded-lg border border-gray-200 flex items-center gap-0.5 text-[9px] font-bold font-mono ml-2 shrink-0">
+      <button
+        type="button"
+        onClick={() => onChange("delivered")}
+        className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+          value === "delivered" 
+            ? "bg-white text-emerald-600 shadow-2xs border border-gray-200" 
+            : "text-gray-400 hover:text-gray-600"
+        }`}
+      >
+        ส่งมอบแล้ว
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange("presented")}
+        className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+          value === "presented" 
+            ? "bg-white text-gray-800 shadow-2xs border border-gray-200" 
+            : "text-gray-400 hover:text-gray-600"
+        }`}
+      >
+        นำเสนอ
+      </button>
+    </div>
+  );
 
   return (
     <div className="space-y-6 animate-fadeIn font-sans pb-10">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <button
@@ -157,34 +189,39 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
               📊 แผงควบคุมวิเคราะห์ภาพรวม (Project Dashboard)
             </h2>
           </div>
-          <p className="text-xs text-gray-400 pl-8">วิเคราะห์ข้อมูลการขอโครงการสำรวจติดตั้งระบบ CCTV ทั้งหมดในระบบคลาวด์</p>
+          <p className="text-xs text-gray-400 pl-8">วิเคราะห์ข้อมูลความต้องการและการส่งมอบระบบ CCTV ในระบบคลาวด์แยกตามแต่ละหน้าต่างย่อย</p>
         </div>
+        
         <button
           onClick={onBack}
-          className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-center cursor-pointer"
+          className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer self-start md:self-center"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>กลับไปหน้าออกแบบโครงการ</span>
+          <span>กลับไปหน้าออกแบบ</span>
         </button>
       </div>
 
-      {/* 4 Stats Cards Row - Blocks.so premium cards */}
+      {/* 4 Stats Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
         {/* Total Projects */}
         <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all hover:shadow-sm">
           <div className="flex justify-between items-start">
             <div className="space-y-1.5">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">โครงการทั้งหมด</span>
               <span className="text-3xl font-extrabold text-gray-900 tracking-tight block font-mono">
-                {totalProjects}
+                {totalProjCount}
               </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
-              <Briefcase className="w-5 h-5" />
+            <div className="flex flex-col items-end gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
+                <Briefcase className="w-4.5 h-4.5" />
+              </div>
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
-            📊 จำนวนความต้องการเสนอราคาในระบบ
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
+            <span>📊 รวมใบงานในระบบ</span>
+            <WindowSwitcher value={totalProjFilter} onChange={setTotalProjFilter} />
           </div>
         </div>
 
@@ -197,12 +234,13 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                 {avgCameras.toFixed(1)}
               </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
-              <Camera className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
+              <Camera className="w-4.5 h-4.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
-            📹 เฉลี่ยจำนวนกล้องต่อหนึ่งใบงานสำรวจ
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
+            <span>📹 เฉลี่ยจำนวนกล้อง</span>
+            <WindowSwitcher value={avgCamFilter} onChange={setAvgCamFilter} />
           </div>
         </div>
 
@@ -215,12 +253,13 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                 ฿{totalMonthlyValue.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
               </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
-              <TrendingUp className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
+              <TrendingUp className="w-4.5 h-4.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
-            💳 รวมค่าเช่ารายเดือนที่เสนอทั้งหมดในระบบ
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
+            <span>💳 ยอดเช่ารายเดือนรวม</span>
+            <WindowSwitcher value={totalMonthlyFilter} onChange={setTotalMonthlyFilter} />
           </div>
         </div>
 
@@ -233,12 +272,13 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                 ฿{avgMonthlyValue.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
               </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
-              <Layers className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-150 flex items-center justify-center text-gray-700">
+              <Layers className="w-4.5 h-4.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
-            📏 เฉลี่ยค่าบริการรายเดือนต่อหนึ่งโครงการ
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
+            <span>📏 ยอดเช่าเฉลี่ยรายโครงการ</span>
+            <WindowSwitcher value={avgMonthlyFilter} onChange={setAvgMonthlyFilter} />
           </div>
         </div>
       </div>
@@ -251,9 +291,12 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
           
           {/* Province table list */}
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div className="flex items-center gap-1.5 pb-1">
-              <MapPin className="w-4 h-4 text-gray-700" />
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📍 สัดส่วนความต้องการรายจังหวัด</h3>
+            <div className="flex items-center justify-between pb-1 border-b border-gray-100">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-gray-700" />
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📍 สัดส่วนความต้องการรายจังหวัด</h3>
+              </div>
+              <WindowSwitcher value={provinceFilter} onChange={setProvinceFilter} />
             </div>
             
             <div className="overflow-x-auto">
@@ -268,7 +311,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                 </thead>
                 <tbody className="divide-y divide-gray-100 font-medium">
                   {sortedProvinces.map((prov, index) => {
-                    const percent = totalProjects > 0 ? (prov.count / totalProjects) * 100 : 0;
+                    const totalProjs = provinceList.length;
+                    const percent = totalProjs > 0 ? (prov.count / totalProjs) * 100 : 0;
                     return (
                       <tr key={index} className="hover:bg-gray-50/50 transition-colors">
                         <td className="py-3 font-semibold text-gray-900">{prov.name}</td>
@@ -290,7 +334,7 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                   })}
                   {sortedProvinces.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-6 text-center text-gray-400">ยังไม่มีข้อมูลโครงการบันทึกในระบบคลาวด์</td>
+                      <td colSpan={4} className="py-6 text-center text-gray-400">ไม่มีข้อมูลโครงการติดตั้งในระบบคลาวด์สำหรับสถานะนี้</td>
                     </tr>
                   )}
                 </tbody>
@@ -303,15 +347,19 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             
             {/* Brand Distribution */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
-              <div className="flex items-center gap-1.5 pb-1">
-                <Boxes className="w-4 h-4 text-gray-700" />
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">🏷️ แบรนด์กล้องยอดนิยม</h3>
+              <div className="flex items-center justify-between pb-1 border-b border-gray-100">
+                <div className="flex items-center gap-1.5">
+                  <Boxes className="w-4 h-4 text-gray-700" />
+                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">🏷️ แบรนด์กล้องยอดนิยม</h3>
+                </div>
+                <WindowSwitcher value={brandFilter} onChange={setBrandFilter} />
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 pt-2">
                 {Object.entries(brandCounts)
                   .sort((a, b) => b[1] - a[1])
                   .map(([name, count], index) => {
-                    const percent = totalProjects > 0 ? (count / totalProjects) * 100 : 0;
+                    const totalBrands = brandList.length;
+                    const percent = totalBrands > 0 ? (count / totalBrands) * 100 : 0;
                     return (
                       <div key={index} className="space-y-1">
                         <div className="flex justify-between items-center text-xs">
@@ -328,16 +376,16 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                     );
                   })}
                 {Object.keys(brandCounts).length === 0 && (
-                  <p className="text-xs text-gray-400 text-center py-4">ไม่มีข้อมูลแบรนด์กล้อง</p>
+                  <p className="text-xs text-gray-400 text-center py-4">ไม่มีข้อมูลแบรนด์กล้องสำหรับสถานะนี้</p>
                 )}
               </div>
             </div>
 
-            {/* Project Status Ratio - Presented vs Delivered */}
+            {/* Project Status Ratio - Overall */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
-              <div className="flex items-center gap-1.5 pb-1">
+              <div className="flex items-center gap-1.5 pb-1 border-b border-gray-100">
                 <PieChart className="w-4 h-4 text-gray-700" />
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📊 สัดส่วนสถานะโครงการ</h3>
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📊 สัดส่วนสถานะโครงการรวม</h3>
               </div>
               
               {(() => {
@@ -347,43 +395,39 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                 const presentedPercent = total > 0 ? (presentedCount / total) * 100 : 0;
                 const deliveredPercent = total > 0 ? (deliveredCount / total) * 100 : 0;
 
-                // Color configuration
                 const presentedColor = "#3f3f46"; // zinc-700
                 const deliveredColor = "#10b981"; // emerald-500
 
                 return (
-                  <div className="flex flex-col items-center justify-center gap-4 py-1">
+                  <div className="flex flex-col items-center justify-center gap-4 py-1 pt-2">
                     {total > 0 ? (
                       <>
-                        {/* Premium Pie Chart Container via conic-gradient */}
-                        <div className="relative w-32 h-32 rounded-full flex items-center justify-center shadow-inner border border-gray-200/50"
+                        <div className="relative w-28 h-28 rounded-full flex items-center justify-center shadow-inner border border-gray-200/50"
                              style={{
-                               background: `conic-gradient(${deliveredColor} 0% ${deliveredPercent}%, ${presentedColor} ${deliveredPercent}% 100%)`
+                                background: `conic-gradient(${deliveredColor} 0% ${deliveredPercent}%, ${presentedColor} ${deliveredPercent}% 100%)`
                              }}
                         >
-                          {/* Inner white circle for donut style */}
-                          <div className="w-20 h-20 rounded-full bg-white flex flex-col items-center justify-center shadow-xs">
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">ทั้งหมด</span>
-                            <span className="text-xl font-extrabold text-gray-900 font-mono leading-none">{total}</span>
+                          <div className="w-18 h-18 rounded-full bg-white flex flex-col items-center justify-center shadow-xs">
+                            <span className="text-[8px] text-gray-400 font-bold uppercase tracking-wider">ทั้งหมด</span>
+                            <span className="text-lg font-extrabold text-gray-900 font-mono leading-none">{total}</span>
                           </div>
                         </div>
 
-                        {/* Legends with statistics */}
-                        <div className="w-full space-y-2 pt-2">
-                          <div className="flex justify-between items-center text-xs">
+                        <div className="w-full space-y-1.5">
+                          <div className="flex justify-between items-center text-[11px]">
                             <span className="flex items-center gap-1.5 font-semibold text-gray-700">
-                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: presentedColor }} />
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: presentedColor }} />
                               📢 นำเสนอ (Presented)
                             </span>
-                            <span className="font-bold text-gray-900 font-mono">{presentedCount} โครงการ ({presentedPercent.toFixed(0)}%)</span>
+                            <span className="font-bold text-gray-900 font-mono">{presentedCount} ({presentedPercent.toFixed(0)}%)</span>
                           </div>
                           
-                          <div className="flex justify-between items-center text-xs">
+                          <div className="flex justify-between items-center text-[11px]">
                             <span className="flex items-center gap-1.5 font-semibold text-gray-700">
-                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: deliveredColor }} />
-                              📦 ส่งมอบงานแล้ว (Delivered)
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: deliveredColor }} />
+                              📦 ส่งมอบแล้ว (Delivered)
                             </span>
-                            <span className="font-bold text-gray-900 font-mono">{deliveredCount} โครงการ ({deliveredPercent.toFixed(0)}%)</span>
+                            <span className="font-bold text-gray-900 font-mono">{deliveredCount} ({deliveredPercent.toFixed(0)}%)</span>
                           </div>
                         </div>
                       </>
@@ -402,13 +446,16 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
         {/* Right 1 Column: Recent Projects requests */}
         <div className="space-y-4">
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4 min-h-[460px]">
-            <div className="flex items-center gap-1.5 pb-1">
-              <BarChart3 className="w-4 h-4 text-gray-700" />
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📅 โครงการที่ขอเข้ามาล่าสุด</h3>
+            <div className="flex items-center justify-between pb-1 border-b border-gray-100">
+              <div className="flex items-center gap-1.5">
+                <BarChart3 className="w-4 h-4 text-gray-700" />
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-mono">📅 โครงการล่าสุด</h3>
+              </div>
+              <WindowSwitcher value={recentFilter} onChange={setRecentFilter} />
             </div>
             
-            <div className="space-y-3.5 max-h-[400px] overflow-y-auto pr-1">
-              {projects.slice(0, 5).map((proj) => {
+            <div className="space-y-3.5 max-h-[400px] overflow-y-auto pr-1 pt-2">
+              {recentList.slice(0, 5).map((proj) => {
                 const monthlyTotal = calcMonthlyTotal(proj);
                 return (
                   <div
@@ -439,9 +486,9 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                   </div>
                 );
               })}
-              {projects.length === 0 && (
+              {recentList.length === 0 && (
                 <div className="p-10 text-center text-xs text-gray-400 border border-dashed rounded-xl border-gray-200">
-                  ไม่มีโครงการในระบบ
+                  ไม่มีโครงการติดตั้งในระบบคลาวด์สำหรับสถานะนี้
                 </div>
               )}
             </div>
