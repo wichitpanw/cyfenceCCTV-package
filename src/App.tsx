@@ -628,6 +628,7 @@ export default function App() {
   const [vatRate, setVatRate] = useState<number>(7);
   const [activeProjectStatus, setActiveProjectStatus] = useState<"draft" | "completed" | "presented" | "delivered">("presented");
   const [activeProjectDeliveryDate, setActiveProjectDeliveryDate] = useState<string | undefined>(undefined);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState<boolean>(false);
 
   // Confirmation Modal state
@@ -1266,6 +1267,7 @@ export default function App() {
     setVatRate(proj.vatRate);
     setActiveProjectStatus(proj.status || "presented");
     setActiveProjectDeliveryDate(proj.deliveryDate || proj.customerInfo.deliveryDate);
+    setIsEditMode(false); // Default to view summary BOM only, not editing other steps
     setStep(5); // switch to the summary/pricing screen so the user can view results immediately
     setIsViewingDashboard(false);
   };
@@ -1303,6 +1305,7 @@ export default function App() {
     setVatRate(7);
     setActiveProjectStatus("presented");
     setActiveProjectDeliveryDate(undefined);
+    setIsEditMode(true); // New project draft is fully editable
     setStep(1);
     setIsViewingDashboard(false);
   };
@@ -1749,6 +1752,7 @@ export default function App() {
               const proj = projectsList.find(p => p.id === id);
               if (proj) {
                 loadProject(proj);
+                setIsEditMode(false); // ดูสรุปโครงการเท่านั้น ล็อคไม่ให้แก้ไข
                 setStep(4); // ดูสรุปโครงการ (หน้ารายการอุปกรณ์ BOM) แทนการเข้าไปแก้ไขโดยตรง
               }
             }}
@@ -1756,6 +1760,7 @@ export default function App() {
               const proj = projectsList.find(p => p.id === id);
               if (proj) {
                 loadProject(proj);
+                setIsEditMode(true); // ปลดล็อคให้แก้ไขโครงการได้ทั้งหมด!
                 setStep(5); // เข้าหน้าแก้ไขราคาประเมินและสเปกส่วนกลาง
               }
             }}
@@ -1808,6 +1813,9 @@ export default function App() {
                     .eq("id", id);
                   if (error) {
                     console.error("Failed to update status in Supabase:", error.message);
+                  } else {
+                    // Refetch projects list to confirm exact database sync
+                    await loadSavedProjects();
                   }
                 } catch (e) {
                   console.error("Error updating project status in database:", e);
@@ -1841,7 +1849,10 @@ export default function App() {
                   const isPassed = stepUnit.number < step;
                   const isCurrent = stepUnit.number === step;
                   const isSurveyIgnored = (stepUnit.number === 4) && !hasSurveyReport;
-                  const isClickable = (isPassed || isCurrent) || !!activeProjectId;
+                  // ล็อคไม่ให้คลิกข้ามหน้าอื่นหากไม่ได้อยู่ในโหมดแก้ไข (อนุมัติให้ดูได้เฉพาะหน้า BOM(4) หรือหน้า Pricing(5))
+                  const isClickable = isEditMode 
+                    ? ((isPassed || isCurrent) || !!activeProjectId)
+                    : (stepUnit.number === 4 || stepUnit.number === 5);
                   return {
                     number: stepUnit.number,
                     label: stepUnit.label,
@@ -1854,7 +1865,13 @@ export default function App() {
                 return (
                   <Sidebar02 
                     steps={sidebarSteps} 
-                    onStepSelect={setStep} 
+                    onStepSelect={(targetStep) => {
+                      if (!isEditMode && targetStep !== 4 && targetStep !== 5) {
+                        showAlert("🔒 โหมดดูสรุปโครงการ", "หากต้องการแก้ไขข้อมูลโครงการนี้ กรุณากดปุ่มดินสอ ✏️ ที่โครงการในแถบด้านข้างก่อนนะคะ");
+                        return;
+                      }
+                      setStep(targetStep);
+                    }} 
                     className="mb-5 flex flex-col md:flex-row gap-2 bg-white p-2.5 rounded-xl border border-gray-200 shadow-sm md:items-center space-y-0"
                   />
                 );
