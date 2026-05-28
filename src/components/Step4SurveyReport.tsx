@@ -69,6 +69,7 @@ export default function Step4SurveyReport({
   // Local state for manual coordinate inputs to prevent React cursor state bugs on floats
   const [localLat, setLocalLat] = useState<string>("");
   const [localLng, setLocalLng] = useState<string>("");
+  const [coordsInput, setCoordsInput] = useState<string>("");
 
   // Compute map center from customer info
   const defaultLat = customerInfo.latitude ? parseFloat(customerInfo.latitude) : 13.7563;
@@ -84,14 +85,25 @@ export default function Step4SurveyReport({
   // Sync manual coordinate inputs when selected camera changes or updates
   useEffect(() => {
     if (isControlCenterSelected) {
-      setLocalLat(centerLat.toString());
-      setLocalLng(centerLng.toString());
+      const latStr = centerLat.toString();
+      const lngStr = centerLng.toString();
+      setLocalLat(latStr);
+      setLocalLng(lngStr);
+      setCoordsInput(`${latStr}, ${lngStr}`);
     } else if (selectedPoint) {
-      setLocalLat(selectedPoint.lat !== undefined ? selectedPoint.lat.toString() : "");
-      setLocalLng(selectedPoint.lng !== undefined ? selectedPoint.lng.toString() : "");
+      const latStr = selectedPoint.lat !== undefined ? selectedPoint.lat.toString() : "";
+      const lngStr = selectedPoint.lng !== undefined ? selectedPoint.lng.toString() : "";
+      setLocalLat(latStr);
+      setLocalLng(lngStr);
+      if (latStr && lngStr) {
+        setCoordsInput(`${latStr}, ${lngStr}`);
+      } else {
+        setCoordsInput("");
+      }
     } else {
       setLocalLat("");
       setLocalLng("");
+      setCoordsInput("");
     }
   }, [selectedPointId, selectedPoint?.lat, selectedPoint?.lng, centerLat, centerLng, isControlCenterSelected]);
 
@@ -454,6 +466,86 @@ export default function Step4SurveyReport({
     }
   };
 
+  // Handle Single-box coordinates input (supporting Google Maps "lat, lng" copy-paste)
+  const handleCoordsChange = (val: string) => {
+    setCoordsInput(val);
+    
+    // Split by comma, spaces, or tabs
+    const parts = val.split(/[,\s]+/).map(p => p.trim()).filter(Boolean);
+    
+    if (parts.length >= 2) {
+      const latVal = parts[0];
+      const lngVal = parts[1];
+      const latParsed = parseFloat(latVal);
+      const lngParsed = parseFloat(lngVal);
+      
+      if (!isNaN(latParsed) && !isNaN(lngParsed)) {
+        if (!latVal.endsWith(".") && !lngVal.endsWith(".")) {
+          if (isControlCenterSelected) {
+            onUpdateCustomerInfo?.({
+              ...customerInfo,
+              latitude: latVal,
+              longitude: lngVal
+            });
+          } else if (selectedPoint) {
+            handleUpdatePointFields(selectedPoint.id, { lat: latParsed, lng: lngParsed });
+          }
+        }
+      }
+    } else if (parts.length === 1) {
+      // If a single number is typed, update the latitude as partial input
+      const latVal = parts[0];
+      const latParsed = parseFloat(latVal);
+      if (!isNaN(latParsed) && !latVal.endsWith(".")) {
+        if (isControlCenterSelected) {
+          onUpdateCustomerInfo?.({
+            ...customerInfo,
+            latitude: latVal
+          });
+        } else if (selectedPoint) {
+          handleUpdatePointFields(selectedPoint.id, { lat: latParsed });
+        }
+      }
+    }
+  };
+
+  // Get current GPS location from browser Geolocation API
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("เบราว์เซอร์ของคุณไม่รองรับการดึงพิกัดตำแหน่ง (Geolocation)");
+      return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        const latStr = lat.toString();
+        const lngStr = lng.toString();
+        
+        setLocalLat(latStr);
+        setLocalLng(lngStr);
+        setCoordsInput(`${latStr}, ${lngStr}`);
+        
+        if (isControlCenterSelected) {
+          onUpdateCustomerInfo?.({
+            ...customerInfo,
+            latitude: latStr,
+            longitude: lngStr
+          });
+        } else if (selectedPoint) {
+          handleUpdatePointFields(selectedPoint.id, { lat, lng });
+        }
+      },
+      (error) => {
+        console.error("Error getting location: ", error);
+        alert("ไม่สามารถดึงตำแหน่งปัจจุบันได้ กรุณาตรวจสอบสิทธิ์การเข้าถึงพิกัดของเบราว์เซอร์");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   // Determine active target coordinates for the center controller
   const panLat = isControlCenterSelected ? centerLat : (selectedPoint?.lat !== undefined ? selectedPoint.lat : centerLat);
   const panLng = isControlCenterSelected ? centerLng : (selectedPoint?.lng !== undefined ? selectedPoint.lng : centerLng);
@@ -765,35 +857,32 @@ export default function Step4SurveyReport({
               </div>
 
               {/* Coordinates Editor */}
-              <div className="bg-white border border-gray-200 rounded-xl p-3.5 space-y-3.5">
-                <span className="block text-[10px] font-bold text-zinc-650 flex items-center gap-1.5 uppercase font-mono tracking-wider">
-                  📍 ป้อนพิกัดภูมิศาสตร์
-                </span>
-                
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <label className="block text-[10px] text-gray-500 font-semibold mb-1">LATITUDE</label>
-                    <input
-                      type="text"
-                      value={localLat}
-                      onChange={(e) => handleLatManualChange(e.target.value)}
-                      className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
-                      placeholder="เช่น 17.3992"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-gray-500 font-semibold mb-1">LONGITUDE</label>
-                    <input
-                      type="text"
-                      value={localLng}
-                      onChange={(e) => handleLngManualChange(e.target.value)}
-                      className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
-                      placeholder="เช่น 102.8582"
-                    />
-                  </div>
+              <div className="bg-white border border-gray-200 rounded-xl p-3.5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="block text-[10px] font-bold text-zinc-650 flex items-center gap-1.5 uppercase font-mono tracking-wider">
+                    📍 ป้อนพิกัดภูมิศาสตร์
+                  </span>
+                  <button
+                    onClick={handleGetCurrentLocation}
+                    type="button"
+                    className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold text-white bg-[#111827] hover:bg-[#1f2937] active:scale-95 transition-all rounded-lg shadow-sm shrink-0"
+                  >
+                    📍 ดึงพิกัดปัจจุบัน
+                  </button>
                 </div>
-                <span className="block text-[9px] text-gray-400 mt-1 leading-relaxed">
-                  *พิมพ์แก้ไขทศนิยมได้โดยตรง หรือคลิกลากหมุดสีน้ำเงินหลักบนแผนที่เพื่ออัปเดตพิกัดแบบ Interactive
+                
+                <div className="text-xs">
+                  <label className="block text-[10px] text-gray-500 font-semibold mb-1">พิกัด (LATITUDE, LONGITUDE)</label>
+                  <input
+                    type="text"
+                    value={coordsInput}
+                    onChange={(e) => handleCoordsChange(e.target.value)}
+                    className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
+                    placeholder="เช่น 13.903868633485667, 100.57982817437522"
+                  />
+                </div>
+                <span className="block text-[9px] text-gray-400 leading-relaxed">
+                  *พิมพ์หรือวางพิกัดจาก Google Maps ได้ทันที หรือคลิกลากหมุดสีน้ำเงินหลักบนแผนที่เพื่ออัปเดตพิกัดแบบ Interactive
                 </span>
               </div>
 
@@ -1196,34 +1285,32 @@ export default function Step4SurveyReport({
                 {activeTab === "location" && (
                   <div className="space-y-4 animate-fadeIn">
                     {/* Coordinate Info Box (Interactive Text-inputs with map panning) */}
-                    <div className="bg-white p-3.5 rounded-xl border border-gray-200 space-y-2">
-                      <span className="text-[10px] font-bold text-zinc-555 block uppercase font-mono tracking-wider">
-                        📍 ป้อนพิกัดภูมิศาสตร์เฉพาะจุด
-                      </span>
-                      <div className="grid grid-cols-2 gap-2 text-[10px]">
-                        <div className="space-y-1">
-                          <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Latitude</label>
-                          <input
-                            type="text"
-                            value={localLat}
-                            onChange={(e) => handleLatManualChange(e.target.value)}
-                            className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
-                            placeholder="เช่น 13.6872"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-zinc-550 block text-[9px] uppercase font-semibold">Longitude</label>
-                          <input
-                            type="text"
-                            value={localLng}
-                            onChange={(e) => handleLngManualChange(e.target.value)}
-                            className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
-                            placeholder="เช่น 100.6057"
-                          />
-                        </div>
+                    <div className="bg-white p-3.5 rounded-xl border border-gray-200 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-zinc-555 block uppercase font-mono tracking-wider">
+                          📍 ป้อนพิกัดภูมิศาสตร์เฉพาะจุด
+                        </span>
+                        <button
+                          onClick={handleGetCurrentLocation}
+                          type="button"
+                          className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold text-white bg-[#111827] hover:bg-[#1f2937] active:scale-95 transition-all rounded-lg shadow-sm shrink-0"
+                        >
+                          📍 ดึงพิกัดปัจจุบัน
+                        </button>
                       </div>
-                      <span className="block text-[9px] text-gray-400 mt-1 leading-relaxed">
-                        *พิมพ์แก้ไขทศนิยมได้โดยตรง แผนที่จะทำการร่อนหน้าจอ (Pan) ไปหาพิกัดใหม่นั้นให้ทันที
+                      
+                      <div className="text-[10px] space-y-1">
+                        <label className="text-zinc-550 block text-[9px] uppercase font-semibold">พิกัด (Latitude, Longitude)</label>
+                        <input
+                          type="text"
+                          value={coordsInput}
+                          onChange={(e) => handleCoordsChange(e.target.value)}
+                          className="w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg font-mono text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#111827]"
+                          placeholder="เช่น 13.903868633485667, 100.57982817437522"
+                        />
+                      </div>
+                      <span className="block text-[9px] text-gray-400 leading-relaxed">
+                        *พิมพ์หรือวางพิกัดจาก Google Maps ได้โดยตรง แผนที่จะร่อนหน้าจอ (Pan) ไปหาพิกัดใหม่ให้ทันที
                       </span>
                     </div>
 
