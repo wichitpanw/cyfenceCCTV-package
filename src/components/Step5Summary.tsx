@@ -328,7 +328,6 @@ export default function Step5Summary({
                 <th className="py-2 px-3 text-center">ประเภท</th>
                 <th className="py-2 px-3 text-right">จำนวนประมาณการ</th>
                 <th className="py-2 px-3 text-center">หน่วย</th>
-                <th className="py-2 px-3">สเปกหน้างาน / แหล่งที่มา</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200">
@@ -354,14 +353,6 @@ export default function Step5Summary({
                     {item.quantity}
                   </td>
                   <td className="py-2.5 px-3 text-center text-gray-550">{item.unit}</td>
-                  <td className="py-2.5 px-3 text-gray-400 text-[10px] leading-relaxed whitespace-normal break-words">
-                    {item.name.includes("กล้อง") ? `สเปคล่าสุดแบรนด์ ${requirements.cameraBrand}` :
-                     item.name.includes("NVR") ? `ช่องสัญญาณ ${requirements.nvrChannels}CH (แบรนด์เดียวกับกล้อง: ${requirements.cameraBrand})` :
-                     item.name.includes("ฮาร์ดดิสก์") ? `แพคเกจบันทึกย้อนหลัง: ${requirements.storagePackage}` :
-                     item.name.includes("เสาเหล็ก") ? `จำลองขนาดเสายึดกล้องหน้างาน` :
-                     item.name.includes("แขนรองรับ") ? `แขนสแตนเลสสำหรับกล้อง Bullet/PTZ` :
-                     "ความยาวสายที่ใช้ตามความกว้างพื้นที่ติดตั้ง"}
-                  </td>
                 </tr>
               ))}
             </tbody>
