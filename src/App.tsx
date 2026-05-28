@@ -565,7 +565,7 @@ function generatePricingItems(
   // 4. ค่าติดตั้ง Router
   items.push({
     id: "bom-labor-router",
-    name: "ค่าติดตั้ง Router (ค่า Config ระบบเครือข่ายให้ทำงานดูภาพทางไกลได้)",
+    name: "ค่าติดตั้ง Router ต้นทาง (ค่า Config ระบบให้สามารถทำงานได้)",
     quantity: 1,
     unit: "เครื่อง",
     unitPrice: costs.laborRouter,
@@ -2322,7 +2322,7 @@ export default function App() {
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">ค่าติดตั้ง Router + Config ระบบ (บาท/เครื่อง)</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">ค่าติดตั้ง Router ต้นทาง (พร้อม Config ระบบ) (บาท/เครื่อง)</label>
                       <input type="number" min={0} value={tempCosts.laborRouter}
                         onChange={(e) => setTempCosts(p => ({ ...p, laborRouter: parseFloat(e.target.value) || 0 }))}
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
