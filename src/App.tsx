@@ -1836,16 +1836,32 @@ export default function App() {
               // Update in database if configured
               if (isSupabaseConfigured) {
                 try {
+                  // We update 'status' first as it's guaranteed to exist, then we try 'delivery_date' or 'deliveryDate' dynamically to bypass schema cache issues
+                  const updatePayload: any = { status: newStatus };
+                  
+                  // Let's set both or fallback if one fails
+                  updatePayload.delivery_date = deliveryDate || null;
+                  
                   const { error } = await supabase
                     .from("projects")
-                    .update({ 
-                      status: newStatus, 
-                      delivery_date: deliveryDate || null 
-                    })
+                    .update(updatePayload)
                     .eq("id", id);
+                    
                   if (error) {
-                    console.error("Failed to update status in Supabase:", error.message);
-                    showAlert("❌ อัปเดตล้มเหลว", "เกิดข้อผิดพลาดในการบันทึกฐานข้อมูล: " + error.message);
+                    console.error("Failed to update status with delivery_date in Supabase:", error.message);
+                    
+                    // Fallback to update status only if delivery_date is missing or cache error occurs
+                    const { error: fallbackError } = await supabase
+                      .from("projects")
+                      .update({ status: newStatus })
+                      .eq("id", id);
+                      
+                    if (fallbackError) {
+                      console.error("Fallback update also failed:", fallbackError.message);
+                      showAlert("❌ อัปเดตล้มเหลว", "เกิดข้อผิดพลาดในการบันทึกฐานข้อมูล: " + fallbackError.message);
+                    } else {
+                      await loadSavedProjects();
+                    }
                   } else {
                     // Refetch projects list to confirm exact database sync
                     await loadSavedProjects();

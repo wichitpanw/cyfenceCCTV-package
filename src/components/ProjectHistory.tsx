@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle, Pencil } from "lucide-react";
+import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle, Pencil, RefreshCw } from "lucide-react";
 import { ProjectSurvey, CameraPoint } from "../types";
 
 // ฟังก์ชันคำนวณค่าใช้จ่ายรายเดือนที่ลูกค้าต้องจ่าย (เหมือนกับ Step6Pricing)
