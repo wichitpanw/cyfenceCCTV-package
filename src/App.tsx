@@ -1804,6 +1804,7 @@ export default function App() {
             currentUserId={currentUser?.id || null}
             onToggleDashboard={() => setIsViewingDashboard(!isViewingDashboard)}
             isViewingDashboard={isViewingDashboard}
+            showConfirm={showConfirm}
             onUpdateProjectStatus={async (id, newStatus, deliveryDate) => {
               // Update state locally first
               const updated = projectsList.map(p => {

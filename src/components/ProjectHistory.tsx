@@ -64,6 +64,8 @@ interface ProjectHistoryProps {
   onToggleDashboard?: () => void;
   isViewingDashboard?: boolean;
   onUpdateProjectStatus?: (id: string, status: "draft" | "completed" | "presented" | "delivered", deliveryDate?: string) => void;
+  showConfirm?: (title: string, message: string, onConfirm: () => void, options?: { confirmText?: string; cancelText?: string; onCancel?: () => void }) => void;
+  showAlert?: (title: string, message: string) => void;
 }
 
 export default function ProjectHistory({
@@ -80,6 +82,8 @@ export default function ProjectHistory({
   onToggleDashboard,
   isViewingDashboard = false,
   onUpdateProjectStatus,
+  showConfirm,
+  showAlert,
 }: ProjectHistoryProps) {
   const [search, setSearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("all");
@@ -283,15 +287,26 @@ export default function ProjectHistory({
                     </span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {/* ปุ่มเปลี่ยนสถานะเป็นส่งมอบงาน */}
+                      {/* ปุ่มเปลี่ยนสถานะเป็นส่งมอบงาน */}
                       {onUpdateProjectStatus && proj.status !== "delivered" && (
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const confirmDelivery = window.confirm(`📦 คุณบีมต้องการยืนยันการส่งมอบงานโครงการ "${proj.customerInfo.projectName || proj.customerInfo.customerName}" หรือไม่คะ?`);
-                            if (confirmDelivery) {
+                            const title = "📦 ยืนยันการส่งมอบงาน";
+                            const msg = `คุณบีมต้องการยืนยันการส่งมอบงานโครงการ "${proj.customerInfo.projectName || proj.customerInfo.customerName}" หรือไม่คะ?`;
+                            const onConfirm = () => {
                               const todayStr = new Date().toISOString().split("T")[0];
                               onUpdateProjectStatus(proj.id, "delivered", todayStr);
+                            };
+                            
+                            if (showConfirm) {
+                              showConfirm(title, msg, onConfirm, {
+                                confirmText: "📦 ยืนยันส่งมอบ",
+                                cancelText: "ยกเลิก"
+                              });
+                            } else {
+                              if (window.confirm(msg)) onConfirm();
                             }
                           }}
                           className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center`}
@@ -307,9 +322,19 @@ export default function ProjectHistory({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const confirmRevert = window.confirm(`📢 คุณบีมต้องการย้อนสถานะโครงการ "${proj.customerInfo.projectName || proj.customerInfo.customerName}" กลับเป็น 'นำเสนอ' ใช่ไหมคะ?\n(ปุ่มแก้ไขสเปก ✏️ จะกลับมาแสดงผลให้ใช้งานอีกครั้งค่ะ)`);
-                            if (confirmRevert) {
+                            const title = "📢 ย้อนสถานะโครงการ";
+                            const msg = `คุณบีมต้องการย้อนสถานะโครงการ "${proj.customerInfo.projectName || proj.customerInfo.customerName}" กลับเป็น 'นำเสนอ' ใช่ไหมคะ?\n\n(ปุ่มแก้ไขสเปก ✏️ จะกลับมาแสดงผลให้ใช้งานอีกครั้งค่ะ)`;
+                            const onConfirm = () => {
                               onUpdateProjectStatus(proj.id, "presented", undefined);
+                            };
+
+                            if (showConfirm) {
+                              showConfirm(title, msg, onConfirm, {
+                                confirmText: "📢 ย้อนสถานะ",
+                                cancelText: "ยกเลิก"
+                              });
+                            } else {
+                              if (window.confirm(msg)) onConfirm();
                             }
                           }}
                           className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center`}
