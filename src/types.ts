@@ -119,6 +119,8 @@ export interface MasterCostDb {
   tv55: number; // TV 55 นิ้ว
   ups1kva: number; // UPS 1Kva
   ups2kva: number; // UPS 2Kva
+  routerHw: number; // Router VPN/Firewall
+  
 
   // --- ค่าติดตั้งปลายทาง ---
   laborCctv: number; // ค่าติดตั้ง กล้อง CCTV (ค่าเดินสาย LAN 25 เมตรในท่อเฟล็กซ์อ่อนภายนอก + ติดตั้งกล้อง)

@@ -89,6 +89,8 @@ const DEFAULT_MASTER_COSTS: MasterCostDb = {
   tv55: 14900, // TV 55 นิ้ว
   ups1kva: 4200, // UPS 1Kva
   ups2kva: 8500, // UPS 2Kva
+  routerHw: 3900, // Router VPN/Firewall
+  
 
   // --- ค่าติดตั้งปลายทาง ---
   laborCctv: 1200, // ค่าติดตั้ง กล้อง CCTV (ค่าเดินสาย LAN 25 เมตรในท่อเฟล็กซ์อ่อนภายนอก + ติดตั้งกล้อง)
@@ -415,6 +417,16 @@ function generatePricingItems(
     quantity: 1,
     unit: "เครื่อง",
     unitPrice: upsPrice,
+    category: "hardware"
+  });
+
+  // --- 10. ต้นทาง: Router VPN/Firewall ---
+  items.push({
+    id: "bom-router-hw",
+    name: "Router VPN/Firewall",
+    quantity: 1,
+    unit: "เครื่อง",
+    unitPrice: costs.routerHw || 3900,
     category: "hardware"
   });
 
@@ -2219,10 +2231,16 @@ export default function App() {
                         onChange={(e) => setTempCosts(p => ({ ...p, ups1kva: parseFloat(e.target.value) || 0 }))}
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
-                    <div>
+                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">UPS 2Kva (บาท)</label>
                       <input type="number" min={0} value={tempCosts.ups2kva}
                         onChange={(e) => setTempCosts(p => ({ ...p, ups2kva: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Router VPN/Firewall (บาท)</label>
+                      <input type="number" min={0} value={tempCosts.routerHw}
+                        onChange={(e) => setTempCosts(p => ({ ...p, routerHw: parseFloat(e.target.value) || 0 }))}
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
