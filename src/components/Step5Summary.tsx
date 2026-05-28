@@ -582,30 +582,32 @@ export default function Step5Summary({
         </div>
       )}
 
-      <div className="border-t border-gray-150 pt-6"></div>
+      {isEditMode && (
+        <>
+          <div className="border-t border-gray-150 pt-6"></div>
 
-      {/* Navigation action bars */}
-      <div className={`flex ${isEditMode ? "justify-between" : "justify-end"}`} id="step5-actions-bar">
-        {isEditMode && (
-          <button
-            type="button"
-            onClick={onPrev}
-            className="inline-flex items-center gap-1 px-4 py-2 bg-gray-50 hover:bg-zinc-200 text-gray-900 text-xs font-medium rounded-xl border border-gray-200 transition-all cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            ย้อนกลับ
-          </button>
-        )}
+          {/* Navigation action bars */}
+          <div className="flex justify-between" id="step5-actions-bar">
+            <button
+              type="button"
+              onClick={onPrev}
+              className="inline-flex items-center gap-1 px-4 py-2 bg-gray-55/50 hover:bg-zinc-200 text-gray-900 text-xs font-medium rounded-xl border border-gray-200 transition-all cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              ย้อนกลับ
+            </button>
 
-        <button
-          type="button"
-          onClick={onNext}
-          className="blocks-btn-primary"
-        >
-          ก้าวถัดไป: ไปหน้าสรุปราคาสินค้า 💰
-          <ArrowRight className="w-3.5 h-3.5" />
-        </button>
-      </div>
+            <button
+              type="button"
+              onClick={onNext}
+              className="blocks-btn-primary"
+            >
+              ก้าวถัดไป: ไปหน้าสรุปราคาสินค้า 💰
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

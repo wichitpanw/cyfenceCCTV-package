@@ -1283,7 +1283,7 @@ export default function App() {
     setActiveProjectStatus(proj.status || "presented");
     setActiveProjectDeliveryDate(proj.deliveryDate || proj.customerInfo.deliveryDate);
     setIsEditMode(false); // Default to view summary BOM only, not editing other steps
-    setStep(5); // switch to the summary/pricing screen so the user can view results immediately
+    setStep(4); // switch to the summary BOM screen so the user can view results immediately
     setIsViewingDashboard(false);
   };
 
@@ -1904,10 +1904,10 @@ export default function App() {
                   const isPassed = stepUnit.number < step;
                   const isCurrent = stepUnit.number === step;
                   const isSurveyIgnored = (stepUnit.number === 4) && !hasSurveyReport;
-                  // ล็อคไม่ให้คลิกข้ามหน้าอื่นหากไม่ได้อยู่ในโหมดแก้ไข (อนุมัติให้ดูได้เฉพาะหน้า BOM(4) หรือหน้า Pricing(5))
+                  // ล็อคไม่ให้คลิกข้ามหน้าอื่นหากไม่ได้อยู่ในโหมดแก้ไข (อนุมัติให้ดูได้เฉพาะหน้า BOM(4))
                   const isClickable = isEditMode 
                     ? ((isPassed || isCurrent) || !!activeProjectId)
-                    : (stepUnit.number === 4 || stepUnit.number === 5);
+                    : (stepUnit.number === 4);
                   return {
                     number: stepUnit.number,
                     label: stepUnit.label,
@@ -1921,8 +1921,8 @@ export default function App() {
                   <Sidebar02 
                     steps={sidebarSteps} 
                     onStepSelect={(targetStep) => {
-                      if (!isEditMode && targetStep !== 4 && targetStep !== 5) {
-                        showAlert("🔒 โหมดดูสรุปโครงการ", "หากต้องการแก้ไขข้อมูลโครงการนี้ กรุณากดปุ่มดินสอ ✏️ ที่โครงการในแถบด้านข้างก่อนนะคะ");
+                      if (!isEditMode && targetStep !== 4) {
+                        showAlert("🔒 โหมดดูสรุปโครงการ", "หากต้องการแก้ไขข้อมูลโครงการหรือตรวจสอบงวดราคา กรุณากดปุ่มดินสอ ✏️ ที่โครงการในแถบด้านข้างก่อนนะคะ");
                         return;
                       }
                       setStep(targetStep);
