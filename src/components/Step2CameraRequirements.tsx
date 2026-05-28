@@ -132,19 +132,20 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200 text-xs font-sans">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200 text-xs font-sans">
           {/* Rack selection */}
           <div className="space-y-2 relative">
             <label className="block text-gray-500 font-bold uppercase tracking-wider text-[10px]">ตู้ Server Rack 19 นิ้ว</label>
             <select
               value={data.rackType || "Rack 19 นิ้ว 6U"}
               onChange={(e) => onChange({ ...data, rackType: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900 cursor-pointer"
             >
               <option value="Rack 19 นิ้ว 6U">ตู้ Rack 19 นิ้ว 6U</option>
               <option value="Rack 19 นิ้ว 16U">ตู้ Rack 19 นิ้ว 16U</option>
               <option value="Rack 19 นิ้ว 42U">ตู้ Rack 19 นิ้ว 42U</option>
-            </select></div>
+            </select>
+          </div>
 
           {/* Monitor selection */}
           <div className="space-y-2 relative">
@@ -152,11 +153,12 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
             <select
               value={data.monitorType || "จอ 27 นิ้ว"}
               onChange={(e) => onChange({ ...data, monitorType: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900 cursor-pointer"
             >
               <option value="จอ 27 นิ้ว">จอ IPS ขนาด 27 นิ้ว</option>
               <option value="TV 55 นิ้ว">Smart TV ขนาด 55 นิ้ว</option>
-            </select></div>
+            </select>
+          </div>
 
           {/* UPS selection */}
           <div className="space-y-2 relative">
@@ -164,11 +166,32 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
             <select
               value={data.upsType || "UPS 1Kva"}
               onChange={(e) => onChange({ ...data, upsType: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900 cursor-pointer"
             >
               <option value="UPS 1Kva">UPS ขนาด 1000VA (1Kva)</option>
               <option value="UPS 2Kva">UPS ขนาด 2000VA (2Kva)</option>
-            </select></div>
+            </select>
+          </div>
+
+          {/* Router selection checkbox */}
+          <div className="space-y-2 relative flex flex-col justify-end">
+            <label className="block text-gray-500 font-bold uppercase tracking-wider text-[10px]">อุปกรณ์ความปลอดภัย</label>
+            <label className={`flex items-center gap-2.5 px-3 py-2 border rounded-lg font-medium cursor-pointer transition-all grow select-none ${
+              data.hasRouter !== false 
+                ? "border-gray-950 bg-gray-50/50" 
+                : "border-gray-200 bg-white hover:bg-gray-50"
+            }`}>
+              <input
+                type="checkbox"
+                checked={data.hasRouter !== false}
+                onChange={(e) => onChange({ ...data, hasRouter: e.target.checked })}
+                className="w-3.5 h-3.5 text-gray-900 border-gray-300 rounded focus:ring-gray-900 cursor-pointer"
+              />
+              <span className={`text-gray-700 leading-tight ${data.hasRouter !== false ? "font-semibold text-gray-900" : ""}`}>
+                Router VPN/Firewall
+              </span>
+            </label>
+          </div>
         </div>
       </div>
 

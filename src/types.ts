@@ -56,6 +56,7 @@ export interface TechRequirements {
   rackType?: string; // "Rack 19 นิ้ว 6U" | "Rack 19 นิ้ว 16U" | "Rack 19 นิ้ว 42U"
   monitorType?: string; // "จอ 27 นิ้ว" | "TV 55 นิ้ว"
   upsType?: string; // "UPS 1Kva" | "UPS 2Kva"
+  hasRouter?: boolean;
 }
 
 export interface PricingItem {

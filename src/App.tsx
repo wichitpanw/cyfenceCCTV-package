@@ -59,6 +59,7 @@ const DEFAULT_REQUIREMENTS: TechRequirements = {
   rackType: "Rack 19 นิ้ว 6U",
   monitorType: "จอ 27 นิ้ว",
   upsType: "UPS 1Kva",
+  hasRouter: true,
 };
 
 const DEFAULT_MASTER_COSTS: MasterCostDb = {
@@ -422,14 +423,16 @@ function generatePricingItems(
   });
 
   // --- 10. ต้นทาง: Router VPN/Firewall ---
-  items.push({
-    id: "bom-router-hw",
-    name: "Router VPN/Firewall",
-    quantity: 1,
-    unit: "เครื่อง",
-    unitPrice: costs.routerHw || 3900,
-    category: "hardware"
-  });
+  if (requirements.hasRouter !== false) {
+    items.push({
+      id: "bom-router-hw",
+      name: "Router VPN/Firewall",
+      quantity: 1,
+      unit: "เครื่อง",
+      unitPrice: costs.routerHw || 3900,
+      category: "hardware"
+    });
+  }
 
   // ==================== รายการค่าติดตั้ง (ปลายทาง) ====================
   // 1. ค่าติดตั้ง กล้อง CCTV (ค่าเดินสาย LAN 25 เมตร/ตัว + ติดตั้งกล้อง)
@@ -564,14 +567,16 @@ function generatePricingItems(
   });
 
   // 4. ค่าติดตั้ง Router
-  items.push({
-    id: "bom-labor-router",
-    name: "ค่าติดตั้ง Router ต้นทาง (ค่า Config ระบบให้สามารถทำงานได้)",
-    quantity: 1,
-    unit: "เครื่อง",
-    unitPrice: costs.laborRouter,
-    category: "labor"
-  });
+  if (requirements.hasRouter !== false) {
+    items.push({
+      id: "bom-labor-router",
+      name: "ค่าติดตั้ง Router ต้นทาง (ค่า Config ระบบให้สามารถทำงานได้)",
+      quantity: 1,
+      unit: "เครื่อง",
+      unitPrice: costs.laborRouter,
+      category: "labor"
+    });
+  }
 
   // 5. ค่าเดินสายไฟฟ้าต้นทาง
   items.push({
@@ -1257,6 +1262,7 @@ export default function App() {
         nvrChannels: 8,
         storagePackage: "HDD 8TB (มาตรฐานราชการ 8CH)",
         otherRequirements: "ต้องการระบบเช่า 3 ปี รวมบริการบำรุงรักษาหลังการขายแบบ On-site Service 24 ชั่วโมง",
+        hasRouter: true,
       };
 
       setCustomerInfo(info);
