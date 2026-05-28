@@ -626,6 +626,8 @@ export default function App() {
   const [pricingItems, setPricingItems] = useState<PricingItem[]>([]);
   const [discount, setDiscount] = useState<number>(0);
   const [vatRate, setVatRate] = useState<number>(7);
+  const [activeProjectStatus, setActiveProjectStatus] = useState<"draft" | "completed" | "presented" | "delivered">("presented");
+  const [activeProjectDeliveryDate, setActiveProjectDeliveryDate] = useState<string | undefined>(undefined);
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState<boolean>(false);
 
   // Confirmation Modal state
@@ -999,6 +1001,7 @@ export default function App() {
                 surveyorDepartment: row.surveyor_department || "",
                 surveyDate: row.survey_date || "",
                 province: row.province || "",
+                deliveryDate: row.delivery_date || undefined,
               },
               requirements: {
                 cameraCount: row.camera_count || 4,
@@ -1017,7 +1020,8 @@ export default function App() {
               hasSurveyReport: row.has_survey_report ?? true,
               discount: parseFloat(row.discount) || 0,
               vatRate: parseFloat(row.vat_rate) || 7,
-              status: row.status || "draft",
+              status: row.status || "presented",
+              deliveryDate: row.delivery_date || undefined,
               createdAt: row.created_at || new Date().toISOString(),
               createdBy: row.created_by || null,
               createdByEmail: row.created_by ? profileMap.get(row.created_by) : undefined,
@@ -1260,6 +1264,8 @@ export default function App() {
     setPricingItems(proj.pricingItems);
     setDiscount(proj.discount);
     setVatRate(proj.vatRate);
+    setActiveProjectStatus(proj.status || "presented");
+    setActiveProjectDeliveryDate(proj.deliveryDate || proj.customerInfo.deliveryDate);
     setStep(5); // switch to the summary/pricing screen so the user can view results immediately
     setIsViewingDashboard(false);
   };
@@ -1295,6 +1301,8 @@ export default function App() {
     setPricingItems([]);
     setDiscount(0);
     setVatRate(7);
+    setActiveProjectStatus("presented");
+    setActiveProjectDeliveryDate(undefined);
     setStep(1);
     setIsViewingDashboard(false);
   };
@@ -1304,7 +1312,10 @@ export default function App() {
     const freshId = activeProjectId || `survey-id-${Date.now()}`;
     const formattedProject: ProjectSurvey = {
       id: freshId,
-      customerInfo,
+      customerInfo: {
+        ...customerInfo,
+        deliveryDate: activeProjectDeliveryDate,
+      },
       requirements,
       hasSurveyReport,
       cameraPoints,
@@ -1312,7 +1323,8 @@ export default function App() {
       discount,
       vatRate,
       createdAt: new Date().toISOString(),
-      status: "draft",
+      status: activeProjectStatus || "presented",
+      deliveryDate: activeProjectDeliveryDate,
       createdBy: currentUser?.id || null
     };
 
@@ -1359,7 +1371,8 @@ export default function App() {
           has_survey_report: hasSurveyReport,
           discount,
           vat_rate: vatRate,
-          status: "draft",
+          status: activeProjectStatus || "presented",
+          delivery_date: activeProjectDeliveryDate || null,
           created_by: currentUser?.id || null
         };
 
@@ -1745,6 +1758,54 @@ export default function App() {
             currentUserId={currentUser?.id || null}
             onToggleDashboard={() => setIsViewingDashboard(!isViewingDashboard)}
             isViewingDashboard={isViewingDashboard}
+            onUpdateProjectStatus={async (id, newStatus, deliveryDate) => {
+              // Update state locally
+              const updated = projectsList.map(p => {
+                if (p.id === id) {
+                  const updatedProj = {
+                    ...p,
+                    status: newStatus,
+                    deliveryDate: deliveryDate,
+                    customerInfo: {
+                      ...p.customerInfo,
+                      deliveryDate: deliveryDate
+                    }
+                  };
+                  // If active project is current one, sync state
+                  if (activeProjectId === id) {
+                    setActiveProjectStatus(newStatus);
+                    setActiveProjectDeliveryDate(deliveryDate);
+                    setCustomerInfo(prev => ({
+                      ...prev,
+                      deliveryDate: deliveryDate
+                    }));
+                  }
+                  return updatedProj;
+                }
+                return p;
+              });
+              setProjectsList(updated);
+
+              // Update in database if configured
+              if (isSupabaseConfigured) {
+                try {
+                  const { error } = await supabase
+                    .from("projects")
+                    .update({ 
+                      status: newStatus, 
+                      delivery_date: deliveryDate || null 
+                    })
+                    .eq("id", id);
+                  if (error) {
+                    console.error("Failed to update status in Supabase:", error.message);
+                  }
+                } catch (e) {
+                  console.error("Error updating project status in database:", e);
+                }
+              }
+              
+              showAlert("📦 อัปเดตสถานะสำเร็จ", "เปลี่ยนสถานะโครงการเป็น 'ส่งมอบงานแล้ว' เรียบร้อยค่ะ! ✨");
+            }}
           />
         </section>
 

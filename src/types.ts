@@ -40,6 +40,7 @@ export interface CustomerInfo {
   surveyorDepartment?: string; // Surveyor department/unit
   surveyDate: string;
   province?: string; // Selected province for filtering
+  deliveryDate?: string; // Date when the project was delivered
 }
 
 export interface TechRequirements {
@@ -85,7 +86,8 @@ export interface ProjectSurvey {
   discount: number;
   vatRate: number; // normally 7
   createdAt: string;
-  status: "draft" | "completed";
+  status: "draft" | "completed" | "presented" | "delivered";
+  deliveryDate?: string; // ISO date string of delivery
   createdBy?: string; // UUID of the user who created it
   createdByEmail?: string; // Email of the user who created it (for admin/superadmin review)
 }

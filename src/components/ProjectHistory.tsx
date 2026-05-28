@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle } from "lucide-react";
+import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle } from "lucide-react";
 import { ProjectSurvey, CameraPoint } from "../types";
 
 // ฟังก์ชันคำนวณค่าใช้จ่ายรายเดือนที่ลูกค้าต้องจ่าย (เหมือนกับ Step6Pricing)
@@ -62,6 +62,7 @@ interface ProjectHistoryProps {
   currentUserId?: string | null;
   onToggleDashboard?: () => void;
   isViewingDashboard?: boolean;
+  onUpdateProjectStatus?: (id: string, status: "draft" | "completed" | "presented" | "delivered", deliveryDate?: string) => void;
 }
 
 export default function ProjectHistory({
@@ -76,6 +77,7 @@ export default function ProjectHistory({
   currentUserId = null,
   onToggleDashboard,
   isViewingDashboard = false,
+  onUpdateProjectStatus,
 }: ProjectHistoryProps) {
   const [search, setSearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("all");
@@ -231,20 +233,38 @@ export default function ProjectHistory({
                     }`}>
                       {proj.customerInfo.projectName || "โครงการเว้นว่าง"}
                     </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteProject(proj.id);
-                      }}
-                      className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
-                        isActive 
-                          ? "text-gray-400 hover:bg-white/10 hover:text-red-400" 
-                          : "text-gray-400 hover:bg-red-50 hover:text-red-600"
-                      }`}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {/* ปุ่มเปลี่ยนสถานะเป็นส่งมอบงาน */}
+                      {onUpdateProjectStatus && proj.status !== "delivered" && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const todayStr = new Date().toISOString().split("T")[0];
+                            onUpdateProjectStatus(proj.id, "delivered", todayStr);
+                          }}
+                          className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center`}
+                          title="เปลี่ยนสถานะเป็น 'ส่งมอบงานแล้ว'"
+                        >
+                          <CheckCircle className={`w-3.5 h-3.5 ${isActive ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-600 hover:text-emerald-500"}`} />
+                        </button>
+                      )}
+                      
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteProject(proj.id);
+                        }}
+                        className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
+                          isActive 
+                            ? "text-gray-400 hover:bg-white/10 hover:text-red-400" 
+                            : "text-gray-400 hover:bg-red-50 hover:text-red-600"
+                        }`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
                   <strong className={`block text-xs font-semibold mt-1 whitespace-normal break-words leading-snug ${
@@ -252,6 +272,19 @@ export default function ProjectHistory({
                   }`}>
                     {proj.customerInfo.customerName || "ไม่ระบุชื่อบริษัท"}
                   </strong>
+
+                  {/* ป้ายสถานะโครงการ */}
+                  <div className="mt-1.5 flex flex-wrap gap-1 items-center">
+                    {proj.status === "delivered" ? (
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500 text-white flex items-center gap-1">
+                        📦 ส่งมอบงานแล้ว ({proj.deliveryDate || proj.customerInfo.deliveryDate || "ไม่ระบุวันที่"})
+                      </span>
+                    ) : (
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${isActive ? "bg-white/10 text-gray-300" : "bg-gray-100 text-gray-600 border border-gray-200"}`}>
+                        📢 สถานะ: นำเสนอ
+                      </span>
+                    )}
+                  </div>
 
                   {/* ป้ายผู้สร้างใบงานสำรวจ (แสดงเฉพาะ Admin/Superadmin เสมอ แม้ไม่มีผู้สำรวจ) */}
                   {canSeeAllProjects && proj.createdByEmail && (
