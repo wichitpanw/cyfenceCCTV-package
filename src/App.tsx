@@ -414,7 +414,7 @@ export default function App() {
               setCurrentUser(null);
               setUserProfile(null);
               setAuthLoading(false);
-              alert("🔒 เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 2 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ");
+              alert("🔒 เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 6 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ");
               return;
             }
           }
@@ -431,7 +431,7 @@ export default function App() {
         if (session && session.user) {
           setCurrentUser(session.user);
           await loadUserProfile(session.user.id, session.user.email || "");
-          const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
+          const expiryTime = Date.now() + 6 * 60 * 60 * 1000;
           localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
         } else {
           setCurrentUser(null);
@@ -451,7 +451,7 @@ export default function App() {
         setCurrentUser(session.user);
         await loadUserProfile(session.user.id, session.user.email || "");
         if (event === "SIGNED_IN") {
-          const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
+          const expiryTime = Date.now() + 6 * 60 * 60 * 1000;
           localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
         }
       } else {
@@ -529,7 +529,7 @@ export default function App() {
       const now = Date.now();
       // Throttle: อัปเดตลง localStorage อย่างมากที่สุดทุกๆ 10 วินาที เพื่อไม่ให้เบราว์เซอร์ทำงานหนักเกินไป
       if (now - lastUpdated > 10000) {
-        const newExpiry = now + 2 * 60 * 60 * 1000;
+        const newExpiry = now + 6 * 60 * 60 * 1000;
         localStorage.setItem("CCTV_SESSION_EXPIRY", newExpiry.toString());
         lastUpdated = now;
       }
@@ -554,7 +554,7 @@ export default function App() {
         const expiryTime = parseInt(expiry, 10);
         if (!isNaN(expiryTime) && Date.now() > expiryTime) {
           clearInterval(interval);
-          alert("🔒 เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 2 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ");
+          alert("🔒 เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 6 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ");
           handleLogout();
         }
       }

@@ -61,7 +61,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         }
       };
 
-      const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
+      const expiryTime = Date.now() + 6 * 60 * 60 * 1000;
 
       localStorage.setItem("CCTV_USER_SESSION", JSON.stringify(sessionPayload));
       localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
