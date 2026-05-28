@@ -334,8 +334,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-1 border-b border-gray-100">
               <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-gray-700" />
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-sans">📍 สัดส่วนรายจังหวัด</h3>
+                <MapPin className="w-4 h-4 text-gray-400" />
+                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block font-sans">📍 จำนวนงานต่อจังหวัด</h3>
               </div>
               <WindowSwitcher value={provinceFilter} onChange={setProvinceFilter} />
             </div>
@@ -345,37 +345,21 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
                 <thead className="sticky top-0 bg-white z-10">
                   <tr className="border-b border-gray-200 text-gray-400 font-sans text-[9px] uppercase tracking-wider bg-white">
                     <th className="py-2.5 text-left font-semibold whitespace-nowrap">จังหวัด</th>
-                    <th className="py-2.5 text-center font-semibold whitespace-nowrap">จำนวนโครงการ</th>
-                    <th className="py-2.5 text-right font-semibold whitespace-nowrap">ยอดเช่าต่อเดือนรวม</th>
-                    <th className="py-2.5 text-right w-36 font-semibold whitespace-nowrap">สัดส่วนเปอร์เซ็นต์</th>
+                    <th className="py-2.5 text-right font-semibold whitespace-nowrap pr-4">จำนวนงาน</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 font-medium">
                   {sortedProvinces.map((prov, index) => {
-                    const totalProjs = provinceList.length;
-                    const percent = totalProjs > 0 ? (prov.count / totalProjs) * 100 : 0;
                     return (
                       <tr key={index} className="hover:bg-gray-50/50 transition-colors">
                         <td className="py-3 font-semibold text-gray-900">{prov.name}</td>
-                        <td className="py-3 text-center font-mono font-bold text-gray-800">{prov.count}</td>
-                        <td className="py-3 text-right font-mono text-gray-800">฿{prov.value.toLocaleString("th-TH", { maximumFractionDigits: 0 })}/เดือน</td>
-                        <td className="py-3 text-right">
-                          <div className="flex items-center gap-2">
-                            <div className="grow bg-gray-100 rounded-full h-2 overflow-hidden border border-gray-200">
-                              <div 
-                                className="bg-gray-900 h-full rounded-full transition-all"
-                                style={{ width: `${percent}%` }}
-                              />
-                            </div>
-                            <span className="text-[10px] font-bold font-mono text-gray-500 w-8 shrink-0">{percent.toFixed(0)}%</span>
-                          </div>
-                        </td>
+                        <td className="py-3 text-right font-mono font-bold text-gray-800 pr-4">{prov.count}</td>
                       </tr>
                     );
                   })}
                   {sortedProvinces.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-6 text-center text-gray-400">ไม่มีข้อมูลโครงการติดตั้งในระบบคลาวด์สำหรับสถานะนี้</td>
+                      <td colSpan={2} className="py-6 text-center text-gray-400">ไม่มีข้อมูลโครงการติดตั้งในระบบคลาวด์สำหรับสถานะนี้</td>
                     </tr>
                   )}
                 </tbody>
@@ -390,8 +374,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between pb-1 border-b border-gray-100">
                 <div className="flex items-center gap-1.5">
-                  <Boxes className="w-4 h-4 text-gray-700" />
-                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-sans">🏷️ แบรนด์ยอดนิยม</h3>
+                  <Boxes className="w-4 h-4 text-gray-400" />
+                  <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block font-sans">🏷️ แบรนด์ยอดนิยม</h3>
                 </div>
                 <WindowSwitcher value={brandFilter} onChange={setBrandFilter} />
               </div>
@@ -426,8 +410,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between pb-1 border-b border-gray-100">
                 <div className="flex items-center gap-1.5">
-                  <Camera className="w-4 h-4 text-gray-700" />
-                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-sans">📹 เฉลี่ยต่อโครงการ</h3>
+                  <Camera className="w-4 h-4 text-gray-400" />
+                  <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block font-sans">📹 เฉลี่ยต่อโครงการ</h3>
                 </div>
                 <WindowSwitcher value={avgCamFilter} onChange={setAvgCamFilter} />
               </div>
@@ -454,8 +438,8 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4 min-h-[460px]">
             <div className="flex items-center justify-between pb-1 border-b border-gray-100">
               <div className="flex items-center gap-1.5">
-                <BarChart3 className="w-4 h-4 text-gray-700" />
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider font-sans">📅 โครงการล่าสุด</h3>
+                <BarChart3 className="w-4 h-4 text-gray-400" />
+                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block font-sans">📅 โครงการล่าสุด</h3>
               </div>
               <WindowSwitcher value={recentFilter} onChange={setRecentFilter} />
             </div>
