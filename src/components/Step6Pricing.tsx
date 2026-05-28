@@ -36,6 +36,7 @@ interface Step6Props {
   cameraPoints?: any[];
   isAdminVerified?: boolean;
   onVerifyAdmin?: () => void;
+  isEditMode?: boolean;
 }
 
 export default function Step6Pricing({
@@ -54,7 +55,8 @@ export default function Step6Pricing({
   onGoToStep1,
   cameraPoints,
   isAdminVerified = false,
-  onVerifyAdmin
+  onVerifyAdmin,
+  isEditMode = true
 }: Step6Props) {
   const [successSaved, setSuccessSaved] = useState(false);
   const [isVatEnabled, setIsVatEnabled] = useState(vatRate > 0);
@@ -902,7 +904,7 @@ export default function Step6Pricing({
           className="inline-flex items-center gap-1 px-4 py-2 bg-gray-50 hover:bg-zinc-200 text-gray-900 text-xs font-medium rounded-xl border border-gray-200 transition-all cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          ย้อนกลับปรับสเปค
+          {isEditMode ? "ย้อนกลับปรับสเปค" : "ย้อนกลับดูรายการวัสดุ (BOM)"}
         </button>
 
         <div className="hidden sm:block p-2 px-4 bg-white border border-gray-200 rounded-xl text-[11px] text-gray-400">

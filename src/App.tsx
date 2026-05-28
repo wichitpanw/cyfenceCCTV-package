@@ -1572,7 +1572,11 @@ export default function App() {
   };
 
   const handlePrevStep = () => {
-    setStep((prev) => Math.max(1, prev - 1));
+    if (!isEditMode) {
+      setStep((prev) => Math.max(4, prev - 1));
+    } else {
+      setStep((prev) => Math.max(1, prev - 1));
+    }
   };
 
   // Human steps label
@@ -1990,6 +1994,7 @@ export default function App() {
                         pricingItems={pricingItems}
                         onNext={handleNextStep}
                         onPrev={handlePrevStep}
+                        isEditMode={isEditMode}
                       />
                     )}
 
@@ -2016,6 +2021,7 @@ export default function App() {
                           setAdminPinPurpose("pricing_admin");
                           setIsAdminPinModalOpen(true);
                         }}
+                        isEditMode={isEditMode}
                       />
                     )}
                   </motion.div>
