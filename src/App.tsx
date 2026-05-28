@@ -745,15 +745,16 @@ export default function App() {
         .eq("id", userId)
         .single();
 
+      let activeProf: UserProfile;
       if (data) {
-        setUserProfile({
+        activeProf = {
           id: data.id,
           role: data.role || "user",
           displayName: data.display_name || "ผู้ใช้",
           email: email,
           province: data.province || "",
           updatedAt: data.updated_at
-        });
+        };
       } else {
         // Fallback profile if row is not created yet
         const defaultProf: UserProfile = {
@@ -764,7 +765,7 @@ export default function App() {
           province: "",
           updatedAt: new Date().toISOString()
         };
-        setUserProfile(defaultProf);
+        activeProf = defaultProf;
         
         // Auto-create profile row if missing
         await supabase.from("profiles").upsert({
@@ -774,6 +775,20 @@ export default function App() {
           province: "",
           updated_at: new Date().toISOString()
         });
+      }
+
+      setUserProfile(activeProf);
+
+      // Persist profile in session to avoid loss during reload
+      const sessionStr = localStorage.getItem("CCTV_USER_SESSION");
+      if (sessionStr) {
+        try {
+          const parsed = JSON.parse(sessionStr);
+          parsed.profile = activeProf;
+          localStorage.setItem("CCTV_USER_SESSION", JSON.stringify(parsed));
+        } catch (e) {
+          // ignore
+        }
       }
     } catch (err) {
       console.error("Load user profile failed:", err);
@@ -1749,19 +1764,35 @@ export default function App() {
           <ProjectHistory
             projects={projectsList}
             onLoadProject={(id) => {
-              const proj = projectsList.find(p => p.id === id);
-              if (proj) {
-                loadProject(proj);
-                setIsEditMode(false); // ดูสรุปโครงการเท่านั้น ล็อคไม่ให้แก้ไข
-                setStep(4); // ดูสรุปโครงการ (หน้ารายการอุปกรณ์ BOM) แทนการเข้าไปแก้ไขโดยตรง
+              if (activeProjectId === id) {
+                // หากคลิกที่ชื่อโครงการที่กำลังเปิดอยู่อีกครั้ง ให้ปิดหน้านี้และสลับกลับมาหน้า "เปิดไฟล์งานใหม่" (Step 1)
+                handleNewProject();
+              } else {
+                const proj = projectsList.find(p => p.id === id);
+                if (proj) {
+                  loadProject(proj);
+                  setIsEditMode(false); // ดูสรุปโครงการเท่านั้น ล็อคไม่ให้แก้ไข
+                  setStep(4); // ดูสรุปโครงการ (หน้ารายการอุปกรณ์ BOM) แทนการเข้าไปแก้ไขโดยตรง
+                }
               }
             }}
             onEditProject={(id) => {
               const proj = projectsList.find(p => p.id === id);
               if (proj) {
-                loadProject(proj);
-                setIsEditMode(true); // ปลดล็อคให้แก้ไขโครงการได้ทั้งหมด!
-                setStep(5); // เข้าหน้าแก้ไขราคาประเมินและสเปกส่วนกลาง
+                const projName = proj.customerInfo.projectName || "ไม่ระบุชื่อโครงการ";
+                showConfirm(
+                  "✏️ ยืนยันการแก้ไขโครงการ",
+                  `คุณบีมต้องการปลดล็อคเพื่อแก้ไขรายละเอียดและสเปกของโครงการ "${projName}" ใช่หรือไม่?`,
+                  () => {
+                    loadProject(proj);
+                    setIsEditMode(true); // ปลดล็อคให้แก้ไขโครงการได้ทั้งหมด!
+                    setStep(5); // เข้าหน้าแก้ไขราคาประเมินและสเปกส่วนกลาง
+                  },
+                  {
+                    confirmText: "ยืนยันการแก้ไข",
+                    cancelText: "ยกเลิก"
+                  }
+                );
               }
             }}
             onDeleteProject={handleDeleteProject}
