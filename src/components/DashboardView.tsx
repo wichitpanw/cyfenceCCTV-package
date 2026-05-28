@@ -121,31 +121,23 @@ export default function DashboardView({ projects, onBack, onLoadProject }: Dashb
     brandCounts[brand] = (brandCounts[brand] || 0) + 1;
   });
 
-  // 4. Camera Type distribution across all projects
+  // 4. Camera Type distribution across all projects (Only Bullet is active/sold currently)
   const cameraTypeCounts: Record<string, number> = {
-    "Bullet (กล้องทรงกระบอก)": 0,
-    "Dome (กล้องครอบโดม)": 0,
-    "PTZ (กล้องหมุนรอบตัว)": 0,
-    "Fisheye (กล้องตาปลา)": 0
+    "Bullet (กล้องทรงกระบอก)": 0
   };
   projects.forEach(proj => {
     const pointsList = proj.cameraPoints || [];
-    pointsList.forEach(pt => {
-      let qty = 1;
-      if (pt.selectedSet === "Set 2") qty = 2;
-      else if (pt.selectedSet === "Set 3") qty = 3;
-      else if (pt.selectedSet === "Set 4") qty = 4;
-
-      if (pt.type === "Dome") {
-        cameraTypeCounts["Dome (กล้องครอบโดม)"] += qty;
-      } else if (pt.type === "PTZ" || pt.type === "Speed Dome") {
-        cameraTypeCounts["PTZ (กล้องหมุนรอบตัว)"] += qty;
-      } else if (pt.type === "Fisheye") {
-        cameraTypeCounts["Fisheye (กล้องตาปลา)"] += qty;
-      } else {
+    if (pointsList.length > 0) {
+      pointsList.forEach(pt => {
+        let qty = 1;
+        if (pt.selectedSet === "Set 2") qty = 2;
+        else if (pt.selectedSet === "Set 3") qty = 3;
+        else if (pt.selectedSet === "Set 4") qty = 4;
         cameraTypeCounts["Bullet (กล้องทรงกระบอก)"] += qty;
-      }
-    });
+      });
+    } else {
+      cameraTypeCounts["Bullet (กล้องทรงกระบอก)"] += proj.requirements?.cameraCount || 0;
+    }
   });
 
   return (
