@@ -141,9 +141,9 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
               onChange={(e) => onChange({ ...data, rackType: e.target.value })}
               className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900"
             >
-              <option value="Rack 19 นิ้ว 6U">ตู้ Rack 19 นิ้ว 6U (ขนาดมาตรฐานเล็ก)</option>
-              <option value="Rack 19 นิ้ว 16U">ตู้ Rack 19 นิ้ว 16U (ขนาดกลางออฟฟิศ)</option>
-              <option value="Rack 19 นิ้ว 42U">ตู้ Rack 19 นิ้ว 42U (ขนาดตู้ใหญ่โยธา)</option>
+              <option value="Rack 19 นิ้ว 6U">ตู้ Rack 19 นิ้ว 6U</option>
+              <option value="Rack 19 นิ้ว 16U">ตู้ Rack 19 นิ้ว 16U</option>
+              <option value="Rack 19 นิ้ว 42U">ตู้ Rack 19 นิ้ว 42U</option>
             </select></div>
 
           {/* Monitor selection */}
@@ -154,8 +154,8 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
               onChange={(e) => onChange({ ...data, monitorType: e.target.value })}
               className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900"
             >
-              <option value="จอ 27 นิ้ว">จอ IPS ขนาด 27 นิ้ว (ความคมชัดสูง)</option>
-              <option value="TV 55 นิ้ว">Smart TV ขนาด 55 นิ้ว (สำหรับติดผนังห้องควบคุม)</option>
+              <option value="จอ 27 นิ้ว">จอ IPS ขนาด 27 นิ้ว</option>
+              <option value="TV 55 นิ้ว">Smart TV ขนาด 55 นิ้ว</option>
             </select></div>
 
           {/* UPS selection */}
@@ -166,8 +166,8 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
               onChange={(e) => onChange({ ...data, upsType: e.target.value })}
               className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900"
             >
-              <option value="UPS 1Kva">UPS ขนาด 1000VA (1Kva) (สเปกมาตรฐาน)</option>
-              <option value="UPS 2Kva">UPS ขนาด 2000VA (2Kva) (สำรองไฟระยะเวลานานพิเศษ)</option>
+              <option value="UPS 1Kva">UPS ขนาด 1000VA (1Kva)</option>
+              <option value="UPS 2Kva">UPS ขนาด 2000VA (2Kva)</option>
             </select></div>
         </div>
       </div>
