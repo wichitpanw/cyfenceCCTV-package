@@ -136,6 +136,10 @@ export interface MasterCostDb {
   laborRouter: number; // ค่าติดตั้ง Router (Config ให้ระบบทำงานได้)
   laborPowerVct: number; // ค่าเดินสายไฟฟ้าต้นทาง (สาย vct 30 เมตร, Breaker 16 A)
 
+  // --- ค่าบริการบำรุงรักษารายปี (MA) สำหรับปีที่ 2 และ 3 ---
+  maYear2: number; // ค่าบริการ MA ปีที่ 2 (เช่น คิดเป็น % ของมูลค่า Hardware หรือราคาคงที่ต่อชุด)
+  maYear3: number; // ค่าบริการ MA ปีที่ 3 (เช่น คิดเป็น % ของมูลค่า Hardware หรือราคาคงที่ต่อชุด)
+
   lastUpdated: string;
 }
 

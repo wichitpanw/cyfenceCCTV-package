@@ -106,7 +106,11 @@ const DEFAULT_MASTER_COSTS: MasterCostDb = {
   laborRouter: 1200, // ค่าติดตั้ง Router (Config ให้ระบบทำงานได้)
   laborPowerVct: 800, // ค่าเดินสายไฟฟ้าต้นทาง (สาย vct 30 เมตร, Breaker 16 A)
 
-  lastUpdated: new Date("2026-05-28T19:00:00+07:00").toISOString(),
+  // --- ค่าบริการบำรุงรักษารายปี (MA) สำหรับปีที่ 2 และ 3 ---
+  maYear2: 3500, // สมมติราคาเริ่มต้นสำหรับค่าบริการ MA ปีที่ 2 ต่อปี
+  maYear3: 3500, // สมมติราคาเริ่มต้นสำหรับค่าบริการ MA ปีที่ 3 ต่อปี
+
+  lastUpdated: new Date("2026-05-28T19:15:00+07:00").toISOString(),
 };
 
 // Help helper for autoBOM items
@@ -563,6 +567,26 @@ function generatePricingItems(
     quantity: 1,
     unit: "ชุด",
     unitPrice: costs.laborPowerVct,
+    category: "labor"
+  });
+
+  // --- 10. ค่าบริการบำรุงรักษารายปี (MA) สำหรับปีที่ 2 และ 3 ---
+  // เพิ่มรายการ MA ปีที่ 2 และ 3 ในใบประเมิน (คิดเป็น 1 งานต่อปี)
+  items.push({
+    id: "bom-ma-year-2",
+    name: "ค่าบริการบำรุงรักษารายปี MA ปีที่ 2 (บำรุงรักษาเชิงป้องกัน ตรวจเช็คระบบกล้องและห้องควบคุม)",
+    quantity: 1,
+    unit: "ปี",
+    unitPrice: costs.maYear2,
+    category: "labor"
+  });
+
+  items.push({
+    id: "bom-ma-year-3",
+    name: "ค่าบริการบำรุงรักษารายปี MA ปีที่ 3 (บำรุงรักษาเชิงป้องกัน ตรวจเช็คระบบกล้องและห้องควบคุม)",
+    quantity: 1,
+    unit: "ปี",
+    unitPrice: costs.maYear3,
     category: "labor"
   });
 
@@ -2289,6 +2313,27 @@ export default function App() {
                       <label className="block text-xs font-medium text-gray-600 mb-1">ค่าเดินสายไฟต้นทาง VCT 30ม. (บาท/ชุด)</label>
                       <input type="number" min={0} value={tempCosts.laborPowerVct}
                         onChange={(e) => setTempCosts(p => ({ ...p, laborPowerVct: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 6: Annual Maintenance Costs (MA) */}
+                <div className="space-y-3.5 pb-4">
+                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200 pb-2 flex items-center gap-1.5">
+                    <span>🛡️</span> ค่าบริการบำรุงรักษารายปี (Annual Maintenance - MA)
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">ค่าบริการ MA ปีที่ 2 (บาทต่อปี)</label>
+                      <input type="number" min={0} value={tempCosts.maYear2}
+                        onChange={(e) => setTempCosts(p => ({ ...p, maYear2: parseFloat(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">ค่าบริการ MA ปีที่ 3 (บาทต่อปี)</label>
+                      <input type="number" min={0} value={tempCosts.maYear3}
+                        onChange={(e) => setTempCosts(p => ({ ...p, maYear3: parseFloat(e.target.value) || 0 }))}
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900/10 focus:bg-white rounded-lg outline-none text-sm font-mono font-semibold text-gray-800 transition-all" />
                     </div>
                   </div>
