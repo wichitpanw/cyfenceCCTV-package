@@ -1373,78 +1373,111 @@ export default function App() {
           return;
         }
 
-        // 2. Replace camera_points: delete old, insert new
+        // 2. & 3. Replace camera_points and pricing_items concurrently to reduce round-trip time and prevent statement timeout
         let hasDetailError = false;
         let detailErrorMessage = "";
 
-        await supabase.from("camera_points").delete().eq("project_id", freshId);
-        if (cameraPoints.length > 0) {
-          const camRows = cameraPoints.map((c, idx) => ({
-            id: `${freshId}-${c.id}`,
-            project_id: freshId,
-            point_index: idx,
-            name: c.name,
-            type: c.type,
-            pole_type: c.poleType,
-            has_support_arm: c.hasSupportArm,
-            notes: c.notes,
-            photo_url_cache: c.photoUrl,
-            x: c.x,
-            y: c.y,
-            focal_angle: c.focalAngle,
-            rotation: c.rotation,
-            lat: c.lat ?? null,
-            lng: c.lng ?? null,
-            lan_cable_length: c.lanCableLength ?? 25,
-            has_outdoor_cabinet: c.hasOutdoorCabinet || false,
-            has_ground_rod: c.hasGroundRod || false,
-            has_power_meter: c.hasPowerMeter || false,
-            has_sd_card: c.hasSdCard || false,
-            has_cabinet_ups: c.hasCabinetUps || false,
-            has_poe_switch: c.hasPoeSwitch || false,
-            selected_set: c.selectedSet ?? null,
-          }));
-          const { error: camError } = await supabase.from("camera_points").insert(camRows);
-          if (camError) {
-            console.error("Camera points insert error:", camError.message);
-            hasDetailError = true;
-            detailErrorMessage += "\n- ไม่สามารถบันทึกจุดติดตั้งกล้องได้: " + camError.message;
+        const cameraPointsPromise = (async () => {
+          // Delete old camera points
+          const { error: delError } = await supabase.from("camera_points").delete().eq("project_id", freshId);
+          if (delError) {
+            console.error("Camera points delete error:", delError.message);
           }
-        }
+          
+          // Insert new camera points
+          if (cameraPoints.length > 0) {
+            const camRows = cameraPoints.map((c, idx) => ({
+              id: `${freshId}-${c.id}`,
+              project_id: freshId,
+              point_index: idx,
+              name: c.name,
+              type: c.type,
+              pole_type: c.poleType,
+              has_support_arm: c.hasSupportArm,
+              notes: c.notes,
+              photo_url_cache: c.photoUrl,
+              x: c.x,
+              y: c.y,
+              focal_angle: c.focalAngle,
+              rotation: c.rotation,
+              lat: c.lat ?? null,
+              lng: c.lng ?? null,
+              lan_cable_length: c.lanCableLength ?? 25,
+              has_outdoor_cabinet: c.hasOutdoorCabinet || false,
+              has_ground_rod: c.hasGroundRod || false,
+              has_power_meter: c.hasPowerMeter || false,
+              has_sd_card: c.hasSdCard || false,
+              has_cabinet_ups: c.hasCabinetUps || false,
+              has_poe_switch: c.hasPoeSwitch || false,
+              selected_set: c.selectedSet ?? null,
+            }));
+            const { error: camError } = await supabase.from("camera_points").insert(camRows);
+            if (camError) {
+              console.error("Camera points insert error:", camError.message);
+              hasDetailError = true;
+              detailErrorMessage += "\n- ไม่สามารถบันทึกจุดติดตั้งกล้องได้: " + camError.message;
+            }
+          }
+        })();
 
-        // 3. Replace pricing_items: delete old, insert new
-        await supabase.from("pricing_items").delete().eq("project_id", freshId);
-        if (pricingItems.length > 0) {
-          const priceRows = pricingItems.map((p, idx) => ({
-            id: `${freshId}-${p.id}`,
-            project_id: freshId,
-            item_index: idx,
-            name: p.name,
-            quantity: p.quantity,
-            unit: p.unit,
-            unit_price: p.unitPrice,
-            category: p.category,
-          }));
-          const { error: priceError } = await supabase.from("pricing_items").insert(priceRows);
-          if (priceError) {
-            console.error("Pricing items insert error:", priceError.message);
-            hasDetailError = true;
-            detailErrorMessage += "\n- ไม่สามารถบันทึกรายการราคาประเมินได้: " + priceError.message;
+        const pricingItemsPromise = (async () => {
+          // Delete old pricing items
+          const { error: delError } = await supabase.from("pricing_items").delete().eq("project_id", freshId);
+          if (delError) {
+            console.error("Pricing items delete error:", delError.message);
           }
-        }
+
+          // Insert new pricing items
+          if (pricingItems.length > 0) {
+            const priceRows = pricingItems.map((p, idx) => ({
+              id: `${freshId}-${p.id}`,
+              project_id: freshId,
+              item_index: idx,
+              name: p.name,
+              quantity: p.quantity,
+              unit: p.unit,
+              unit_price: p.unitPrice,
+              category: p.category,
+            }));
+            const { error: priceError } = await supabase.from("pricing_items").insert(priceRows);
+            if (priceError) {
+              console.error("Pricing items insert error:", priceError.message);
+              hasDetailError = true;
+              detailErrorMessage += "\n- ไม่สามารถบันทึกรายการราคาประเมินได้: " + priceError.message;
+            }
+          }
+        })();
+
+        // Wait for both sub-table updates to finish concurrently
+        await Promise.all([cameraPointsPromise, pricingItemsPromise]);
 
         if (hasDetailError) {
           showAlert("⚠️ บันทึกข้อมูลไม่สมบูรณ์", "ข้อมูลหลักถูกบันทึกแล้ว แต่พบปัญหาในส่วนข้อมูลย่อย:" + detailErrorMessage);
-          return;
+          return false;
         }
       } catch (err) {
         console.error("Supabase Save Exception:", err);
+        showAlert("❌ บันทึกไม่สำเร็จ", "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + (err instanceof Error ? err.message : String(err)));
+        return false;
       }
     }
 
     // เคลียร์ประวัติใน LocalStorage ทิ้งตามความต้องการของคุณบีม
     localStorage.removeItem("cctv_surveys_data");
-    showAlert("✅ บันทึกสำเร็จ", "บันทึกโครงการ เรียบร้อยแล้วค่ะ ✨");
+    
+    // แสดงป๊อปอัปแจ้งผลสำเร็จก่อน และเมื่อกด "ตกลง" ค่อยสลับกลับไปหน้าแรก (Step 1)
+    setConfirmModal({
+      isOpen: true,
+      title: "✅ บันทึกสำเร็จ",
+      message: "บันทึกโครงการ เรียบร้อยแล้วค่ะ ✨",
+      confirmText: "✅ ตกลง",
+      cancelText: "",
+      onConfirm: () => {
+        handleNewProject();
+      }
+    });
+    
+    return true;
   };
 
   // Delete a project from list and database/LocalStorage

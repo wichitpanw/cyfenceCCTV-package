@@ -21,7 +21,7 @@ interface Step6Props {
   onUpdateDiscount: (discount: number) => void;
   onUpdateVatRate: (vat: number) => void;
   onUpdateItems: (items: PricingItem[]) => void;
-  onSaveProject: () => void;
+  onSaveProject: () => Promise<boolean> | any;
   onPrev: () => void;
   customerName: string;
   customerInfo?: CustomerInfo;
@@ -184,14 +184,15 @@ export default function Step6Pricing({
     onUpdateItems(updated);
   };
 
-  const handleSave = () => {
-    const saveAndRedirect = () => {
-      onSaveProject();
-      setSuccessSaved(true);
-      setTimeout(() => {
-        setSuccessSaved(false);
-        onGoToStep1?.();
-      }, 1000);
+  const handleSave = async () => {
+    const saveAndRedirect = async () => {
+      const success = await onSaveProject();
+      if (success) {
+        setSuccessSaved(true);
+        setTimeout(() => {
+          setSuccessSaved(false);
+        }, 2000);
+      }
     };
 
     if (showConfirm) {
@@ -205,7 +206,7 @@ export default function Step6Pricing({
         }
       );
     } else {
-      saveAndRedirect();
+      await saveAndRedirect();
     }
   };
 
