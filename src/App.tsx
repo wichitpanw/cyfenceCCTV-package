@@ -55,7 +55,7 @@ const DEFAULT_REQUIREMENTS: TechRequirements = {
   nvrChannels: 8,
   storagePackage: "HDD 8TB (มาตรฐานส่วนกลาง 8CH NVR)",
   otherRequirements: "",
-  rackType: "rack 19 นิ้ว 6U",
+  rackType: "Rack 19 นิ้ว 6U",
   monitorType: "จอ 27 นิ้ว",
   upsType: "UPS 1Kva",
 };
@@ -82,9 +82,9 @@ const DEFAULT_MASTER_COSTS: MasterCostDb = {
   nvr16ch: 6800,
   nvr32ch: 11900,
   hdd8tb: 8500, // HDD 8TB
-  rack6u: 2800, // rack 19 นิ้ว 6U
-  rack16u: 5500, // rack 19 นิ้ว 16U
-  rack42u: 12900, // rack 19 นิ้ว 42U
+  rack6u: 2800, // Rack 19 นิ้ว 6U
+  rack16u: 5500, // Rack 19 นิ้ว 16U
+  rack42u: 12900, // Rack 19 นิ้ว 42U
   monitor27: 4500, // จอ 27 นิ้ว
   tv55: 14900, // TV 55 นิ้ว
   ups1kva: 4200, // UPS 1Kva
@@ -212,7 +212,7 @@ function generatePricingItems(
   const poeQty = (hasSurvey && cameraPoints.length > 0) ? cameraPoints.length : Math.max(1, Math.ceil(totalCams / 4));
   items.push({
     id: "bom-poe-4port",
-    name: "Switch POE 4 Port Industrial Grade (เกรดอุตสาหกรรมทนความร้อนสูง)",
+    name: "Switch POE 4 Port Industrial Grade",
     quantity: poeQty,
     unit: "เครื่อง",
     unitPrice: costs.poe4port,
@@ -363,14 +363,14 @@ function generatePricingItems(
 
   // --- 7. ต้นทาง: ตู้ Rack 19 นิ้ว ---
   let rackPrice = costs.rack6u;
-  let rackName = "rack 19 นิ้ว 6U";
-  const selectedRack = requirements.rackType || "rack 19 นิ้ว 6U";
-  if (selectedRack === "rack 19 นิ้ว 16U") {
+  let rackName = "Rack 19 นิ้ว 6U";
+  const selectedRack = requirements.rackType || "Rack 19 นิ้ว 6U";
+  if (selectedRack === "Rack 19 นิ้ว 16U") {
     rackPrice = costs.rack16u;
-    rackName = "rack 19 นิ้ว 16U";
-  } else if (selectedRack === "rack 19 นิ้ว 42U") {
+    rackName = "Rack 19 นิ้ว 16U";
+  } else if (selectedRack === "Rack 19 นิ้ว 42U") {
     rackPrice = costs.rack42u;
-    rackName = "rack 19 นิ้ว 42U";
+    rackName = "Rack 19 นิ้ว 42U";
   }
 
   items.push({
@@ -462,7 +462,7 @@ function generatePricingItems(
     if (cabinetCount > 0) {
       items.push({
         id: "bom-labor-cabinet",
-        name: "ค่าติดตั้งตู้ Outdoor cabinet (พัดลมระบายอากาศ 2 ตัว, ปลั๊กไฟ, Circuit Breaker)",
+        name: "ค่าติดตั้งตู้ Outdoor Cabinet (พร้อมพัดลมระบายอากาศ 2 ตัว, ปลั๊กไฟ, Circuit Breaker)",
         quantity: cabinetCount,
         unit: "ตู้",
         unitPrice: costs.laborCabinet,
@@ -543,7 +543,7 @@ function generatePricingItems(
   // 3. ค่าติดตั้ง NVR
   items.push({
     id: "bom-labor-nvr",
-    name: "ค่าติดตั้ง NVR (เมาส์ไร้สาย และค่า Config ระบบให้ดูภาพได้)",
+    name: "ค่าติดตั้ง NVR (พร้อมเมาส์ไร้สาย และค่า Config ระบบ)",
     quantity: 1,
     unit: "เครื่อง",
     unitPrice: costs.laborNvr,
@@ -1271,7 +1271,7 @@ export default function App() {
       nvrChannels: 8,
       storagePackage: "HDD 8TB (มาตรฐานส่วนกลาง 8CH NVR)",
       otherRequirements: "",
-      rackType: "rack 19 นิ้ว 6U",
+      rackType: "Rack 19 นิ้ว 6U",
       monitorType: "จอ 27 นิ้ว",
       upsType: "UPS 1Kva",
     });

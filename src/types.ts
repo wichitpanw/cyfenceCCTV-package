@@ -52,7 +52,7 @@ export interface TechRequirements {
   standardCableLimit?: number; // standard cable limit per camera (default 25)
   extraCablePricePerMeter?: number; // price per extra meter for LAN cable (default 35)
   extraLaborPricePerMeter?: number; // labor fee per extra meter (default 25)
-  rackType?: string; // "rack 19 นิ้ว 6U" | "rack 19 นิ้ว 16U" | "rack 19 นิ้ว 42U"
+  rackType?: string; // "Rack 19 นิ้ว 6U" | "Rack 19 นิ้ว 16U" | "Rack 19 นิ้ว 42U"
   monitorType?: string; // "จอ 27 นิ้ว" | "TV 55 นิ้ว"
   upsType?: string; // "UPS 1Kva" | "UPS 2Kva"
 }
@@ -112,9 +112,9 @@ export interface MasterCostDb {
   nvr16ch: number;
   nvr32ch: number;
   hdd8tb: number; // HDD 8TB
-  rack6u: number; // rack 19 นิ้ว 6U
-  rack16u: number; // rack 19 นิ้ว 16U
-  rack42u: number; // rack 19 นิ้ว 42U
+  rack6u: number; // Rack 19 นิ้ว 6U
+  rack16u: number; // Rack 19 นิ้ว 16U
+  rack42u: number; // Rack 19 นิ้ว 42U
   monitor27: number; // จอ 27 นิ้ว
   tv55: number; // TV 55 นิ้ว
   ups1kva: number; // UPS 1Kva

@@ -137,13 +137,13 @@ export default function Step2CameraRequirements({ data, onChange, onNext, onPrev
           <div className="space-y-2 relative">
             <label className="block text-gray-500 font-bold uppercase tracking-wider text-[10px]">ตู้ Server Rack 19 นิ้ว</label>
             <select
-              value={data.rackType || "rack 19 นิ้ว 6U"}
+              value={data.rackType || "Rack 19 นิ้ว 6U"}
               onChange={(e) => onChange({ ...data, rackType: e.target.value })}
               className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-gray-900"
             >
-              <option value="rack 19 นิ้ว 6U">ตู้ Rack 19 นิ้ว 6U (ขนาดมาตรฐานเล็ก)</option>
-              <option value="rack 19 นิ้ว 16U">ตู้ Rack 19 นิ้ว 16U (ขนาดกลางออฟฟิศ)</option>
-              <option value="rack 19 นิ้ว 42U">ตู้ Rack 19 นิ้ว 42U (ขนาดตู้ใหญ่โยธา)</option>
+              <option value="Rack 19 นิ้ว 6U">ตู้ Rack 19 นิ้ว 6U (ขนาดมาตรฐานเล็ก)</option>
+              <option value="Rack 19 นิ้ว 16U">ตู้ Rack 19 นิ้ว 16U (ขนาดกลางออฟฟิศ)</option>
+              <option value="Rack 19 นิ้ว 42U">ตู้ Rack 19 นิ้ว 42U (ขนาดตู้ใหญ่โยธา)</option>
             </select></div>
 
           {/* Monitor selection */}
