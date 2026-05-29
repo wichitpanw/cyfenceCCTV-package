@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Building, 
   Settings, 
@@ -663,6 +663,12 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [isUserMgmtOpen, setIsUserMgmtOpen] = useState<boolean>(false);
 
+  // React Ref to hold the latest user profile and prevent stale closure loops in event listeners
+  const userProfileRef = useRef<UserProfile | null>(null);
+  useEffect(() => {
+    userProfileRef.current = userProfile;
+  }, [userProfile]);
+
   // Active Project Data state
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>(DEFAULT_CUSTOMER_INFO);
@@ -772,8 +778,9 @@ export default function App() {
 
       if (session && session.user) {
         setCurrentUser(session.user);
-        // ดึงโปรไฟล์ใหม่เฉพาะเมื่อไม่มีข้อมูลเดิม หรือผู้ใช้เปลี่ยนคน เพื่อลดการดึงข้อมูลซ้ำซ้อน
-        if (!userProfile || userProfile.id !== session.user.id) {
+        // ดึงโปรไฟล์ใหม่เฉพาะเมื่อไม่มีข้อมูลเดิม หรือผู้ใช้เปลี่ยนคน (ใช้ ref เพื่อป้องกัน stale closure loops)
+        const currentProfile = userProfileRef.current;
+        if (!currentProfile || currentProfile.id !== session.user.id) {
           await loadUserProfile(session.user.id, session.user.email || "");
         } else {
           setAuthLoading(false);
