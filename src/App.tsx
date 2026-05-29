@@ -799,11 +799,11 @@ export default function App() {
   }, []);
 
   const loadUserProfile = async (userId: string, email: string) => {
-    // กำหนดเวลา Timeout 3 วินาที เผื่อตาราง profiles มีปัญหาคิวรีค้าง (RLS Recursion) จะได้ไม่ค้างหมุนที่หน้าโหลดดิ้ง
+    // กำหนดเวลา Timeout 15 วินาที (เพิ่มจาก 3 วินาที เพื่อให้รองรับกรณี Supabase Cold Start บน Free Plan และ RLS ได้รับการแก้ไขแล้ว)
     const timeoutPromise = new Promise((resolve) => {
       setTimeout(() => {
         resolve({ timeout: true });
-      }, 3000);
+      }, 15000);
     });
 
     try {
@@ -817,15 +817,33 @@ export default function App() {
       let activeProf: UserProfile;
 
       if (result && result.timeout) {
-        console.warn("⚠️ Load user profile timed out. Using fallback profile.");
-        activeProf = {
-          id: userId,
-          role: "user",
-          displayName: email.split("@")[0] || "ผู้ใช้",
-          email: email,
-          province: "",
-          updatedAt: new Date().toISOString()
-        };
+        console.warn("⚠️ Load user profile timed out. Using fallback or cached profile.");
+        
+        // ป้องกันสิทธิ์หลุด: พยายามดึงโปรไฟล์ล่าสุดจาก Cache ใน localStorage ก่อน เพื่อคงระดับสิทธิ์เดิม (เช่น superadmin) ไว้อย่างมั่นคง
+        const sessionStr = localStorage.getItem("CCTV_USER_SESSION");
+        let cachedProf: UserProfile | null = null;
+        if (sessionStr) {
+          try {
+            const parsed = JSON.parse(sessionStr);
+            if (parsed && parsed.profile && parsed.profile.id === userId) {
+              cachedProf = parsed.profile;
+            }
+          } catch (e) {}
+        }
+
+        if (cachedProf) {
+          console.log("ℹ️ Preserving existing profile from cache due to database timeout:", cachedProf.role);
+          activeProf = cachedProf;
+        } else {
+          activeProf = {
+            id: userId,
+            role: "user",
+            displayName: email.split("@")[0] || "ผู้ใช้",
+            email: email,
+            province: "",
+            updatedAt: new Date().toISOString()
+          };
+        }
       } else {
         const { data, error } = result;
         if (data) {
