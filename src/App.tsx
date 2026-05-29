@@ -669,6 +669,9 @@ export default function App() {
     userProfileRef.current = userProfile;
   }, [userProfile]);
 
+  // React Ref to track if a profile load request is currently in-flight to prevent concurrent flooding
+  const profileLoadingRef = useRef<string | null>(null);
+
   // Active Project Data state
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>(DEFAULT_CUSTOMER_INFO);
@@ -773,6 +776,16 @@ export default function App() {
   }, []);
 
   const loadUserProfile = async (userId: string, email: string) => {
+    // ป้องกันการยิงคิวรีซ้ำซ้อน (Concurrent Request Flood) ในกรณีที่มีการดึงโปรไฟล์อยู่แล้ว
+    if (profileLoadingRef.current === userId) {
+      console.log("ℹ️ Load user profile query is already in-flight for this user. Ignoring duplicate request.");
+      return;
+    }
+    
+    // ตั้งค่า Lock
+    profileLoadingRef.current = userId;
+    setAuthLoading(true);
+
     // กำหนดเวลา Timeout 15 วินาที (เพิ่มจาก 3 วินาที เพื่อให้รองรับกรณี Supabase Cold Start บน Free Plan และ RLS ได้รับการแก้ไขแล้ว)
     const timeoutPromise = new Promise((resolve) => {
       setTimeout(() => {
@@ -858,6 +871,7 @@ export default function App() {
     } catch (err) {
       console.error("Load user profile failed:", err);
     } finally {
+      profileLoadingRef.current = null; // คลาย Lock เสมอเมื่อสิ้นสุดการทำงาน
       setAuthLoading(false);
     }
   };
