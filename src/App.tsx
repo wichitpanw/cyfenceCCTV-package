@@ -758,43 +758,65 @@ export default function App() {
   }, []);
 
   const loadUserProfile = async (userId: string, email: string) => {
+    // กำหนดเวลา Timeout 3 วินาที เผื่อตาราง profiles มีปัญหาคิวรีค้าง (RLS Recursion) จะได้ไม่ค้างหมุนที่หน้าโหลดดิ้ง
+    const timeoutPromise = new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ timeout: true });
+      }, 3000);
+    });
+
     try {
-      const { data, error } = await supabase
+      const queryPromise = supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
 
+      const result: any = await Promise.race([queryPromise, timeoutPromise]);
       let activeProf: UserProfile;
-      if (data) {
+
+      if (result && result.timeout) {
+        console.warn("⚠️ Load user profile timed out. Using fallback profile.");
         activeProf = {
-          id: data.id,
-          role: data.role || "user",
-          displayName: data.display_name || "ผู้ใช้",
-          email: email,
-          province: data.province || "",
-          updatedAt: data.updated_at
-        };
-      } else {
-        // Fallback profile if row is not created yet
-        const defaultProf: UserProfile = {
           id: userId,
           role: "user",
-          displayName: email.split("@")[0],
+          displayName: email.split("@")[0] || "ผู้ใช้",
           email: email,
           province: "",
           updatedAt: new Date().toISOString()
         };
-        activeProf = defaultProf;
-        
-        // Auto-create profile row if missing
-        await supabase.from("profiles").upsert({
-          id: userId,
-          role: "user",
-          display_name: defaultProf.displayName,
-          province: "",
-          updated_at: new Date().toISOString()
-        });
+      } else {
+        const { data, error } = result;
+        if (data) {
+          activeProf = {
+            id: data.id,
+            role: data.role || "user",
+            displayName: data.display_name || "ผู้ใช้",
+            email: email,
+            province: data.province || "",
+            updatedAt: data.updated_at
+          };
+        } else {
+          // Fallback profile if row is not created yet
+          const defaultProf: UserProfile = {
+            id: userId,
+            role: "user",
+            displayName: email.split("@")[0] || "ผู้ใช้",
+            email: email,
+            province: "",
+            updatedAt: new Date().toISOString()
+          };
+          activeProf = defaultProf;
+          
+          // Auto-create profile row if missing (รันแบบ Background ป้องกันการบล็อก)
+          supabase.from("profiles").upsert({
+            id: userId,
+            role: "user",
+            display_name: defaultProf.displayName,
+            province: "",
+            updated_at: new Date().toISOString()
+          }).catch(e => console.error("Auto-create profile failed:", e));
+        }
       }
 
       setUserProfile(activeProf);
