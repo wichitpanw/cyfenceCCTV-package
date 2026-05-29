@@ -672,6 +672,9 @@ export default function App() {
   // React Ref to track if a profile load request is currently in-flight to prevent concurrent flooding
   const profileLoadingRef = useRef<string | null>(null);
 
+  // React Ref to track if a project was just loaded from history to prevent immediate auto-BOM regeneration overwriting custom pricing items
+  const isJustLoadedRef = useRef<boolean>(false);
+
   // Active Project Data state
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>(DEFAULT_CUSTOMER_INFO);
@@ -1297,7 +1300,16 @@ export default function App() {
       }
     }
 
+    if (step < 4) {
+      isJustLoadedRef.current = false;
+    }
+
     if (step === 4 || step === 5) {
+      if (isJustLoadedRef.current) {
+        // Skip auto-BOM regeneration upon loading saved project to preserve saved pricing items
+        return;
+      }
+
       // Re-generate BOM dynamically to reflect latest edits if they don't exist yet or need updates
       const regenerated = generatePricingItems(requirements, hasSurveyReport, cameraPoints, masterCosts);
       
@@ -1444,6 +1456,7 @@ export default function App() {
 
   // Load project Survey into main workflow inputs
   const loadProject = (proj: ProjectSurvey) => {
+    isJustLoadedRef.current = true; // Set block ref to prevent auto-BOM regeneration from overwriting saved prices
     setActiveProjectId(proj.id);
     setCustomerInfo(proj.customerInfo);
     setRequirements(proj.requirements);
@@ -1762,7 +1775,30 @@ export default function App() {
         return sum + tier.price;
       }, 0);
 
-      const grandMonthlyBeforeVat = leaseMonthlyPayment + totalFieldLinksPrice;
+      const totalCams = cameraPoints.reduce((sum, pt) => {
+        if (pt.selectedSet === "Set 2") return sum + 2;
+        if (pt.selectedSet === "Set 3") return sum + 3;
+        if (pt.selectedSet === "Set 4") return sum + 4;
+        return sum + 1;
+      }, 0);
+      const totalCamsCount = totalCams > 0 ? totalCams : 1;
+      const centerSpeed = totalCamsCount * 5;
+      const centerTier = [
+        { speed: 10, price: 640 },
+        { speed: 20, price: 720 },
+        { speed: 30, price: 770 },
+        { speed: 50, price: 860 },
+        { speed: 100, price: 1150 },
+        { speed: 150, price: 1440 },
+        { speed: 200, price: 1730 },
+        { speed: 300, price: 2310 },
+        { speed: 400, price: 2750 },
+        { speed: 500, price: 3180 },
+      ].find(t => t.speed >= centerSpeed) || { speed: 500, price: 3180 };
+
+      const totalMonthlyPrice = totalFieldLinksPrice + centerTier.price;
+
+      const grandMonthlyBeforeVat = leaseMonthlyPayment + totalMonthlyPrice;
       const isVatEnabled = vatRate > 0;
       const calVatAmount = isVatEnabled ? (grandMonthlyBeforeVat * vatRate) / 100 : 0;
       const grandMonthlyTotal = grandMonthlyBeforeVat + calVatAmount;
@@ -1894,9 +1930,9 @@ export default function App() {
 
   <div class="summary-wrap">
     <div class="summary">
-      <div class="summary-row" style="font-weight: 700; color: #111;"><span>ค่าเช่าระบบรายเดือน (ก่อนภาษีมูลค่าเพิ่ม)</span><span>฿${grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span></div>
-      ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม ${vatRate}%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span></div>` : ""}
-      <div class="summary-row total"><span>ค่าเช่าระบบรวมรายเดือนทั้งสิ้น (หลังภาษี)</span><span>฿${grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span></div>
+      <div class="summary-row" style="font-weight: 700; color: #111;"><span>ค่าเช่าระบบรายเดือน (ก่อนภาษีมูลค่าเพิ่ม)</span><span>฿${grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span></div>
+      ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม ${vatRate}%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span></div>` : ""}
+      <div class="summary-row total"><span>ค่าเช่าระบบรวมรายเดือนทั้งสิ้น (หลังภาษี)</span><span>฿${grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span></div>
     </div>
   </div>
 

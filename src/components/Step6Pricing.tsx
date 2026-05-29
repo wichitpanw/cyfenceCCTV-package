@@ -345,9 +345,9 @@ export default function Step6Pricing({
 
   <div class="summary-wrap">
     <div class="summary">
-      <div class="summary-row" style="font-weight: 700; color: #111;"><span>ค่าเช่าระบบรายเดือน (ก่อนภาษีมูลค่าเพิ่ม)</span><span>฿${grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span></div>
-      ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม ${vatRate}%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span></div>` : ""}
-      <div class="summary-row total"><span>ค่าเช่าระบบรวมรายเดือนทั้งสิ้น (หลังภาษี)</span><span>฿${grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span></div>
+      <div class="summary-row" style="font-weight: 700; color: #111;"><span>ค่าเช่าระบบรายเดือน (ก่อนภาษีมูลค่าเพิ่ม)</span><span>฿${grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span></div>
+      ${isVatEnabled ? `<div class="summary-row"><span>ภาษีมูลค่าเพิ่ม ${vatRate}%</span><span>฿${calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span></div>` : ""}
+      <div class="summary-row total"><span>ค่าเช่าระบบรวมรายเดือนทั้งสิ้น (หลังภาษี)</span><span>฿${grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span></div>
     </div>
   </div>
 
@@ -561,7 +561,7 @@ export default function Step6Pricing({
                       <div className="space-y-0.5 text-right">
                         <div className="font-mono text-[8px] text-zinc-400 tracking-wide uppercase">รวม (฿)</div>
                         <div className="font-mono font-bold text-zinc-900 text-xs py-1.5 pr-0.5">
-                          {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                          {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </div>
                     </>
@@ -642,7 +642,7 @@ export default function Step6Pricing({
                           />
                         </td>
                         <td className="py-3 px-3 text-right font-mono font-bold text-zinc-900">
-                          {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                          {(item.quantity * item.unitPrice).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                       </>
                     )}
@@ -718,7 +718,7 @@ export default function Step6Pricing({
           <div className="flex justify-between items-center pt-2 border-t border-gray-200 text-xs font-bold text-gray-900">
             <span className="text-gray-950">รวมประมาณการค่าบริการ NT Leased Line ทั้งโครงการ:</span>
             <span className="font-mono text-gray-950 text-sm">
-              ฿{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน
+              ฿{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน
             </span>
           </div>
         </div>
@@ -739,7 +739,7 @@ export default function Step6Pricing({
                   <div className="flex justify-between items-center text-gray-550 font-medium">
                     <span>มูลค่าอุปกรณ์และบริการ (Subtotal):</span>
                     <span className="font-mono font-bold text-sm text-zinc-900">
-                      ฿{calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                      ฿{calSubtotal.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
 
@@ -760,28 +760,28 @@ export default function Step6Pricing({
                   <div className="flex justify-between items-center text-gray-500">
                     <span>ยอดจัดเช่าอุปกรณ์ต้นทุนสุทธิ์:</span>
                     <span className="font-mono font-bold text-gray-900">
-                      ฿{calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                      ฿{calBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center text-gray-400 border-t border-gray-200/50 pt-2">
                     <span>บวก กำไรโครงการ (+40%):</span>
                     <span className="font-mono font-semibold text-zinc-750">
-                      ฿{(calBeforeVat * 0.4).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                      ฿{(calBeforeVat * 0.4).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center text-gray-400">
                     <span>บวก ดอกเบี้ยจัดเช่า 8%/ปี (3 ปี = 24%):</span>
                     <span className="font-mono font-semibold text-zinc-750">
-                      ฿{leaseInterest.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                      ฿{leaseInterest.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center text-gray-900 font-bold border-t border-gray-200/50 pt-2">
                     <span>รวมมูลค่าระบบจัดเช่าอุปกรณ์:</span>
                     <span className="font-mono text-zinc-900">
-                      ฿{leaseTotalAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                      ฿{leaseTotalAmount.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </>
@@ -808,7 +808,7 @@ export default function Step6Pricing({
                   <div className="flex justify-between items-center border-t border-gray-200/50 pt-1.5 mt-1.5">
                     <span className="text-[10px] text-gray-400">มูลค่าภาษี VAT รายเดือน:</span>
                     <span className="font-mono text-gray-700 font-semibold">
-                      ฿{calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน
+                      ฿{calVatAmount.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน
                     </span>
                   </div>
                 )}
@@ -824,12 +824,12 @@ export default function Step6Pricing({
                 </span>
                 <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between">
                   <span className="text-gray-400 font-sans text-xs">ก่อน VAT:</span>
-                  <span className="text-gray-950">฿{leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <span className="text-gray-950">฿{leaseMonthlyPayment.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                 </div>
                 {isVatEnabled && (
                   <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-gray-150 pt-1">
                     <span className="text-gray-400 font-sans text-xs">รวม VAT (7%):</span>
-                    <span className="text-gray-950">฿{(leaseMonthlyPayment * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                    <span className="text-gray-950">฿{(leaseMonthlyPayment * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}
               </div>
@@ -841,12 +841,12 @@ export default function Step6Pricing({
                 </span>
                 <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between">
                   <span className="text-gray-400 font-sans text-xs">ก่อน VAT:</span>
-                  <span className="text-gray-950">฿{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <span className="text-gray-950">฿{totalMonthlyPrice.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                 </div>
                 {isVatEnabled && (
                   <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-gray-150 pt-1">
                     <span className="text-gray-400 font-sans text-xs">รวม VAT (7%):</span>
-                    <span className="text-gray-950">฿{(totalMonthlyPrice * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                    <span className="text-gray-950">฿{(totalMonthlyPrice * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}
               </div>
@@ -858,12 +858,12 @@ export default function Step6Pricing({
                 </span>
                 <div className="text-sm font-bold font-mono text-zinc-900 flex justify-between">
                   <span className="text-gray-400 font-sans text-xs">ก่อน VAT:</span>
-                  <span className="text-gray-950">฿{grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                  <span className="text-gray-950">฿{grandMonthlyBeforeVat.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                 </div>
                 {isVatEnabled && (
                   <div className="text-lg font-black font-mono text-zinc-900 flex justify-between border-t border-gray-200/60 pt-1.5">
                     <span className="text-gray-550 font-sans text-xs font-bold">รวม VAT (7%):</span>
-                    <span className="text-gray-950">฿{grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}/เดือน</span>
+                    <span className="text-gray-950">฿{grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}
               </div>

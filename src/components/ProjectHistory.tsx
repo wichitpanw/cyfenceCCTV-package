@@ -474,7 +474,7 @@ export default function ProjectHistory({
                     {/* แสดงราคาต้นทุนเฉพาะ superadmin และ admin เท่านั้น */}
                     {canSeeCost && (
                       <strong className={`text-xs font-semibold ${isActive ? "text-white" : "text-gray-900"}`}>
-                        ฿{subtotal.toLocaleString("th-TH")}
+                        ฿{subtotal.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </strong>
                     )}
                   </div>
@@ -490,7 +490,7 @@ export default function ProjectHistory({
                         💳 ลูกค้าจ่ายต่อเดือน
                       </span>
                       <strong className={`text-xs font-bold font-mono ${isActive ? "text-white" : "text-gray-900"}`}>
-                        ฿{monthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        ฿{monthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         <span className={`text-[9px] font-normal ${isActive ? "text-gray-400" : "text-gray-500"}`}>/เดือน</span>
                       </strong>
                     </div>
