@@ -1720,8 +1720,8 @@ export default function App() {
     );
   };
 
-  // Print PDF for a specific project from sidebar
-  const handlePrintProjectPDF = (proj: ProjectSurvey) => {
+  // Print PDF for a specific project from sidebar (autoPrint = true means trigger print dialog, false means preview only)
+  const handlePrintProjectPDF = (proj: ProjectSurvey, autoPrint: boolean = true) => {
     const printWin = window.open("", "_blank", "width=860,height=1100");
     if (printWin) {
       const today = new Date().toLocaleDateString("th-TH", {
@@ -2007,11 +2007,15 @@ export default function App() {
       
       // Delay printing slightly to let the tiles load!
       setTimeout(() => {
-        window.print();
+        if (${autoPrint}) {
+          window.print();
+        }
       }, 1000);
     } catch(err) {
       console.error(err);
-      window.print();
+      if (${autoPrint}) {
+        window.print();
+      }
     }
   };
 </script>
@@ -2245,8 +2249,8 @@ export default function App() {
             onLoadProject={(id) => {
               const proj = projectsList.find(p => p.id === id);
               if (proj) {
-                // เด้งหน้าต่างใหม่เพื่อดูสรุปโครงการ (PDF/พิมพ์รายงาน) ทันที
-                handlePrintProjectPDF(proj);
+                // เด้งหน้าต่างใหม่เพื่อดูสรุปโครงการ (PDF/พิมพ์รายงาน) ทันที (โหมดพรีวิวเท่านั้น ไม่เด้งกล่องปริ้นท์)
+                handlePrintProjectPDF(proj, false);
               }
             }}
             onEditProject={(id) => {
@@ -2362,8 +2366,8 @@ export default function App() {
               onLoadProject={(id) => {
                 const proj = projectsList.find(p => p.id === id);
                 if (proj) {
-                  // เด้งหน้าต่างใหม่เพื่อดูสรุปโครงการ (PDF/พิมพ์รายงาน) ทันทีจากหน้าแดชบอร์ด
-                  handlePrintProjectPDF(proj);
+                  // เด้งหน้าต่างใหม่เพื่อดูสรุปโครงการ (PDF/พิมพ์รายงาน) ทันทีจากหน้าแดชบอร์ด (โหมดพรีวิวเท่านั้น ไม่เด้งกล่องปริ้นท์)
+                  handlePrintProjectPDF(proj, false);
                 }
               }}
             />
