@@ -917,25 +917,26 @@ export default function App() {
 
   // Reusable handleLogout function
   const handleLogout = async () => {
+    setAuthLoading(true);
+    
+    // เคลียร์ข้อมูลระดับ Client ทันทีเพื่อความรวดเร็วและไม่ค้างหน้าจอหลัก
     localStorage.removeItem("CCTV_USER_SESSION");
     localStorage.removeItem("CCTV_SESSION_EXPIRY");
-    
-    // เคลียร์ React states ทันทีเพื่อความรวดเร็ว
     setCurrentUser(null);
     setUserProfile(null);
-    setAuthLoading(false);
 
     try {
-      // เรียก signOut โดยไม่ต้องรอนาน (หลีกเลี่ยงการล็อกเอาต์ค้างเนื่องจากเครือข่าย)
-      supabase.auth.signOut().catch(err => console.error("SignOut err:", err));
+      // เรียก signOut โดยกำหนดเวลารอสูงสุด 1.5 วินาที เพื่อความมั่นใจว่าไม่ติดหล่มเครือข่ายหน่วง
+      await Promise.race([
+        supabase.auth.signOut(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("SignOut Timeout")), 1500))
+      ]);
     } catch (err) {
-      console.error("Supabase signOut failed:", err);
+      console.warn("Supabase signOut handled with fallback/timeout:", err);
+    } finally {
+      // ปิด Loading เพื่อกลับสู่หน้าล็อกอินอย่างลื่นไหล 100% โดยไม่ต้องโหลดหน้าเว็บใหม่
+      setAuthLoading(false);
     }
-    
-    // บังคับรีโหลดหลังผ่านไป 150ms เพื่อให้แน่ใจว่าล้างข้อมูลในบราวเซอร์เรียบร้อย
-    setTimeout(() => {
-      window.location.reload();
-    }, 150);
   };
 
   // Rolling Expiry Activity Tracker (ต่ออายุอีก 2 ชั่วโมงเมื่อมีการเคลื่อนไหว)
