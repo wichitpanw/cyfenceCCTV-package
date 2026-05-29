@@ -875,13 +875,22 @@ export default function App() {
           activeProf = defaultProf;
           
           // Auto-create profile row if missing (รันแบบ Background ป้องกันการบล็อก)
-          supabase.from("profiles").upsert({
-            id: userId,
-            role: "user",
-            display_name: defaultProf.displayName,
-            province: "",
-            updated_at: new Date().toISOString()
-          }).catch(e => console.error("Auto-create profile failed:", e));
+          (async () => {
+            try {
+              const { error } = await supabase.from("profiles").upsert({
+                id: userId,
+                role: "user",
+                display_name: defaultProf.displayName,
+                province: "",
+                updated_at: new Date().toISOString()
+              });
+              if (error) {
+                console.error("Auto-create profile failed:", error.message);
+              }
+            } catch (e) {
+              console.error("Auto-create profile failed:", e);
+            }
+          })();
         }
       }
 
