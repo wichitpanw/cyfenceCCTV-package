@@ -720,44 +720,17 @@ export default function App() {
   // Load user session and monitor changes
   useEffect(() => {
     let mounted = true;
-
-    // ตรวจสอบเซสชันจาก localStorage ก่อน เพื่อความเร็วในการโหลดหน้าจอหลัก
-    const savedSession = localStorage.getItem("CCTV_USER_SESSION");
-    const sessionExpiry = localStorage.getItem("CCTV_SESSION_EXPIRY");
-    
-    let hasValidCachedSession = false;
-    if (savedSession && sessionExpiry) {
-      const expiryTime = parseInt(sessionExpiry, 10);
-      if (!isNaN(expiryTime) && Date.now() < expiryTime) {
-        hasValidCachedSession = true;
-      }
-    }
-
-    if (!hasValidCachedSession) {
-      setAuthLoading(true);
-    } else {
-      setAuthLoading(false);
-    }
+    setAuthLoading(true);
 
     const checkUserSession = async () => {
       try {
-        if (hasValidCachedSession && savedSession) {
-          const parsed = JSON.parse(savedSession);
-          setCurrentUser(parsed.user);
-          setUserProfile(parsed.profile);
-          setAuthLoading(false);
-          return;
-        }
-
-        // หากไม่มี cache หรือหมดอายุ ให้ดึงข้อมูลสดๆ จาก Supabase Auth
+        // ดึงข้อมูล session สดๆ จาก Supabase Auth (ซึ่งมีระบบ Caching ในตัวอยู่แล้วอย่างปลอดภัย)
         const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
 
         if (session && session.user) {
           setCurrentUser(session.user);
           await loadUserProfile(session.user.id, session.user.email || "");
-          const expiryTime = Date.now() + 6 * 60 * 60 * 1000;
-          localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
         } else {
           setCurrentUser(null);
           setUserProfile(null);
@@ -785,16 +758,10 @@ export default function App() {
         } else {
           setAuthLoading(false);
         }
-        if (event === "SIGNED_IN") {
-          const expiryTime = Date.now() + 6 * 60 * 60 * 1000;
-          localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
-        }
       } else {
         // หากผู้ใช้ Sign Out หรือไม่มี Session
         setCurrentUser(null);
         setUserProfile(null);
-        localStorage.removeItem("CCTV_USER_SESSION");
-        localStorage.removeItem("CCTV_SESSION_EXPIRY");
         setAuthLoading(false);
       }
     });
@@ -826,21 +793,11 @@ export default function App() {
       if (result && result.timeout) {
         console.warn("⚠️ Load user profile timed out. Using fallback or cached profile.");
         
-        // ป้องกันสิทธิ์หลุด: พยายามดึงโปรไฟล์ล่าสุดจาก Cache ใน localStorage ก่อน เพื่อคงระดับสิทธิ์เดิม (เช่น superadmin) ไว้อย่างมั่นคง
-        const sessionStr = localStorage.getItem("CCTV_USER_SESSION");
-        let cachedProf: UserProfile | null = null;
-        if (sessionStr) {
-          try {
-            const parsed = JSON.parse(sessionStr);
-            if (parsed && parsed.profile && parsed.profile.id === userId) {
-              cachedProf = parsed.profile;
-            }
-          } catch (e) {}
-        }
-
-        if (cachedProf) {
-          console.log("ℹ️ Preserving existing profile from cache due to database timeout:", cachedProf.role);
-          activeProf = cachedProf;
+        // ป้องกันสิทธิ์หลุด: ดึงจาก React Ref ล่าสุดที่ยังมีหน่วยความจำอยู่ เพื่อคงระดับสิทธิ์เดิม (เช่น superadmin) ไว้อย่างมั่นคง
+        const currentProfile = userProfileRef.current;
+        if (currentProfile && currentProfile.id === userId) {
+          console.log("ℹ️ Preserving existing profile from state due to database timeout:", currentProfile.role);
+          activeProf = currentProfile;
         } else {
           activeProf = {
             id: userId,
@@ -897,17 +854,7 @@ export default function App() {
 
       setUserProfile(activeProf);
 
-      // Persist profile in session to avoid loss during reload
-      const sessionStr = localStorage.getItem("CCTV_USER_SESSION");
-      if (sessionStr) {
-        try {
-          const parsed = JSON.parse(sessionStr);
-          parsed.profile = activeProf;
-          localStorage.setItem("CCTV_USER_SESSION", JSON.stringify(parsed));
-        } catch (e) {
-          // ignore
-        }
-      }
+      // Persist profile in session logic removed to use Supabase as the single source of truth
     } catch (err) {
       console.error("Load user profile failed:", err);
     } finally {
@@ -920,8 +867,6 @@ export default function App() {
     setAuthLoading(true);
     
     // เคลียร์ข้อมูลระดับ Client ทันทีเพื่อความรวดเร็วและไม่ค้างหน้าจอหลัก
-    localStorage.removeItem("CCTV_USER_SESSION");
-    localStorage.removeItem("CCTV_SESSION_EXPIRY");
     setCurrentUser(null);
     setUserProfile(null);
 
