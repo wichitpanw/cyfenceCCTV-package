@@ -57,8 +57,11 @@ export default function Step5Summary({
   // Group surveyed CCTV specs if they exist, otherwise use requirements
   const totalCamerasCount = hasSurveyReport ? cameraPoints.length : requirements.cameraCount;
   
-  // Count how many poles are scheduled
-  const poleCount = cameraPoints.filter(p => p.poleType !== "None").length;
+  // Count individual pole types dynamically for accurate survey reporting
+  const steelPoleCount = cameraPoints.filter(p => p.poleType === "เสาเหล็กกัลวาไนซ์ 4 เมตร").length;
+  const concretePoleCount = cameraPoints.filter(p => p.poleType === "เสาปูน 8 เมตร").length;
+  const electricPoleCount = cameraPoints.filter(p => p.poleType === "เสาไฟฟ้า (ยึดสายรัดสแตนเลส)").length;
+  const wallMountCount = cameraPoints.filter(p => p.poleType === "None" || !p.poleType).length;
   // Count support arms
   const supportArmCount = cameraPoints.filter(p => p.hasSupportArm).length;
 
@@ -292,9 +295,22 @@ export default function Step5Summary({
                     ระบุรายจุดพร้อมพิกัดภูมิศาสตร์และรูปถ่ายหน้างานจริงครบถ้วน
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-400 mt-1">
-                  <div>• เสาเหล็กเสริม: <strong className="text-gray-900">{poleCount} ต้น</strong></div>
-                  <div>• แขน Support ยึด: <strong className="text-gray-900">{supportArmCount} ชุด</strong></div>
+                <div className="flex flex-col gap-1 text-[10.5px] text-gray-500 mt-2 border-t border-gray-100 pt-2 space-y-0.5">
+                  {steelPoleCount > 0 && (
+                    <div>• เสาเหล็กกัลวาไนซ์ 4 ม.: <strong className="text-gray-900 font-bold">{steelPoleCount} ต้น</strong></div>
+                  )}
+                  {concretePoleCount > 0 && (
+                    <div>• เสาปูนมาตรฐาน 8 ม.: <strong className="text-gray-900 font-bold">{concretePoleCount} ต้น</strong></div>
+                  )}
+                  {electricPoleCount > 0 && (
+                    <div>• เสาไฟฟ้าของการไฟฟ้า: <strong className="text-gray-900 font-bold">{electricPoleCount} ต้น</strong></div>
+                  )}
+                  {wallMountCount > 0 && (
+                    <div>• ยึดผนัง/อาคารโดยตรง: <strong className="text-gray-900 font-bold">{wallMountCount} จุด</strong></div>
+                  )}
+                  {supportArmCount > 0 && (
+                    <div>• แขน Support ยึด: <strong className="text-gray-900 font-bold">{supportArmCount} ชุด</strong></div>
+                  )}
                 </div>
               </>
             ) : (
