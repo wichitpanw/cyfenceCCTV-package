@@ -23,12 +23,23 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     setErrorMsg("");
 
     try {
-      // ค้นหา user จาก profiles table โดยตรงด้วย username + password
+      // 1. ล็อกอินผ่าน Supabase Auth จริง
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
+
+      if (authError || !authData.user) {
+        setErrorMsg("❌ ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้งค่ะ");
+        setLoading(false);
+        return;
+      }
+
+      // 2. ดึงข้อมูลโปรไฟล์จาก profiles table ตาม User ID
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
-        .eq("email", email.trim())
-        .eq("password", password)
+        .eq("id", authData.user.id)
         .maybeSingle();
 
       if (profileError) {
@@ -38,7 +49,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
       }
 
       if (!profile) {
-        setErrorMsg("❌ ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้งค่ะ");
+        setErrorMsg("❌ ไม่พบข้อมูลสิทธิ์ผู้ใช้งานในระบบโปรไฟล์ กรุณาติดต่อผู้ดูแลระบบค่ะ");
         setLoading(false);
         return;
       }

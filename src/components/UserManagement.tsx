@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Users, User, UserCheck, AlertCircle, Search, RefreshCw, Eye, EyeOff } from "lucide-react";
 import { supabase } from "../supabaseClient";
+import { createClient } from "@supabase/supabase-js";
 
 interface EditableGroupCellProps {
   userId: string;
@@ -94,30 +95,54 @@ export default function UserManagement() {
     setSuccessMsg("");
     
     try {
-      const generatedId = crypto.randomUUID();
-      const { error } = await supabase
-        .from("profiles")
-        .insert({
-          id: generatedId,
-          email: newEmail.trim().toLowerCase(),
-          password: newPassword,
-          display_name: newName.trim(),
-          role: newRole,
-          province: newProvince,
-          updated_at: new Date().toISOString()
-        });
+      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
+      const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || "";
+      
+      const tempSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false
+        }
+      });
 
-      if (error) {
-        setErrorMsg("ไม่สามารถสร้างบัญชีได้: " + error.message);
-      } else {
-        setSuccessMsg(`💾 สร้างบัญชีผู้ใช้ [${newEmail}] สำเร็จเรียบร้อยแล้วค่ะ!`);
-        setNewEmail("");
-        setNewPassword("");
-        setNewName("");
-        setNewRole("user");
-        setNewProvince("");
-        fetchUsersList();
-        setTimeout(() => setSuccessMsg(""), 4000);
+      // 1. ลงทะเบียนผ่าน Supabase Auth (จะไม่รบกวนเซสชันของ Admin ปัจจุบัน)
+      const { data: authData, error: authError } = await tempSupabase.auth.signUp({
+        email: newEmail.trim().toLowerCase(),
+        password: newPassword,
+      });
+
+      if (authError) {
+        setErrorMsg("ไม่สามารถสร้างบัญชีผู้ใช้งานได้: " + authError.message);
+        setIsCreating(false);
+        return;
+      }
+
+      // 2. เมื่อสมัครเสร็จ ระบบ Trigger บนฐานข้อมูลจะสร้าง Row โปรไฟล์ให้อัตโนมัติ 
+      // เราจึงอัปเดตข้อมูลส่วนอื่นๆ (เช่น บทบาท, ชื่อแสดงผล, จังหวัด)
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({
+            display_name: newName.trim(),
+            role: newRole,
+            province: newProvince,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", authData.user.id);
+
+        if (profileError) {
+          setErrorMsg("สร้างบัญชีสำเร็จ แต่ไม่สามารถตั้งค่าโปรไฟล์ได้: " + profileError.message);
+        } else {
+          setSuccessMsg(`💾 สร้างบัญชีผู้ใช้ [${newEmail}] สำเร็จเรียบร้อยแล้วค่ะ!`);
+          setNewEmail("");
+          setNewPassword("");
+          setNewName("");
+          setNewRole("user");
+          setNewProvince("");
+          fetchUsersList();
+          setTimeout(() => setSuccessMsg(""), 4000);
+        }
       }
     } catch (err: any) {
       setErrorMsg("เกิดข้อผิดพลาดในการสร้างผู้ใช้งานใหม่");
