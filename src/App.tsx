@@ -672,29 +672,29 @@ export default function App() {
 
   // Load user session and monitor changes
   useEffect(() => {
-    const checkUserSession = async () => {
+    let mounted = true;
+
+    // ตรวจสอบเซสชันจาก localStorage ก่อน เพื่อความเร็วในการโหลดหน้าจอหลัก
+    const savedSession = localStorage.getItem("CCTV_USER_SESSION");
+    const sessionExpiry = localStorage.getItem("CCTV_SESSION_EXPIRY");
+    
+    let hasValidCachedSession = false;
+    if (savedSession && sessionExpiry) {
+      const expiryTime = parseInt(sessionExpiry, 10);
+      if (!isNaN(expiryTime) && Date.now() < expiryTime) {
+        hasValidCachedSession = true;
+      }
+    }
+
+    if (!hasValidCachedSession) {
       setAuthLoading(true);
+    } else {
+      setAuthLoading(false);
+    }
+
+    const checkUserSession = async () => {
       try {
-        // 1. ตรวจสอบเซสชันผู้ใช้และอายุเซสชันหมดเวลา 2 ชั่วโมงก่อน
-        const savedSession = localStorage.getItem("CCTV_USER_SESSION");
-        const sessionExpiry = localStorage.getItem("CCTV_SESSION_EXPIRY");
-
-        if (savedSession) {
-          if (sessionExpiry) {
-            const expiryTime = parseInt(sessionExpiry, 10);
-            if (!isNaN(expiryTime) && Date.now() > expiryTime) {
-              // เซสชันหมดอายุแล้ว!
-              localStorage.removeItem("CCTV_USER_SESSION");
-              localStorage.removeItem("CCTV_SESSION_EXPIRY");
-              await supabase.auth.signOut();
-              setCurrentUser(null);
-              setUserProfile(null);
-              setAuthLoading(false);
-              alert("🔒 เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 6 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ");
-              return;
-            }
-          }
-
+        if (hasValidCachedSession && savedSession) {
           const parsed = JSON.parse(savedSession);
           setCurrentUser(parsed.user);
           setUserProfile(parsed.profile);
@@ -702,8 +702,10 @@ export default function App() {
           return;
         }
 
-        // 2. ดึงข้อมูลจาก Supabase Auth ปกติ (Fallback)
+        // หากไม่มี cache หรือหมดอายุ ให้ดึงข้อมูลสดๆ จาก Supabase Auth
         const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+
         if (session && session.user) {
           setCurrentUser(session.user);
           await loadUserProfile(session.user.id, session.user.email || "");
@@ -716,28 +718,41 @@ export default function App() {
         }
       } catch (err) {
         console.error("Auth init failed:", err);
-        setAuthLoading(false);
+        if (mounted) {
+          setAuthLoading(false);
+        }
       }
     };
 
     checkUserSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+
       if (session && session.user) {
         setCurrentUser(session.user);
-        await loadUserProfile(session.user.id, session.user.email || "");
+        // ดึงโปรไฟล์ใหม่เฉพาะเมื่อไม่มีข้อมูลเดิม หรือผู้ใช้เปลี่ยนคน เพื่อลดการดึงข้อมูลซ้ำซ้อน
+        if (!userProfile || userProfile.id !== session.user.id) {
+          await loadUserProfile(session.user.id, session.user.email || "");
+        } else {
+          setAuthLoading(false);
+        }
         if (event === "SIGNED_IN") {
           const expiryTime = Date.now() + 6 * 60 * 60 * 1000;
           localStorage.setItem("CCTV_SESSION_EXPIRY", expiryTime.toString());
         }
       } else {
+        // หากผู้ใช้ Sign Out หรือไม่มี Session
         setCurrentUser(null);
         setUserProfile(null);
+        localStorage.removeItem("CCTV_USER_SESSION");
+        localStorage.removeItem("CCTV_SESSION_EXPIRY");
         setAuthLoading(false);
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -806,7 +821,11 @@ export default function App() {
   const handleLogout = async () => {
     localStorage.removeItem("CCTV_USER_SESSION");
     localStorage.removeItem("CCTV_SESSION_EXPIRY");
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error("Supabase signOut failed:", err);
+    }
     setCurrentUser(null);
     setUserProfile(null);
     window.location.reload();
@@ -954,6 +973,10 @@ export default function App() {
 
   // Load project history on mount (Hybrid Cloud & Local Storage)
   const loadSavedProjects = async () => {
+    if (!currentUser || !userProfile) {
+      setProjectsList([]);
+      return;
+    }
     if (isSupabaseConfigured) {
       try {
         // Fetch projects with related camera_points and pricing_items
