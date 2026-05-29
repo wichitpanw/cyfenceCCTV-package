@@ -117,6 +117,47 @@ const DEFAULT_MASTER_COSTS: MasterCostDb = {
   lastUpdated: new Date("2026-05-28T19:15:00+07:00").toISOString(),
 };
 
+const MASTER_COSTS_METADATA = [
+  { key: "camBullet", name: "กล้อง CCTV แบบ Bullet", category: "hardware" },
+  { key: "camDome", name: "กล้อง CCTV แบบ Dome", category: "hardware" },
+  { key: "camPtz", name: "กล้อง CCTV แบบ PTZ", category: "hardware" },
+  { key: "camFisheye", name: "กล้อง CCTV แบบ Fisheye", category: "hardware" },
+  { key: "poe4port", name: "Switch POE 4 Port Industrial Grade", category: "hardware" },
+  { key: "ups800va", name: "UPS 800 VA (สำหรับกล้อง)", category: "hardware" },
+  { key: "outdoorCabinet", name: "ตู้ Outdoor Cabinet แบบมีพัดลม", category: "hardware" },
+  { key: "sdCard128", name: "SD Card 128GB", category: "hardware" },
+  { key: "supportArm", name: "แขน Support กล้อง", category: "hardware" },
+  { key: "thw16sqmm", name: "สายไฟฟ้า THW IEC 16 sq.mm. 50 เมตร", category: "hardware" },
+  { key: "poleSteel4m", name: "เสาเหล็ก 4 เมตร", category: "pole" },
+  { key: "poleCement8m", name: "เสาปูน 8 เมตร", category: "pole" },
+  { key: "nvr8ch", name: "NVR 8 Channels", category: "headend" },
+  { key: "nvr16ch", name: "NVR 16 Channels", category: "headend" },
+  { key: "nvr32ch", name: "NVR 32 Channels", category: "headend" },
+  { key: "hdd8tb", name: "HDD 8TB", category: "headend" },
+  { key: "rack6u", name: "Rack 19 นิ้ว 6U", category: "headend" },
+  { key: "rack16u", name: "Rack 19 นิ้ว 16U", category: "headend" },
+  { key: "rack42u", name: "Rack 19 นิ้ว 42U", category: "headend" },
+  { key: "monitor27", name: "จอ Monitor 27 นิ้ว", category: "headend" },
+  { key: "tv55", name: "TV 55 นิ้ว", category: "headend" },
+  { key: "ups1kva", name: "UPS 1Kva (ต้นทาง)", category: "headend" },
+  { key: "ups2kva", name: "UPS 2Kva (ต้นทาง)", category: "headend" },
+  { key: "routerHw", name: "Router VPN", category: "headend" },
+  { key: "laborCctv", name: "ค่าติดตั้งกล้อง CCTV + สาย LAN 25 เมตร", category: "install_endpoint" },
+  { key: "laborSupportArm", name: "ค่าติดตั้งแขน Support กล้อง", category: "install_endpoint" },
+  { key: "laborCabinet", name: "ค่าติดตั้งตู้ Outdoor Cabinet", category: "install_endpoint" },
+  { key: "laborGroundRod", name: "ค่าติดตั้ง Ground Rod", category: "install_endpoint" },
+  { key: "laborPoleCement8m", name: "ค่าปักเสาปูน 8 เมตรพร้อมฐานราก", category: "install_endpoint" },
+  { key: "laborPoleSteel4m", name: "ค่าติดตั้งเสาเหล็ก 4 เมตรพร้อมฐานราก", category: "install_endpoint" },
+  { key: "laborPowerThw", name: "ค่าติดตั้งสายไฟ THW 50 เมตร + มิเตอร์ไฟ", category: "install_endpoint" },
+  { key: "laborMonitor", name: "ค่าติดตั้งจอ Monitor + HDMI", category: "install_headend" },
+  { key: "laborRack", name: "ค่าติดตั้งตู้ Rack + UPS + พัดลม", category: "install_headend" },
+  { key: "laborNvr", name: "ค่าติดตั้งและ Config NVR", category: "install_headend" },
+  { key: "laborRouter", name: "ค่าติดตั้งและ Config Router", category: "install_headend" },
+  { key: "laborPowerVct", name: "ค่าเดินสายไฟต้นทาง สาย VCT 30 เมตร + Breaker", category: "install_headend" },
+  { key: "maYear2", name: "ค่าบริการบำรุงรักษารายปี (MA) ปีที่ 2", category: "ma" },
+  { key: "maYear3", name: "ค่าบริการบำรุงรักษารายปี (MA) ปีที่ 3", category: "ma" }
+];
+
 // Help helper for autoBOM items
 function generatePricingItems(
   requirements: TechRequirements,
@@ -914,27 +955,74 @@ export default function App() {
 
   // Load master costs from Supabase on mount if configured
   useEffect(() => {
+    const initializeNewCostsTable = async (costs: MasterCostDb) => {
+      try {
+        const rowsToUpsert = Object.keys(costs)
+          .filter(k => k !== 'lastUpdated')
+          .map(k => {
+            const meta = MASTER_COSTS_METADATA.find(m => m.key === k) || { name: k, category: 'other' };
+            return {
+              item_key: k,
+              item_name: meta.name,
+              category: meta.category,
+              cost_value: Number(costs[k as keyof MasterCostDb] || 0),
+              updated_at: new Date().toISOString()
+            };
+          });
+        
+        const { error } = await supabase
+          .from("cctv_master_costs")
+          .upsert(rowsToUpsert);
+          
+        if (error) {
+          console.error("Failed to initialize costs in new schema format:", error.message);
+          // Fallback to old format
+          await supabase
+            .from("cctv_master_costs")
+            .upsert({
+              id: "default",
+              costs: costs,
+              updated_at: new Date().toISOString()
+            });
+        } else {
+          console.log("Initialized cctv_master_costs table successfully in row-based format.");
+        }
+      } catch (err) {
+        console.error("Error during master costs initialization:", err);
+      }
+    };
+
     const loadCostsFromSupabase = async () => {
       if (!isSupabaseConfigured) return;
       try {
         const { data, error } = await supabase
           .from("cctv_master_costs")
-          .select("costs")
-          .eq("id", "default");
+          .select("*");
         
-        if (data && data.length > 0 && data[0].costs) {
-          console.log("Loaded master costs from Supabase:", data[0].costs);
-          setMasterCosts({ ...DEFAULT_MASTER_COSTS, ...data[0].costs });
+        if (error) {
+          console.error("Failed to fetch master costs from Supabase:", error.message);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          // Check if it's the old schema
+          if (data[0].costs !== undefined) {
+            console.log("Loaded master costs from Supabase (Old JSONB schema):", data[0].costs);
+            setMasterCosts({ ...DEFAULT_MASTER_COSTS, ...data[0].costs });
+          } else {
+            // New row-based schema
+            console.log("Loaded master costs from Supabase (New Row-based schema):", data.length, "items");
+            const costsObj: any = {};
+            data.forEach((row: any) => {
+              if (row.item_key) {
+                costsObj[row.item_key] = Number(row.cost_value);
+              }
+            });
+            setMasterCosts({ ...DEFAULT_MASTER_COSTS, ...costsObj });
+          }
         } else {
           console.log("No master costs record found on Supabase. Table is empty. Initializing...");
-          // Gracefully initialize the row with masterCosts (either from localStorage or defaults)
-          await supabase
-            .from("cctv_master_costs")
-            .upsert({
-              id: "default",
-              costs: masterCosts,
-              updated_at: new Date().toISOString()
-            });
+          await initializeNewCostsTable(masterCosts);
         }
       } catch (err) {
         console.error("Failed to load master costs from Supabase:", err);
@@ -2959,18 +3047,44 @@ export default function App() {
                       // Also save to Supabase if configured
                       if (isSupabaseConfigured) {
                         try {
-                          const { error } = await supabase
-                            .from("cctv_master_costs")
-                            .upsert({
-                              id: "default",
-                              costs: updated,
-                              updated_at: new Date().toISOString()
+                          const rowsToUpsert = Object.keys(updated)
+                            .filter(k => k !== 'lastUpdated')
+                            .map(k => {
+                              const meta = MASTER_COSTS_METADATA.find(m => m.key === k) || { name: k, category: 'other' };
+                              return {
+                                item_key: k,
+                                item_name: meta.name,
+                                category: meta.category,
+                                cost_value: Number(updated[k as keyof MasterCostDb] || 0),
+                                updated_at: new Date().toISOString()
+                              };
                             });
-                          if (error) {
-                            console.error("Failed to save master costs to Supabase:", error.message);
-                            alert("💾 บันทึกในเบราว์เซอร์สำเร็จ แต่ไม่สามารถซิงค์ขึ้น Supabase ได้ค่ะ:\n" + error.message);
+
+                          // Try upserting to the new row-based schema
+                          const { error: newError } = await supabase
+                            .from("cctv_master_costs")
+                            .upsert(rowsToUpsert);
+
+                          if (newError) {
+                            console.warn("New schema upsert failed, attempting old format fallback...", newError.message);
+                            
+                            // Fallback to old format
+                            const { error: oldError } = await supabase
+                              .from("cctv_master_costs")
+                              .upsert({
+                                id: "default",
+                                costs: updated,
+                                updated_at: new Date().toISOString()
+                              });
+                            
+                            if (oldError) {
+                              console.error("Failed to save master costs to Supabase (old format):", oldError.message);
+                              alert("💾 บันทึกในเบราว์เซอร์สำเร็จ แต่ไม่สามารถซิงค์ขึ้น Supabase ได้ค่ะ:\n" + oldError.message);
+                            } else {
+                              alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จและซิงค์ขึ้นระบบ Cloud Supabase เรียบร้อยแล้วค่ะ! (รูปแบบตารางเก่า)");
+                            }
                           } else {
-                            alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จและซิงค์ขึ้นระบบ Cloud Supabase เรียบร้อยแล้วค่ะ!");
+                            alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จและซิงค์ขึ้นระบบ Cloud Supabase (รูปแบบแถวรายไอเทมใหม่) เรียบร้อยแล้วค่ะ!");
                           }
                         } catch (err: any) {
                           console.error("Failed to save master costs to Supabase:", err);
