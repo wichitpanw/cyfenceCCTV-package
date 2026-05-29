@@ -762,9 +762,8 @@ export default function App() {
           setAuthLoading(false);
         }
       } else {
-        // หากผู้ใช้ Sign Out หรือไม่มี Session
-        setCurrentUser(null);
-        setUserProfile(null);
+        // หากผู้ใช้ Sign Out หรือไม่มี Session ให้ล้างสเตตทั้งหมดของ Client เพื่อความปลอดภัยของข้อมูล
+        resetAllStates();
         setAuthLoading(false);
       }
     });
@@ -876,13 +875,32 @@ export default function App() {
     }
   };
 
+  // Reset all Client React states to prevent state leakage between sessions
+  const resetAllStates = () => {
+    setCurrentUser(null);
+    setUserProfile(null);
+    setStep(1);
+    setIsViewingDashboard(false);
+    setProjectsList([]);
+    setActiveProjectId(null);
+    setCustomerInfo(DEFAULT_CUSTOMER_INFO);
+    setRequirements(DEFAULT_REQUIREMENTS);
+    setHasSurveyReport(true);
+    setCameraPoints([]);
+    setPricingItems([]);
+    setDiscount(0);
+    setVatRate(7);
+    setActiveProjectStatus("presented");
+    setActiveProjectDeliveryDate(undefined);
+    setIsEditMode(false);
+  };
+
   // Reusable handleLogout function
   const handleLogout = async () => {
     setAuthLoading(true);
     
-    // เคลียร์ข้อมูลระดับ Client ทันทีเพื่อความรวดเร็วและไม่ค้างหน้าจอหลัก
-    setCurrentUser(null);
-    setUserProfile(null);
+    // เคลียร์ข้อมูลและล้างสเตตทั้งหมดของ Client ทันทีเพื่อความรวดเร็วและป้องกันข้อมูลเก่าตกค้าง (State Leakage)
+    resetAllStates();
 
     try {
       // เรียก signOut โดยกำหนดเวลารอสูงสุด 1.5 วินาที เพื่อความมั่นใจว่าไม่ติดหล่มเครือข่ายหน่วง
@@ -897,6 +915,7 @@ export default function App() {
       setAuthLoading(false);
     }
   };
+
 
   // Rolling Expiry Activity Tracker (ต่ออายุอีก 2 ชั่วโมงเมื่อมีการเคลื่อนไหว)
   useEffect(() => {
