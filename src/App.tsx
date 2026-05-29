@@ -821,14 +821,23 @@ export default function App() {
   const handleLogout = async () => {
     localStorage.removeItem("CCTV_USER_SESSION");
     localStorage.removeItem("CCTV_SESSION_EXPIRY");
+    
+    // เคลียร์ React states ทันทีเพื่อความรวดเร็ว
+    setCurrentUser(null);
+    setUserProfile(null);
+    setAuthLoading(false);
+
     try {
-      await supabase.auth.signOut();
+      // เรียก signOut โดยไม่ต้องรอนาน (หลีกเลี่ยงการล็อกเอาต์ค้างเนื่องจากเครือข่าย)
+      supabase.auth.signOut().catch(err => console.error("SignOut err:", err));
     } catch (err) {
       console.error("Supabase signOut failed:", err);
     }
-    setCurrentUser(null);
-    setUserProfile(null);
-    window.location.reload();
+    
+    // บังคับรีโหลดหลังผ่านไป 150ms เพื่อให้แน่ใจว่าล้างข้อมูลในบราวเซอร์เรียบร้อย
+    setTimeout(() => {
+      window.location.reload();
+    }, 150);
   };
 
   // Rolling Expiry Activity Tracker (ต่ออายุอีก 2 ชั่วโมงเมื่อมีการเคลื่อนไหว)
