@@ -879,6 +879,7 @@ export default function App() {
             try {
               const { error } = await supabase.from("profiles").upsert({
                 id: userId,
+                email: email, // ป้อนอีเมลเพื่อป้องกันปัญหา Null Value Violates Not-Null Constraint
                 role: "user",
                 display_name: defaultProf.displayName,
                 province: "",
