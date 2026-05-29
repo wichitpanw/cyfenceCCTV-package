@@ -683,7 +683,7 @@ export default function App() {
   const [vatRate, setVatRate] = useState<number>(7);
   const [activeProjectStatus, setActiveProjectStatus] = useState<"draft" | "completed" | "presented" | "delivered">("presented");
   const [activeProjectDeliveryDate, setActiveProjectDeliveryDate] = useState<string | undefined>(undefined);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(true);
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState<boolean>(false);
 
   // Confirmation Modal state
@@ -892,15 +892,23 @@ export default function App() {
     setVatRate(7);
     setActiveProjectStatus("presented");
     setActiveProjectDeliveryDate(undefined);
-    setIsEditMode(false);
+    setIsEditMode(true);
   };
 
   // Reusable handleLogout function
   const handleLogout = async () => {
     setAuthLoading(true);
     
-    // เคลียร์ข้อมูลและล้างสเตตทั้งหมดของ Client ทันทีเพื่อความรวดเร็วและป้องกันข้อมูลเก่าตกค้าง (State Leakage)
+    // เคลียร์ข้อมูลและล้างสเตตทั้งหมดของ Client ทันที
     resetAllStates();
+
+    // ล้างแคชทั้งหมดใน LocalStorage และ SessionStorage เพื่อป้องกันข้อมูลเก่าตกค้าง 100% (รวมถึง Auth tokens และข้อมูลชั่วคราว)
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {
+      console.warn("Failed to clear local/session storage:", e);
+    }
 
     try {
       // เรียก signOut โดยกำหนดเวลารอสูงสุด 1.5 วินาที เพื่อความมั่นใจว่าไม่ติดหล่มเครือข่ายหน่วง
@@ -911,8 +919,9 @@ export default function App() {
     } catch (err) {
       console.warn("Supabase signOut handled with fallback/timeout:", err);
     } finally {
-      // ปิด Loading เพื่อกลับสู่หน้าล็อกอินอย่างลื่นไหล 100% โดยไม่ต้องโหลดหน้าเว็บใหม่
-      setAuthLoading(false);
+      // ทำการ Clean Reload หน้าเว็บกลับไปที่หน้าแรกสุดเพื่อทำลายหน่วยความจำและ JS Context ทั้งหมดของเบราว์เซอร์
+      // การทำงานจะเร็วมากเนื่องจากเบราว์เซอร์จะโหลดไฟล์จาก Disk Cache เดิมอยู่แล้ว แต่จะได้ความปลอดภัยและไร้สเตตเก่าตกค้าง 100%
+      window.location.href = window.location.origin;
     }
   };
 
@@ -1445,7 +1454,7 @@ export default function App() {
     setVatRate(proj.vatRate);
     setActiveProjectStatus(proj.status || "presented");
     setActiveProjectDeliveryDate(proj.deliveryDate || proj.customerInfo.deliveryDate);
-    setIsEditMode(false); // Default to view summary BOM only, not editing other steps
+    setIsEditMode(true); // Default to edit mode since view mode is removed
     setStep(4); // switch to the summary BOM screen so the user can view results immediately
     setIsViewingDashboard(false);
   };
@@ -2234,16 +2243,10 @@ export default function App() {
           <ProjectHistory
             projects={projectsList}
             onLoadProject={(id) => {
-              if (activeProjectId === id) {
-                // หากคลิกที่ชื่อโครงการที่กำลังเปิดอยู่อีกครั้ง ให้ปิดหน้านี้และสลับกลับมาหน้า "เปิดไฟล์งานใหม่" (Step 1)
-                handleNewProject();
-              } else {
-                const proj = projectsList.find(p => p.id === id);
-                if (proj) {
-                  loadProject(proj);
-                  setIsEditMode(false); // ดูสรุปโครงการเท่านั้น ล็อคไม่ให้แก้ไข
-                  setStep(4); // ดูสรุปโครงการ (หน้ารายการอุปกรณ์ BOM) แทนการเข้าไปแก้ไขโดยตรง
-                }
+              const proj = projectsList.find(p => p.id === id);
+              if (proj) {
+                // เด้งหน้าต่างใหม่เพื่อดูสรุปโครงการ (PDF/พิมพ์รายงาน) ทันที
+                handlePrintProjectPDF(proj);
               }
             }}
             onEditProject={(id) => {
@@ -2359,8 +2362,8 @@ export default function App() {
               onLoadProject={(id) => {
                 const proj = projectsList.find(p => p.id === id);
                 if (proj) {
-                  loadProject(proj);
-                  setStep(4); // เมื่อกดจากหน้า dashboard ให้สลับไปดูใบสรุปอุปกรณ์ BOM เช่นกัน
+                  // เด้งหน้าต่างใหม่เพื่อดูสรุปโครงการ (PDF/พิมพ์รายงาน) ทันทีจากหน้าแดชบอร์ด
+                  handlePrintProjectPDF(proj);
                 }
               }}
             />
@@ -2372,9 +2375,7 @@ export default function App() {
                   const isCurrent = stepUnit.number === step;
                   const isSurveyIgnored = (stepUnit.number === 4) && !hasSurveyReport;
                   // ล็อคไม่ให้คลิกข้ามหน้าอื่นหากไม่ได้อยู่ในโหมดแก้ไข (อนุมัติให้ดูได้เฉพาะหน้า BOM(4))
-                  const isClickable = isEditMode 
-                    ? ((isPassed || isCurrent) || !!activeProjectId)
-                    : (stepUnit.number === 4);
+                  const isClickable = (isPassed || isCurrent) || !!activeProjectId;
                   return {
                     number: stepUnit.number,
                     label: stepUnit.label,
@@ -2388,8 +2389,8 @@ export default function App() {
                   <Sidebar02 
                     steps={sidebarSteps} 
                     onStepSelect={(targetStep) => {
-                      if (!isEditMode && targetStep !== 4) {
-                        showAlert("🔒 โหมดดูสรุปโครงการ", "หากต้องการแก้ไขข้อมูลโครงการหรือตรวจสอบงวดราคา กรุณากดปุ่มดินสอ ✏️ ที่โครงการในแถบด้านข้างก่อนนะคะ");
+                      const targetStepUnit = sidebarSteps.find(s => s.number === targetStep);
+                      if (!targetStepUnit || !targetStepUnit.isClickable) {
                         return;
                       }
                       setStep(targetStep);
