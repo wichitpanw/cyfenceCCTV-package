@@ -123,18 +123,18 @@ export default function UserManagement() {
         return;
       }
 
-      // 2. เมื่อสมัครเสร็จ ระบบ Trigger บนฐานข้อมูลจะสร้าง Row โปรไฟล์ให้อัตโนมัติ 
-      // เราจึงอัปเดตข้อมูลส่วนอื่นๆ (เช่น บทบาท, ชื่อแสดงผล, จังหวัด)
+      // 2. ใช้ upsert เพื่อรับประกันการสร้างข้อมูลในตาราง profiles ทันที
       if (authData.user) {
         const { error: profileError } = await supabase
           .from("profiles")
-          .update({
+          .upsert({
+            id: authData.user.id,
+            email: newEmail.trim().toLowerCase(),
             display_name: newName.trim(),
             role: newRole,
             province: newProvince,
             updated_at: new Date().toISOString()
-          })
-          .eq("id", authData.user.id);
+          });
 
         if (profileError) {
           setErrorMsg("สร้างบัญชีสำเร็จ แต่ไม่สามารถตั้งค่าโปรไฟล์ได้: " + profileError.message);
