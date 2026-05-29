@@ -1874,6 +1874,8 @@ export default function App() {
       <div class="info-row">ผู้สำรวจ: <span>${customerInfo?.surveyorName || "-"}</span></div>
       ${customerInfo?.surveyorDepartment ? `<div class="info-row">ส่วนงาน: <span>${customerInfo.surveyorDepartment}</span></div>` : ""}
       ${customerInfo?.surveyorPhone ? `<div class="info-row">เบอร์โทรผู้สำรวจ: <span>${customerInfo.surveyorPhone}</span></div>` : ""}
+      <div class="info-row">จำนวนจุดติดตั้ง: <span>${cameraPoints.length} จุด</span></div>
+      <div class="info-row">จำนวนห้องควบคุม: <span>1 จุด</span></div>
     </div>
   </div>
 
