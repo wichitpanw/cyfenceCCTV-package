@@ -12,9 +12,9 @@ import {
   CheckCircle,
   HelpCircle
 } from "lucide-react";
-import { PricingItem, CustomerInfo, TechRequirements } from "../types";
+import { PricingItem, CustomerInfo, TechRequirements, calculateLeasePayments } from "../types";
 
-interface Step6Props {
+interface Step5Props {
   pricingItems: PricingItem[];
   discount: number;
   vatRate: number;
@@ -39,7 +39,7 @@ interface Step6Props {
   isEditMode?: boolean;
 }
 
-export default function Step6Pricing({
+export default function Step5Pricing({
   pricingItems,
   discount,
   vatRate,
@@ -57,7 +57,7 @@ export default function Step6Pricing({
   isAdminVerified = false,
   onVerifyAdmin,
   isEditMode = true
-}: Step6Props) {
+}: Step5Props) {
   const [successSaved, setSuccessSaved] = useState(false);
   const [isVatEnabled, setIsVatEnabled] = useState(vatRate > 0);
   const [showCostsAdmin, setShowCostsAdmin] = useState(false);
@@ -67,11 +67,8 @@ export default function Step6Pricing({
   const calDiscountAmount = discount;
   const calBeforeVat = Math.max(0, calSubtotal - calDiscountAmount);
 
-  // 3-Year Leased/Rental System calculations (กำไร +40%, ดอกเบี้ย 8% ต่อปี แฟลตเรต 3 ปี)
-  const leasePrincipal = calBeforeVat * 1.40;
-  const leaseInterest = leasePrincipal * 0.08 * 3;
-  const leaseTotalAmount = leasePrincipal + leaseInterest;
-  const leaseMonthlyPayment = leaseTotalAmount / 36;
+  // 3-Year Leased/Rental System calculations (ดึงสูตรกลาง)
+  const { leasePrincipal, leaseInterest, leaseTotalAmount, leaseMonthlyPayment } = calculateLeasePayments(calBeforeVat);
 
   // Calculate Monthly Recurring Costs (OPEX)
   const pointsList = cameraPoints || [];
@@ -791,7 +788,7 @@ export default function Step6Pricing({
               <div className="space-y-2 bg-gray-50 p-3 rounded-xl border border-gray-200">
                 <div className="flex justify-between items-center">
                   <label htmlFor="vat-toggle" className="text-gray-550 font-medium flex items-center gap-1 cursor-pointer">
-                    คำนวณภาษีมูลค่าเพิ่ม (VAT 7%):
+                    คำนวณภาษีมูลค่าเพิ่ม (VAT {vatRate || 7}%):
                   </label>
                   <input
                     id="vat-toggle"
@@ -828,8 +825,8 @@ export default function Step6Pricing({
                 </div>
                 {isVatEnabled && (
                   <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-gray-150 pt-1">
-                    <span className="text-gray-400 font-sans text-xs">รวม VAT (7%):</span>
-                    <span className="text-gray-950">฿{(leaseMonthlyPayment * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
+                    <span className="text-gray-400 font-sans text-xs">รวม VAT ({vatRate}%):</span>
+                    <span className="text-gray-950">฿{(leaseMonthlyPayment * (1 + vatRate / 100)).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}
               </div>
@@ -845,8 +842,8 @@ export default function Step6Pricing({
                 </div>
                 {isVatEnabled && (
                   <div className="text-sm font-semibold font-mono text-zinc-900 flex justify-between border-t border-gray-150 pt-1">
-                    <span className="text-gray-400 font-sans text-xs">รวม VAT (7%):</span>
-                    <span className="text-gray-950">฿{(totalMonthlyPrice * 1.07).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
+                    <span className="text-gray-400 font-sans text-xs">รวม VAT ({vatRate}%):</span>
+                    <span className="text-gray-950">฿{(totalMonthlyPrice * (1 + vatRate / 100)).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}
               </div>
@@ -862,7 +859,7 @@ export default function Step6Pricing({
                 </div>
                 {isVatEnabled && (
                   <div className="text-lg font-black font-mono text-zinc-900 flex justify-between border-t border-gray-200/60 pt-1.5">
-                    <span className="text-gray-550 font-sans text-xs font-bold">รวม VAT (7%):</span>
+                    <span className="text-gray-550 font-sans text-xs font-bold">รวม VAT ({vatRate}%):</span>
                     <span className="text-gray-950">฿{grandMonthlyTotal.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/เดือน</span>
                   </div>
                 )}

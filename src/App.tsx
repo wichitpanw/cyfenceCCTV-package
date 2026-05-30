@@ -16,12 +16,12 @@ import {
   Home
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { ProjectSurvey, CustomerInfo, TechRequirements, CameraPoint, PricingItem, MasterCostDb, UserProfile } from "./types";
+import { ProjectSurvey, CustomerInfo, TechRequirements, CameraPoint, PricingItem, MasterCostDb, UserProfile, calculateLeasePayments } from "./types";
 import Step1BasicInfo from "./components/Step1BasicInfo";
-import Step2CameraRequirements from "./components/Step2CameraRequirements";
-import Step4SurveyReport from "./components/Step4SurveyReport";
-import Step5Summary from "./components/Step5Summary";
-import Step6Pricing from "./components/Step6Pricing";
+import Step3CameraRequirements from "./components/Step3CameraRequirements";
+import Step2SurveyReport from "./components/Step2SurveyReport";
+import Step4Summary from "./components/Step4Summary";
+import Step5Pricing from "./components/Step5Pricing";
 import ProjectHistory from "./components/ProjectHistory";
 import DashboardView from "./components/DashboardView";
 import LoginScreen from "./components/LoginScreen";
@@ -74,6 +74,7 @@ const DEFAULT_MASTER_COSTS: MasterCostDb = {
   sdCard128: 650, // SDcard 128G
   supportArm: 850, // แขน Support
   thw16sqmm: 3000, // ค่าสายไฟฟ้า THW IEC 16 sq.mm. 50 เมตร (ราคาชุดละ 50 เมตร)
+  groundRod: 650, // อุปกรณ์สายดิน/หลักดิน Ground Rod (ค่าของ)
 
   // --- เสา ---
   poleSteel4m: 3500, // เสาเหล็ก 4 เมตร
@@ -128,6 +129,7 @@ const MASTER_COSTS_METADATA = [
   { key: "sdCard128", name: "SD Card 128GB", category: "hardware" },
   { key: "supportArm", name: "แขน Support กล้อง", category: "hardware" },
   { key: "thw16sqmm", name: "สายไฟฟ้า THW IEC 16 sq.mm. 50 เมตร", category: "hardware" },
+  { key: "groundRod", name: "อุปกรณ์หลักดิน/สายดิน Ground Rod", category: "hardware" },
   { key: "poleSteel4m", name: "เสาเหล็ก 4 เมตร", category: "pole" },
   { key: "poleCement8m", name: "เสาปูน 8 เมตร", category: "pole" },
   { key: "nvr8ch", name: "NVR 8 Channels", category: "headend" },
@@ -169,199 +171,197 @@ function generatePricingItems(
   const items: PricingItem[] = [];
 
   // --- 1. ปลายทาง: กล้อง CCTV ---
-  let totalCams = requirements.cameraCount;
-  if (hasSurvey && cameraPoints.length > 0) {
-    totalCams = cameraPoints.reduce((sum, pt) => {
-      let ptCams = 1;
-      if (pt.selectedSet === "Set 1") ptCams = 1;
-      else if (pt.selectedSet === "Set 2") ptCams = 2;
-      else if (pt.selectedSet === "Set 3") ptCams = 3;
-      else if (pt.selectedSet === "Set 4") ptCams = 4;
-      return sum + ptCams;
-    }, 0);
-  }
+  // บังคับผ่านการสำรวจพิกัดกล้องจริงเสมอ
+  const totalCams = cameraPoints.reduce((sum, pt) => {
+    let ptCams = 1;
+    if (pt.selectedSet === "Set 1") ptCams = 1;
+    else if (pt.selectedSet === "Set 2") ptCams = 2;
+    else if (pt.selectedSet === "Set 3") ptCams = 3;
+    else if (pt.selectedSet === "Set 4") ptCams = 4;
+    return sum + ptCams;
+  }, 0);
 
-  // แยกประเภทกล้องสำหรับกรณีมี Survey
-  if (hasSurvey && cameraPoints.length > 0) {
-    let domes = 0;
-    let bullets = 0;
-    let ptzs = 0;
-    let fisheyes = 0;
+  // แยกประเภทกล้อง
+  let domes = 0;
+  let bullets = 0;
+  let ptzs = 0;
+  let fisheyes = 0;
 
-    cameraPoints.forEach(p => {
-      let ptCams = 1;
-      if (p.selectedSet === "Set 1") ptCams = 1;
-      else if (p.selectedSet === "Set 2") ptCams = 2;
-      else if (p.selectedSet === "Set 3") ptCams = 3;
-      else if (p.selectedSet === "Set 4") ptCams = 4;
+  cameraPoints.forEach(p => {
+    let ptCams = 1;
+    if (p.selectedSet === "Set 1") ptCams = 1;
+    else if (p.selectedSet === "Set 2") ptCams = 2;
+    else if (p.selectedSet === "Set 3") ptCams = 3;
+    else if (p.selectedSet === "Set 4") ptCams = 4;
 
-      if (p.type === "Dome") domes += ptCams;
-      else if (p.type === "PTZ" || p.type === "Speed Dome") ptzs += ptCams;
-      else if (p.type === "Fisheye") fisheyes += ptCams;
-      else bullets += ptCams; // Default is Bullet
-    });
+    if (p.type === "Dome") domes += ptCams;
+    else if (p.type === "PTZ" || p.type === "Speed Dome") ptzs += ptCams;
+    else if (p.type === "Fisheye") fisheyes += ptCams;
+    else bullets += ptCams; // Default is Bullet
+  });
 
-    if (bullets > 0) {
-      items.push({
-        id: "bom-cam-bullet",
-        name: `กล้อง CCTV Bullet IP Camera 5MP (${brand})`,
-        quantity: bullets,
-        unit: "ตัว",
-        unitPrice: costs.camBullet,
-        category: "hardware"
-      });
-    }
-    if (domes > 0) {
-      items.push({
-        id: "bom-cam-dome",
-        name: `กล้อง CCTV Dome IP Camera 5MP (${brand})`,
-        quantity: domes,
-        unit: "ตัว",
-        unitPrice: costs.camDome,
-        category: "hardware"
-      });
-    }
-    if (ptzs > 0) {
-      items.push({
-        id: "bom-cam-ptz",
-        name: `กล้อง CCTV PTZ Speed Dome (${brand})`,
-        quantity: ptzs,
-        unit: "ตัว",
-        unitPrice: costs.camPtz,
-        category: "hardware"
-      });
-    }
-    if (fisheyes > 0) {
-      items.push({
-        id: "bom-cam-fisheye",
-        name: `กล้อง CCTV Fisheye 360° (${brand})`,
-        quantity: fisheyes,
-        unit: "ตัว",
-        unitPrice: costs.camFisheye,
-        category: "hardware"
-      });
-    }
-  } else {
+  if (bullets > 0) {
     items.push({
       id: "bom-cam-bullet",
       name: `กล้อง CCTV Bullet IP Camera 5MP (${brand})`,
-      quantity: totalCams,
+      quantity: bullets,
       unit: "ตัว",
       unitPrice: costs.camBullet,
       category: "hardware"
     });
   }
+  if (domes > 0) {
+    items.push({
+      id: "bom-cam-dome",
+      name: `กล้อง CCTV Dome IP Camera 5MP (${brand})`,
+      quantity: domes,
+      unit: "ตัว",
+      unitPrice: costs.camDome,
+      category: "hardware"
+    });
+  }
+  if (ptzs > 0) {
+    items.push({
+      id: "bom-cam-ptz",
+      name: `กล้อง CCTV PTZ Speed Dome (${brand})`,
+      quantity: ptzs,
+      unit: "ตัว",
+      unitPrice: costs.camPtz,
+      category: "hardware"
+    });
+  }
+  if (fisheyes > 0) {
+    items.push({
+      id: "bom-cam-fisheye",
+      name: `กล้อง CCTV Fisheye 360° (${brand})`,
+      quantity: fisheyes,
+      unit: "ตัว",
+      unitPrice: costs.camFisheye,
+      category: "hardware"
+    });
+  }
 
   // --- 2. ปลายทาง: Switch POE 4 Port Industrial Grade ---
-  // การจ่าย POE ปลายทางจะคิดตามจุด (1 จุดต่อ 1 เครื่อง Switch POE 4 Port)
-  const poeQty = (hasSurvey && cameraPoints.length > 0) ? cameraPoints.length : Math.max(1, Math.ceil(totalCams / 4));
-  items.push({
-    id: "bom-poe-4port",
-    name: "Switch POE 4 Port Industrial Grade",
-    quantity: poeQty,
-    unit: "เครื่อง",
-    unitPrice: costs.poe4port,
-    category: "hardware"
-  });
+  // การจ่าย POE ปลายทางจะคิดตามจุดที่มีการตั้งค่า hasPoeSwitch เป็น true จริงๆ
+  const poeQty = cameraPoints.filter(p => p.hasPoeSwitch).length;
+  if (poeQty > 0) {
+    items.push({
+      id: "bom-poe-4port",
+      name: "Switch POE 4 Port Industrial Grade",
+      quantity: poeQty,
+      unit: "เครื่อง",
+      unitPrice: costs.poe4port,
+      category: "hardware"
+    });
+  }
 
   // --- 3. ปลายทาง: อุปกรณ์เสริมยิบย่อยตามแฟล็กของ CameraPoint ---
-  if (hasSurvey && cameraPoints.length > 0) {
-    let ups800vaCount = 0;
-    let outdoorCabinetCount = 0;
-    let sdCardCount = 0;
-    let supportArmCount = 0;
-    let powerMeterCount = 0;
+  let ups800vaCount = 0;
+  let outdoorCabinetCount = 0;
+  let sdCardCount = 0;
+  let supportArmCount = 0;
+  let powerMeterCount = 0;
+  let groundRodCount = 0; // เพิ่มการนับวัสดุ Ground Rod
 
-    cameraPoints.forEach(p => {
-      if (p.hasCabinetUps) ups800vaCount++;
-      if (p.hasOutdoorCabinet) outdoorCabinetCount++;
-      if (p.hasSdCard) sdCardCount++;
-      if (p.hasSupportArm) supportArmCount++;
-      if (p.hasPowerMeter) powerMeterCount++;
+  cameraPoints.forEach(p => {
+    if (p.hasCabinetUps) ups800vaCount++;
+    if (p.hasOutdoorCabinet) outdoorCabinetCount++;
+    if (p.hasSdCard) sdCardCount++;
+    if (p.hasSupportArm) supportArmCount++;
+    if (p.hasPowerMeter) powerMeterCount++;
+    if (p.hasGroundRod) groundRodCount++;
+  });
+
+  if (ups800vaCount > 0) {
+    items.push({
+      id: "bom-ups-800va",
+      name: "Ups 800 VA (เครื่องสำรองไฟสำหรับตู้ควบคุมปลายทาง)",
+      quantity: ups800vaCount,
+      unit: "เครื่อง",
+      unitPrice: costs.ups800va,
+      category: "hardware"
     });
-
-    if (ups800vaCount > 0) {
-      items.push({
-        id: "bom-ups-800va",
-        name: "Ups 800 VA (เครื่องสำรองไฟสำหรับตู้ควบคุมปลายทาง)",
-        quantity: ups800vaCount,
-        unit: "เครื่อง",
-        unitPrice: costs.ups800va,
-        category: "hardware"
-      });
-    }
-    if (outdoorCabinetCount > 0) {
-      items.push({
-        id: "bom-outdoor-cabinet",
-        name: "ตู้ Outdoor Cabinet แบบมีพัดลมระบายอากาศภายในตู้",
-        quantity: outdoorCabinetCount,
-        unit: "ตู้",
-        unitPrice: costs.outdoorCabinet,
-        category: "accessory"
-      });
-    }
-    if (sdCardCount > 0) {
-      items.push({
-        id: "bom-sdcard-128g",
-        name: "SDcard 128G (เมมโมรี่การ์ดบันทึกสำรองปลายทาง)",
-        quantity: sdCardCount,
-        unit: "ใบ",
-        unitPrice: costs.sdCard128,
-        category: "accessory"
-      });
-    }
-    if (supportArmCount > 0) {
-      items.push({
-        id: "bom-support-arm",
-        name: "แขน Support ยึดกล้อง (ความยาวไม่น้อยกว่า 1 เมตร)",
-        quantity: supportArmCount,
-        unit: "ชุด",
-        unitPrice: costs.supportArm,
-        category: "accessory"
-      });
-    }
-    if (powerMeterCount > 0) {
-      items.push({
-        id: "bom-power-thw-cable",
-        name: "ค่าสายไฟฟ้า THW IEC 16 sq.mm. 50 เมตร (สำหรับจ่ายไฟเมนปลายทาง)",
-        quantity: powerMeterCount,
-        unit: "ชุด",
-        unitPrice: costs.thw16sqmm,
-        category: "accessory"
-      });
-    }
+  }
+  if (outdoorCabinetCount > 0) {
+    items.push({
+      id: "bom-outdoor-cabinet",
+      name: "ตู้ Outdoor Cabinet แบบมีพัดลมระบายอากาศภายในตู้",
+      quantity: outdoorCabinetCount,
+      unit: "ตู้",
+      unitPrice: costs.outdoorCabinet,
+      category: "accessory"
+    });
+  }
+  if (sdCardCount > 0) {
+    items.push({
+      id: "bom-sdcard-128g",
+      name: "SDcard 128G (เมมโมรี่การ์ดบันทึกสำรองปลายทาง)",
+      quantity: sdCardCount,
+      unit: "ใบ",
+      unitPrice: costs.sdCard128,
+      category: "accessory"
+    });
+  }
+  if (supportArmCount > 0) {
+    items.push({
+      id: "bom-support-arm",
+      name: "แขน Support ยึดกล้อง (ความยาวไม่น้อยกว่า 1 เมตร)",
+      quantity: supportArmCount,
+      unit: "ชุด",
+      unitPrice: costs.supportArm,
+      category: "accessory"
+    });
+  }
+  if (powerMeterCount > 0) {
+    items.push({
+      id: "bom-power-thw-cable",
+      name: "ค่าสายไฟฟ้า THW IEC 16 sq.mm. 50 เมตร (สำหรับจ่ายไฟเมนปลายทาง)",
+      quantity: powerMeterCount,
+      unit: "ชุด",
+      unitPrice: costs.thw16sqmm,
+      category: "accessory"
+    });
+  }
+  // เพิ่มอุปกรณ์ Ground Rod (ค่าของ)
+  if (groundRodCount > 0) {
+    items.push({
+      id: "bom-ground-rod",
+      name: "อุปกรณ์สายดินและหลักดิน Ground Rod (ความยาวไม่น้อยกว่า 2.4 เมตร)",
+      quantity: groundRodCount,
+      unit: "ชุด",
+      unitPrice: costs.groundRod || 650,
+      category: "accessory"
+    });
   }
 
   // --- 4. เสา (กรณีไม่ได้ติดตั้งกับเสาของการไฟฟ้า) ---
-  if (hasSurvey && cameraPoints.length > 0) {
-    let poleSteel4mCount = 0;
-    let poleCement8mCount = 0;
+  let poleSteel4mCount = 0;
+  let poleCement8mCount = 0;
 
-    cameraPoints.forEach(p => {
-      if (p.poleType === "เสาเหล็กกัลวาไนซ์ 4 เมตร") poleSteel4mCount++;
-      else if (p.poleType === "เสาปูน 8 เมตร") poleCement8mCount++;
+  cameraPoints.forEach(p => {
+    if (p.poleType === "เสาเหล็กกัลวาไนซ์ 4 เมตร") poleSteel4mCount++;
+    else if (p.poleType === "เสาปูน 8 เมตร") poleCement8mCount++;
+  });
+
+  if (poleSteel4mCount > 0) {
+    items.push({
+      id: "bom-pole-steel-4m",
+      name: "เสาเหล็ก 4 เมตร (สำหรับติดตั้งกล้องนอกอาคาร)",
+      quantity: poleSteel4mCount,
+      unit: "ต้น",
+      unitPrice: costs.poleSteel4m,
+      category: "accessory"
     });
-
-    if (poleSteel4mCount > 0) {
-      items.push({
-        id: "bom-pole-steel-4m",
-        name: "เสาเหล็ก 4 เมตร (สำหรับติดตั้งกล้องนอกอาคาร)",
-        quantity: poleSteel4mCount,
-        unit: "ต้น",
-        unitPrice: costs.poleSteel4m,
-        category: "accessory"
-      });
-    }
-    if (poleCement8mCount > 0) {
-      items.push({
-        id: "bom-pole-cement-8m",
-        name: "เสาปูน 8 เมตร (สำหรับติดตั้งโยธาภายนอก)",
-        quantity: poleCement8mCount,
-        unit: "ต้น",
-        unitPrice: costs.poleCement8m,
-        category: "accessory"
-      });
-    }
+  }
+  if (poleCement8mCount > 0) {
+    items.push({
+      id: "bom-pole-cement-8m",
+      name: "เสาปูน 8 เมตร (สำหรับติดตั้งโยธาภายนอก)",
+      quantity: poleCement8mCount,
+      unit: "ต้น",
+      unitPrice: costs.poleCement8m,
+      category: "accessory"
+    });
   }
 
   // --- 5. ต้นทาง: เครื่องบันทึก NVR ---
@@ -486,94 +486,76 @@ function generatePricingItems(
     category: "labor"
   });
 
-  if (hasSurvey && cameraPoints.length > 0) {
-    let supportArmCount = 0;
-    let cabinetCount = 0;
-    let groundRodCount = 0;
-    let cement8mCount = 0;
-    let steel4mCount = 0;
-    let powerThwCount = 0;
-
-    cameraPoints.forEach(p => {
-      if (p.hasSupportArm) supportArmCount++;
-      if (p.hasOutdoorCabinet) cabinetCount++;
-      if (p.hasGroundRod) groundRodCount++;
-      if (p.poleType === "เสาปูน 8 เมตร") cement8mCount++;
-      if (p.poleType === "เสาเหล็กกัลวาไนซ์ 4 เมตร") steel4mCount++;
-      if (p.hasPowerMeter) powerThwCount++;
+  // 2. ค่าติดตั้ง แขน Support
+  if (supportArmCount > 0) {
+    items.push({
+      id: "bom-labor-support-arm",
+      name: "ค่าติดตั้ง แขน Support (ความยาวไม่น้อยกว่า 1 เมตร)",
+      quantity: supportArmCount,
+      unit: "ชุด",
+      unitPrice: costs.laborSupportArm,
+      category: "labor"
     });
+  }
 
-    // 2. ค่าติดตั้ง แขน Support
-    if (supportArmCount > 0) {
-      items.push({
-        id: "bom-labor-support-arm",
-        name: "ค่าติดตั้ง แขน Support (ความยาวไม่น้อยกว่า 1 เมตร)",
-        quantity: supportArmCount,
-        unit: "ชุด",
-        unitPrice: costs.laborSupportArm,
-        category: "labor"
-      });
-    }
+  // 3. ค่าติดตั้งตู้ Outdoor cabinet
+  if (outdoorCabinetCount > 0) {
+    items.push({
+      id: "bom-labor-cabinet",
+      name: "ค่าติดตั้งตู้ Outdoor Cabinet (พร้อมพัดลมระบายอากาศ 2 ตัว, ปลั๊กไฟ, Circuit Breaker)",
+      quantity: outdoorCabinetCount,
+      unit: "ตู้",
+      unitPrice: costs.laborCabinet,
+      category: "labor"
+    });
+  }
 
-    // 3. ค่าติดตั้งตู้ Outdoor cabinet
-    if (cabinetCount > 0) {
-      items.push({
-        id: "bom-labor-cabinet",
-        name: "ค่าติดตั้งตู้ Outdoor Cabinet (พร้อมพัดลมระบายอากาศ 2 ตัว, ปลั๊กไฟ, Circuit Breaker)",
-        quantity: cabinetCount,
-        unit: "ตู้",
-        unitPrice: costs.laborCabinet,
-        category: "labor"
-      });
-    }
+  // 4. ค่าติดตั้ง Ground Rod
+  if (groundRodCount > 0) {
+    items.push({
+      id: "bom-labor-ground-rod",
+      name: "ค่าติดตั้ง Ground Rod (ค่าขุดเจาะบ่อกราวด์เพื่อความปลอดภัย)",
+      quantity: groundRodCount,
+      unit: "จุด",
+      unitPrice: costs.laborGroundRod,
+      category: "labor"
+    });
+  }
 
-    // 4. ค่าติดตั้ง Ground Rod
-    if (groundRodCount > 0) {
-      items.push({
-        id: "bom-labor-ground-rod",
-        name: "ค่าติดตั้ง Ground Rod (ค่าขุดเจาะบ่อกราวด์เพื่อความปลอดภัย)",
-        quantity: groundRodCount,
-        unit: "จุด",
-        unitPrice: costs.laborGroundRod,
-        category: "labor"
-      });
-    }
+  // 5. ค่าติดตั้งเสาปูน 8 เมตร
+  if (poleCement8mCount > 0) {
+    items.push({
+      id: "bom-labor-pole-cement-8m",
+      name: "ค่าติดตั้งเสาปูน 8 เมตร (ค่าปักเสาปูนพร้อมฐานรากงานโยธา)",
+      quantity: poleCement8mCount,
+      unit: "ต้น",
+      unitPrice: costs.laborPoleCement8m,
+      category: "labor"
+    });
+  }
 
-    // 5. ค่าติดตั้งเสาปูน 8 เมตร
-    if (cement8mCount > 0) {
-      items.push({
-        id: "bom-labor-pole-cement-8m",
-        name: "ค่าติดตั้งเสาปูน 8 เมตร (ค่าปักเสาปูนพร้อมฐานรากงานโยธา)",
-        quantity: cement8mCount,
-        unit: "ต้น",
-        unitPrice: costs.laborPoleCement8m,
-        category: "labor"
-      });
-    }
+  // 6. ค่าติดตั้งเสาเหล็ก 4 เมตร
+  if (poleSteel4mCount > 0) {
+    items.push({
+      id: "bom-labor-pole-steel-4m",
+      name: "ค่าติดตั้งเสาเหล็กกัลวาไนซ์ สูง 4 เมตร (ค่าติดตั้งพร้อมฐานราก)",
+      quantity: poleSteel4mCount,
+      unit: "ต้น",
+      unitPrice: costs.laborPoleSteel4m,
+      category: "labor"
+    });
+  }
 
-    // 6. ค่าติดตั้งเสาเหล็ก 4 เมตร
-    if (steel4mCount > 0) {
-      items.push({
-        id: "bom-labor-pole-steel-4m",
-        name: "ค่าติดตั้งเสาเหล็กกัลวาไนซ์ สูง 4 เมตร (ค่าติดตั้งพร้อมฐานราก)",
-        quantity: steel4mCount,
-        unit: "ต้น",
-        unitPrice: costs.laborPoleSteel4m,
-        category: "labor"
-      });
-    }
-
-    // 7. ค่าติดตั้ง สายไฟฟ้า
-    if (powerThwCount > 0) {
-      items.push({
-        id: "bom-labor-power-thw",
-        name: "ค่าติดตั้ง สายไฟฟ้า (สาย THW IEC 16 sq.mm. 50 เมตร + ค่าแรกเข้าติดตั้งมิเตอร์ไฟฟ้า)",
-        quantity: powerThwCount,
-        unit: "ชุด",
-        unitPrice: costs.laborPowerThw,
-        category: "labor"
-      });
-    }
+  // 7. ค่าติดตั้ง สายไฟฟ้า
+  if (powerMeterCount > 0) {
+    items.push({
+      id: "bom-labor-power-thw",
+      name: "ค่าติดตั้ง สายไฟฟ้า (สาย THW IEC 16 sq.mm. 50 เมตร + ค่าแรกเข้าติดตั้งมิเตอร์ไฟฟ้า)",
+      quantity: powerMeterCount,
+      unit: "ชุด",
+      unitPrice: costs.laborPowerThw,
+      category: "labor"
+    });
   }
 
   // ==================== รายการค่าติดตั้ง (ต้นทาง) ====================
@@ -1759,10 +1741,8 @@ export default function App() {
       );
       const beforeVat = Math.max(0, subtotal - discount);
 
-      // ค่าผ่อนอุปกรณ์ 3 ปี (กำไร 40% + ดอกเบี้ยแฟลต 8%/ปี)
-      const leasePrincipal = beforeVat * 1.4;
-      const leaseInterest = leasePrincipal * 0.08 * 3;
-      const leaseMonthlyPayment = (leasePrincipal + leaseInterest) / 36;
+      // ค่าผ่อนอุปกรณ์ 3 ปี (ดึงสูตรกลาง)
+      const { leasePrincipal, leaseInterest, leaseMonthlyPayment } = calculateLeasePayments(beforeVat);
 
       // ค่าเช่าวงจร NT Links รายเดือน
       const totalFieldLinksPrice = cameraPoints.reduce((sum, pt) => {
@@ -2467,7 +2447,7 @@ export default function App() {
                     )}
                     
                     {step === 2 && (
-                      <Step4SurveyReport
+                      <Step2SurveyReport
                         cameraPoints={cameraPoints}
                         cameraCount={requirements.cameraCount}
                         onChange={setCameraPoints}
@@ -2482,7 +2462,7 @@ export default function App() {
                     )}
 
                     {step === 3 && (
-                      <Step2CameraRequirements
+                      <Step3CameraRequirements
                         data={requirements}
                         onChange={setRequirements}
                         onNext={handleNextStep}
@@ -2500,7 +2480,7 @@ export default function App() {
                     )}
 
                     {step === 4 && (
-                      <Step5Summary
+                      <Step4Summary
                         customerInfo={customerInfo}
                         requirements={requirements}
                         hasSurveyReport={hasSurveyReport}
@@ -2513,7 +2493,7 @@ export default function App() {
                     )}
 
                     {step === 5 && (
-                      <Step6Pricing
+                      <Step5Pricing
                         pricingItems={pricingItems}
                         discount={discount}
                         vatRate={vatRate}

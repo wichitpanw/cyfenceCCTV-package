@@ -17,7 +17,7 @@ const suggestedChannels = (count: number) => {
   return 32;
 };
 
-export default function Step2CameraRequirements({ data, onChange, onNext, onPrev, cameraCount, cameraPoints }: Step2Props) {
+export default function Step3CameraRequirements({ data, onChange, onNext, onPrev, cameraCount, cameraPoints }: Step2Props) {
   
   const handleStorageSelect = (storage: string) => {
     onChange({ ...data, storagePackage: storage });

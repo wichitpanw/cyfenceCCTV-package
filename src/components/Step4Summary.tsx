@@ -18,7 +18,7 @@ import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-interface Step5Props {
+interface Step4Props {
   customerInfo: CustomerInfo;
   requirements: TechRequirements;
   hasSurveyReport: boolean;
@@ -43,7 +43,7 @@ function MapCenterController({ lat, lng }: { lat: number; lng: number }) {
   return null;
 }
 
-export default function Step5Summary({
+export default function Step4Summary({
   customerInfo,
   requirements,
   hasSurveyReport,
@@ -52,7 +52,7 @@ export default function Step5Summary({
   onNext,
   onPrev,
   isEditMode = true
-}: Step5Props) {
+}: Step4Props) {
   
   // Group surveyed CCTV specs if they exist, otherwise use requirements
   const totalCamerasCount = hasSurveyReport ? cameraPoints.length : requirements.cameraCount;

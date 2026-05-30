@@ -17,7 +17,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-lea
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-interface Step4Props {
+interface Step2Props {
   cameraPoints: CameraPoint[];
   cameraCount: number;
   onChange: (points: CameraPoint[]) => void;
@@ -49,7 +49,7 @@ function MapCenterController({ lat, lng }: { lat: number; lng: number }) {
   return null;
 }
 
-export default function Step4SurveyReport({ 
+export default function Step2SurveyReport({ 
   cameraPoints, 
   cameraCount, 
   onChange, 
@@ -60,7 +60,7 @@ export default function Step4SurveyReport({
   onUpdateCameraBrand,
   showConfirm,
   onUpdateCustomerInfo
-}: Step4Props) {
+}: Step2Props) {
   const stdLimit = requirements?.standardCableLimit ?? 25;
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"main" | "options" | "location">("main");

@@ -11,17 +11,15 @@ import {
   MapPin,
   PieChart
 } from "lucide-react";
-import { ProjectSurvey, CameraPoint } from "../types";
+import { ProjectSurvey, CameraPoint, calculateLeasePayments } from "../types";
 
 // Helper function to calculate monthly payments (matching ProjectHistory.tsx)
 function calcMonthlyTotal(proj: ProjectSurvey): number {
   const subtotal = proj.pricingItems.reduce((acc, curr) => acc + curr.quantity * curr.unitPrice, 0);
   const beforeVat = Math.max(0, subtotal - proj.discount);
 
-  // ค่าผ่อนอุปกรณ์ 3 ปี (กำไร 40% + ดอกเบี้ยแฟลต 8%/ปี)
-  const leasePrincipal = beforeVat * 1.4;
-  const leaseInterest = leasePrincipal * 0.08 * 3;
-  const leaseMonthlyPayment = (leasePrincipal + leaseInterest) / 36;
+  // ค่าผ่อนอุปกรณ์ 3 ปี (ดึงสูตรกลาง)
+  const { leaseMonthlyPayment } = calculateLeasePayments(beforeVat);
 
   // ค่าเช่าวงจร NT Links รายเดือน
   const pointsList: CameraPoint[] = proj.cameraPoints || [];

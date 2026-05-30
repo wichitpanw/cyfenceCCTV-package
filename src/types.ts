@@ -105,6 +105,7 @@ export interface MasterCostDb {
   sdCard128: number; // SDcard 128G
   supportArm: number; // แขน Support
   thw16sqmm: number; // ค่าสายไฟฟ้า THW IEC 16 sq.mm. 50 เมตร (ราคาต่อชุด 50 เมตร หรือต่อเมตรก็ได้ ในที่นี้กำหนดราคาต่อชุด 50 เมตร)
+  groundRod: number; // อุปกรณ์สายดิน/หลักดิน Ground Rod (ค่าของ)
 
   // --- เสา ---
   poleSteel4m: number; // เสาเหล็ก 4 เมตร
@@ -146,5 +147,18 @@ export interface MasterCostDb {
   maYear3: number; // ค่าบริการ MA ปีที่ 3 (เช่น คิดเป็น % ของมูลค่า Hardware หรือราคาคงที่ต่อชุด)
 
   lastUpdated: string;
+}
+
+export function calculateLeasePayments(subtotalBeforeVat: number) {
+  const leasePrincipal = subtotalBeforeVat * 1.40;
+  const leaseInterest = leasePrincipal * 0.08 * 3;
+  const leaseTotalAmount = leasePrincipal + leaseInterest;
+  const leaseMonthlyPayment = leaseTotalAmount / 36;
+  return {
+    leasePrincipal,
+    leaseInterest,
+    leaseTotalAmount,
+    leaseMonthlyPayment
+  };
 }
 
