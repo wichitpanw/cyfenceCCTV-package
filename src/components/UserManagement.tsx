@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Users, User, Search, RefreshCw, Layers, ShieldCheck, LayoutGrid, List, CheckCircle } from "lucide-react";
+import { Users, User, Search, RefreshCw, Layers, ShieldCheck, LayoutGrid, List, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 interface UserManagementProps {
@@ -12,6 +12,7 @@ export default function UserManagement({ showAlert }: UserManagementProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "diagram">("diagram"); // Default to the beautiful visual diagram board!
+  const [collapsedGroups, setCollapsedGroups] = useState<{ [key: string]: boolean }>({});
 
   const fetchUsersList = async () => {
     setLoading(true);
@@ -58,6 +59,27 @@ export default function UserManagement({ showAlert }: UserManagementProps) {
     }
     groupsMap[grp].push(u);
   });
+
+  const toggleGroup = (groupName: string) => {
+    setCollapsedGroups((prev) => ({
+      ...prev,
+      [groupName]: !prev[groupName],
+    }));
+  };
+
+  const handleCollapseAll = () => {
+    const collapsed: { [key: string]: boolean } = {};
+    Object.keys(groupsMap).forEach((grp) => {
+      collapsed[grp] = true;
+    });
+    setCollapsedGroups(collapsed);
+  };
+
+  const handleExpandAll = () => {
+    setCollapsedGroups({});
+  };
+
+
 
   // Generates consistent beautiful HSL pastel colors for unlimited groups based on their names
   const getGroupColor = (name: string) => {
@@ -173,6 +195,31 @@ export default function UserManagement({ showAlert }: UserManagementProps) {
       {viewMode === "diagram" ? (
         /* ==================== 👥 VIEW 1: HIERARCHICAL DIAGRAM ==================== */
         <div className="space-y-4">
+          {/* Quick Collapse/Expand All controls */}
+          {Object.keys(groupsMap).length > 0 && (
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+              <span className="text-[10px] text-gray-500 font-semibold pl-1.5 flex items-center gap-1.5">
+                💡 <span className="text-gray-600">คำแนะนำ:</span> คลิกบริเวณแถบหัวข้อกลุ่มงานเพื่อ หุบ/ขยาย แต่ละกลุ่ม หรือใช้ปุ่มลัดด้านขวาได้ค่ะ
+              </span>
+              <div className="flex gap-2 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={handleCollapseAll}
+                  className="py-1 px-3 bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 rounded-lg text-[10px] font-bold transition-all cursor-pointer shadow-xs"
+                >
+                  หุบทั้งหมด
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExpandAll}
+                  className="py-1 px-3 bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 rounded-lg text-[10px] font-bold transition-all cursor-pointer shadow-xs"
+                >
+                  ขยายทั้งหมด
+                </button>
+              </div>
+            </div>
+          )}
+
           {Object.keys(groupsMap).length === 0 ? (
             <div className="p-12 text-center text-gray-400 border border-dashed rounded-2xl border-gray-250 text-xs">
               ไม่พบข้อมูลกลุ่มงานตามเงื่อนไขที่ค้นหาค่ะ
@@ -183,9 +230,17 @@ export default function UserManagement({ showAlert }: UserManagementProps) {
                 const sorted = sortMembers(members);
                 const leaders = sorted.filter(m => ["superadmin", "admin", "head_user"].includes(m.role));
                 const staff = sorted.filter(m => !["superadmin", "admin", "head_user"].includes(m.role));
+                const isCollapsed = collapsedGroups[groupName] === true;
                 
                 return (
-                  <div key={groupName} className="bg-white border border-gray-200/80 shadow-xs rounded-2xl p-5 flex flex-col gap-4 relative overflow-hidden transition-all hover:shadow-sm">
+                  <div 
+                    key={groupName} 
+                    className={`bg-white border border-gray-200/80 shadow-xs rounded-2xl relative overflow-hidden transition-all duration-200 ${
+                      isCollapsed 
+                        ? "p-3.5 flex flex-col gap-2 bg-gray-50/20 hover:bg-gray-50/50" 
+                        : "p-5 flex flex-col gap-4 hover:shadow-sm"
+                    }`}
+                  >
                     <div 
                       className="absolute top-0 left-0 bottom-0 w-1.5 bg-gray-900 rounded-l-2xl" 
                       style={{
@@ -193,81 +248,95 @@ export default function UserManagement({ showAlert }: UserManagementProps) {
                       }} 
                     />
                     
-                    {/* Group Title Header */}
-                    <div className="flex justify-between items-center pl-2">
+                    {/* Group Title Header (Interactive) */}
+                    <div 
+                      onClick={() => toggleGroup(groupName)}
+                      className="flex justify-between items-center pl-2 cursor-pointer hover:opacity-85 select-none transition-opacity"
+                    >
                       <span className="font-bold text-gray-900 text-xs flex items-center gap-1.5">
                         📁 กลุ่มงาน: <span className="underline decoration-2 decoration-gray-300 font-mono text-xs">{groupName}</span>
                       </span>
-                      <span className="bg-gray-50 border border-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-[9px] font-bold">
-                        {members.length} รายการ
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="bg-gray-55 border border-gray-250 text-gray-600 px-2 py-0.5 rounded-full text-[9px] font-bold font-mono">
+                          {members.length}
+                        </span>
+                        {isCollapsed ? (
+                          <ChevronDown className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        ) : (
+                          <ChevronUp className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        )}
+                      </div>
                     </div>
                     
-                    {/* 1. Leader (Head of Group) Section */}
-                    {leaders.length > 0 && (
-                      <div className="flex flex-col gap-1.5 pl-2 mt-1">
-                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider block">👑 หัวหน้ากลุ่มงาน / แอดมิน</span>
-                        <div className="space-y-1.5">
-                          {leaders.map(m => {
-                            let roleLabel = "ADMIN";
-                            let roleClass = "bg-blue-50 border-blue-200 text-blue-700";
-                            if (m.role === "superadmin") {
-                              roleLabel = "SUPER ADMIN";
-                              roleClass = "bg-purple-50 border-purple-200 text-purple-700";
-                            } else if (m.role === "head_user") {
-                              roleLabel = "HEAD USER";
-                              roleClass = "bg-amber-50 border-amber-200 text-amber-700";
-                            }
-                            
-                            return (
-                              <div key={m.id} className="p-2.5 bg-gray-50/50 border border-gray-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <div className="w-8 h-8 rounded-full bg-white border border-gray-250 flex items-center justify-center font-bold text-xs shrink-0 text-gray-700 uppercase">
+                    {!isCollapsed && (
+                      <>
+                        {/* 1. Leader (Head of Group) Section */}
+                        {leaders.length > 0 && (
+                          <div className="flex flex-col gap-1.5 pl-2 mt-1">
+                            <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider block">👑 หัวหน้ากลุ่มงาน / แอดมิน</span>
+                            <div className="space-y-1.5">
+                              {leaders.map(m => {
+                                let roleLabel = "ADMIN";
+                                let roleClass = "bg-blue-50 border-blue-200 text-blue-700";
+                                if (m.role === "superadmin") {
+                                  roleLabel = "SUPER ADMIN";
+                                  roleClass = "bg-purple-50 border-purple-200 text-purple-700";
+                                } else if (m.role === "head_user") {
+                                  roleLabel = "HEAD USER";
+                                  roleClass = "bg-amber-50 border-amber-200 text-amber-700";
+                                }
+                                
+                                return (
+                                  <div key={m.id} className="p-2.5 bg-gray-50/50 border border-gray-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <div className="w-8 h-8 rounded-full bg-white border border-gray-250 flex items-center justify-center font-bold text-xs shrink-0 text-gray-700 uppercase">
+                                        {(m.display_name || m.email || "U").substring(0, 1)}
+                                      </div>
+                                      <div className="min-w-0">
+                                        <span className="font-bold text-gray-900 text-xs block truncate leading-tight">{m.display_name || "ไม่ระบุชื่อ"}</span>
+                                        <span className="text-[9px] text-gray-400 font-mono block truncate leading-none mt-0.5">{m.email}</span>
+                                      </div>
+                                    </div>
+                                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold border whitespace-nowrap shrink-0 tracking-wide ${roleClass}`}>
+                                      {roleLabel}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Connector line (Visual Org Tree Line) */}
+                        {leaders.length > 0 && staff.length > 0 && (
+                          <div className="flex justify-center my-0.5">
+                            <div className="h-3 border-l-2 border-dotted border-gray-300" />
+                          </div>
+                        )}
+                        
+                        {/* 2. Staff / Surveyor Section */}
+                        {staff.length > 0 && (
+                          <div className="flex flex-col gap-1.5 pl-2">
+                            <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider block">👥 ทีมปฏิบัติงาน / ผู้สำรวจ</span>
+                            <div className="grid grid-cols-1 gap-1.5">
+                              {staff.map(m => (
+                                <div key={m.id} className="p-2 bg-white border border-gray-150 rounded-xl flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center font-bold text-xs shrink-0 text-gray-500 uppercase">
                                     {(m.display_name || m.email || "U").substring(0, 1)}
                                   </div>
-                                  <div className="min-w-0">
-                                    <span className="font-bold text-gray-900 text-xs block truncate leading-tight">{m.display_name || "ไม่ระบุชื่อ"}</span>
+                                  <div className="min-w-0 grow">
+                                    <span className="font-semibold text-gray-800 text-[11px] block truncate leading-tight">{m.display_name || "ไม่ระบุชื่อ"}</span>
                                     <span className="text-[9px] text-gray-400 font-mono block truncate leading-none mt-0.5">{m.email}</span>
                                   </div>
+                                  <span className="px-1.5 py-0.5 rounded text-[8px] font-bold border bg-gray-50 border-gray-200 text-gray-500 whitespace-nowrap tracking-wider scale-95 origin-right">
+                                    USER
+                                  </span>
                                 </div>
-                                <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold border whitespace-nowrap shrink-0 tracking-wide ${roleClass}`}>
-                                  {roleLabel}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Connector line (Visual Org Tree Line) */}
-                    {leaders.length > 0 && staff.length > 0 && (
-                      <div className="flex justify-center my-0.5">
-                        <div className="h-3 border-l-2 border-dotted border-gray-300" />
-                      </div>
-                    )}
-                    
-                    {/* 2. Staff / Surveyor Section */}
-                    {staff.length > 0 && (
-                      <div className="flex flex-col gap-1.5 pl-2">
-                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider block">👥 ทีมปฏิบัติงาน / ผู้สำรวจ</span>
-                        <div className="grid grid-cols-1 gap-1.5">
-                          {staff.map(m => (
-                            <div key={m.id} className="p-2 bg-white border border-gray-150 rounded-xl flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center font-bold text-xs shrink-0 text-gray-500 uppercase">
-                                {(m.display_name || m.email || "U").substring(0, 1)}
-                              </div>
-                              <div className="min-w-0 grow">
-                                <span className="font-semibold text-gray-800 text-[11px] block truncate leading-tight">{m.display_name || "ไม่ระบุชื่อ"}</span>
-                                <span className="text-[9px] text-gray-400 font-mono block truncate leading-none mt-0.5">{m.email}</span>
-                              </div>
-                              <span className="px-1.5 py-0.5 rounded text-[8px] font-bold border bg-gray-50 border-gray-200 text-gray-500 whitespace-nowrap tracking-wider scale-95 origin-right">
-                                USER
-                              </span>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 );
