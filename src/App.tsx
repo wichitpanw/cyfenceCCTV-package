@@ -963,8 +963,12 @@ export default function App() {
         const expiryTime = parseInt(expiry, 10);
         if (!isNaN(expiryTime) && Date.now() > expiryTime) {
           clearInterval(interval);
-          alert("🔒 เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 6 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ");
-          handleLogout();
+          showConfirm(
+            "🔒 เซสชันหมดอายุ",
+            "เซสชันของคุณหมดอายุแล้วเนื่องจากไม่มีการเคลื่อนไหวเกิน 6 ชั่วโมง กรุณาเข้าสู่ระบบใหม่อีกครั้งเพื่อความปลอดภัยค่ะ",
+            handleLogout,
+            { confirmText: "✅ เข้าสู่ระบบใหม่", cancelText: "" }
+          );
         }
       }
     }, 15000);
@@ -3136,19 +3140,19 @@ export default function App() {
                             
                             if (oldError) {
                               console.error("Failed to save master costs to Supabase (old format):", oldError.message);
-                              alert("💾 บันทึกในเบราว์เซอร์สำเร็จ แต่ไม่สามารถซิงค์ขึ้น Supabase ได้ค่ะ:\n" + oldError.message);
+                              showAlert("💾 ซิงค์ไม่สำเร็จ", "บันทึกในเบราว์เซอร์สำเร็จ แต่ไม่สามารถซิงค์ขึ้น Supabase ได้ค่ะ:\n" + oldError.message);
                             } else {
-                              alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จและซิงค์ขึ้นระบบ Cloud Supabase เรียบร้อยแล้วค่ะ! (รูปแบบตารางเก่า)");
+                              showAlert("💾 บันทึกสำเร็จ", "บันทึกราคาต้นทุนมาตรฐานสำเร็จและซิงค์ขึ้นระบบ Cloud Supabase เรียบร้อยแล้วค่ะ! (รูปแบบตารางเก่า)");
                             }
                           } else {
-                            alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จและซิงค์ขึ้นระบบ Cloud Supabase (รูปแบบแถวรายไอเทมใหม่) เรียบร้อยแล้วค่ะ!");
+                            showAlert("💾 บันทึกสำเร็จ", "บันทึกราคาต้นทุนมาตรฐานสำเร็จและซิงค์ขึ้นระบบ Cloud Supabase (รูปแบบแถวรายไอเทมใหม่) เรียบร้อยแล้วค่ะ!");
                           }
                         } catch (err: any) {
                           console.error("Failed to save master costs to Supabase:", err);
-                          alert("💾 บันทึกในเบราว์เซอร์สำเร็จ แต่ไม่สามารถซิงค์ขึ้น Supabase ได้ค่ะ");
+                          showAlert("💾 ซิงค์ไม่สำเร็จ", "บันทึกในเบราว์เซอร์สำเร็จ แต่ไม่สามารถซิงค์ขึ้น Supabase ได้ค่ะ");
                         }
                       } else {
-                        alert("💾 บันทึกราคาต้นทุนมาตรฐานสำเร็จเรียบร้อยแล้วค่ะ! (โหมดบันทึกในเครื่อง)");
+                        showAlert("💾 บันทึกสำเร็จ", "บันทึกราคาต้นทุนมาตรฐานสำเร็จเรียบร้อยแล้วค่ะ! (โหมดบันทึกในเครื่อง)");
                       }
                       
                       setIsCostsModalOpen(false);
@@ -3199,7 +3203,7 @@ export default function App() {
 
               {/* Scrollable Content */}
               <div className="overflow-y-auto p-6 flex-1">
-                <UserManagement />
+                <UserManagement showConfirm={showConfirm} showAlert={showAlert} />
               </div>
 
               {/* Footer */}

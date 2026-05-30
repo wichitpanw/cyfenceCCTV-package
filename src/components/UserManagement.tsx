@@ -67,14 +67,22 @@ function EditableGroupCell({ userId, initialValue, onSave }: EditableGroupCellPr
   );
 }
 
-export default function UserManagement() {
+interface UserManagementProps {
+  showConfirm?: (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    options?: { confirmText?: string; cancelText?: string; onCancel?: () => void }
+  ) => void;
+  showAlert?: (title: string, message: string) => void;
+}
+
+export default function UserManagement({ showConfirm, showAlert }: UserManagementProps) {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-
-
 
   const fetchUsersList = async () => {
     setLoading(true);
@@ -102,7 +110,10 @@ export default function UserManagement() {
   }, []);
 
   const handleRoleChange = async (userId: string, newRole: "superadmin" | "admin" | "head_user" | "user") => {
-    if (confirm(`🔄 คุณต้องการเปลี่ยนสิทธิ์การเข้าถึงของผู้ใช้รายนี้เป็น [${newRole.toUpperCase()}] ใช่หรือไม่?`)) {
+    const title = "🔄 ยืนยันการเปลี่ยนสิทธิ์";
+    const msg = `คุณบีมต้องการเปลี่ยนสิทธิ์การเข้าถึงของผู้ใช้รายนี้เป็น [${newRole.toUpperCase()}] ใช่หรือไม่?`;
+
+    const onConfirm = async () => {
       setErrorMsg("");
       setSuccessMsg("");
       try {
@@ -121,6 +132,15 @@ export default function UserManagement() {
       } catch (err: any) {
         setErrorMsg("ไม่สามารถอัปเดตสิทธิ์ผู้ใช้ได้");
       }
+    };
+
+    if (showConfirm) {
+      showConfirm(title, msg, onConfirm, {
+        confirmText: "🔄 ยืนยันเปลี่ยนสิทธิ์",
+        cancelText: "ยกเลิก"
+      });
+    } else {
+      if (window.confirm(msg)) onConfirm();
     }
   };
 
