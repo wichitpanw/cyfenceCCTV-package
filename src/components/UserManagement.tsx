@@ -59,6 +59,22 @@ export default function UserManagement({ showAlert }: UserManagementProps) {
     groupsMap[grp].push(u);
   });
 
+  // Generates consistent beautiful HSL pastel colors for unlimited groups based on their names
+  const getGroupColor = (name: string) => {
+    if (name === "ยังไม่จัดกลุ่มงาน") return "#cbd5e1"; // Gray
+    if (name.includes("อน")) return "#8b5cf6"; // Purple
+    if (name.includes("ภดจ")) return "#3b82f6"; // Blue
+    if (name.includes("วบน")) return "#f59e0b"; // Orange
+
+    // Hash-based pastel generator for infinite dynamic scale
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash % 360);
+    return `hsl(${hue}, 65%, 52%)`;
+  };
+
   // Sort members within each group so that Superadmins/Admins/HeadUsers are at the top (Hierarchical Tree)
   const sortMembers = (members: any[]) => {
     return [...members].sort((a, b) => {
@@ -170,14 +186,10 @@ export default function UserManagement({ showAlert }: UserManagementProps) {
                 
                 return (
                   <div key={groupName} className="bg-white border border-gray-200/80 shadow-xs rounded-2xl p-5 flex flex-col gap-4 relative overflow-hidden transition-all hover:shadow-sm">
-                    {/* Decorative side accent bar depending on group name */}
                     <div 
                       className="absolute top-0 left-0 bottom-0 w-1.5 bg-gray-900 rounded-l-2xl" 
                       style={{
-                        backgroundColor: groupName === "ยังไม่จัดกลุ่มงาน" ? "#cbd5e1" : 
-                                         groupName.includes("อน") ? "#8b5cf6" : 
-                                         groupName.includes("ภดจ") ? "#3b82f6" : 
-                                         groupName.includes("วบน") ? "#f59e0b" : "#10b981"
+                        backgroundColor: getGroupColor(groupName)
                       }} 
                     />
                     
