@@ -2216,17 +2216,23 @@ export default function App() {
       background: #fff; 
     }
 
-    @page { size: A4 ${orientation}; margin: 15mm 15mm; }
+    @page { 
+      size: A4 ${orientation}; 
+      margin: 10mm; 
+    }
 
     .page-container {
-      width: ${orientation === "portrait" ? "210mm" : "297mm"};
-      min-height: ${orientation === "portrait" ? "297mm" : "210mm"};
-      padding: 15mm 15mm;
+      width: ${orientation === "portrait" ? "190mm" : "277mm"};
+      height: ${orientation === "portrait" ? "277mm" : "190mm"};
       margin: 0 auto;
       page-break-after: always;
       break-after: page;
       position: relative;
       background: #fff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     
     .page-container:last-child {
@@ -2238,9 +2244,10 @@ export default function App() {
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      padding-bottom: 8px; 
+      padding-bottom: 6px; 
       border-bottom: 2px solid #111827; 
-      margin-bottom: 12px; 
+      margin-bottom: 8px; 
+      height: 38px;
     }
     
     .doc-info { 
@@ -2248,48 +2255,69 @@ export default function App() {
     }
     
     .doc-title { 
-      font-size: 13pt; 
+      font-size: 12pt; 
       font-weight: 700; 
       color: #111827; 
     }
     
     .doc-date { 
-      font-size: 8.5pt; 
+      font-size: 8pt; 
       color: #555; 
-      margin-top: 2px; 
+      margin-top: 1px; 
     }
 
     .point-title {
-      font-size: 13pt;
+      font-size: 12pt;
       font-weight: 700;
       color: #0071e3;
-      margin-bottom: 10px;
-      padding-bottom: 4px;
+      margin-bottom: 8px;
+      padding-bottom: 2px;
       border-bottom: 1px solid #e5e7eb;
+      height: 24px;
+    }
+
+    .content-split {
+      display: flex;
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .left-col {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .right-col {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .detail-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 15px;
-      font-size: 9pt;
+      font-size: 8.5pt;
     }
     
     .detail-table td {
-      padding: 6px 10px;
+      padding: 4px 8px;
       border: 1px solid #e5e7eb;
       vertical-align: middle;
     }
     
     .detail-table td.label {
-      width: 18%;
+      width: 20%;
       font-weight: 600;
       color: #4b5563;
       background: #f9fafb;
     }
     
     .detail-table td.val {
-      width: 32%;
+      width: 30%;
       color: #111827;
     }
     
@@ -2299,46 +2327,50 @@ export default function App() {
     
     .detail-table td.font-mono {
       font-family: monospace;
-      font-size: 8.5pt;
+      font-size: 8pt;
     }
     
     .text-blue {
       color: #0071e3;
     }
 
-    .photos-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 5px;
-      margin-bottom: 20px;
-    }
-
     .photo-box {
       border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 6px;
+      padding: 6px;
       background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .photo-title {
-      font-size: 9.5pt;
+      font-size: 8.5pt;
       font-weight: 600;
       color: #374151;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       text-align: center;
     }
 
     .img-wrapper {
       width: 100%;
-      aspect-ratio: 4/3;
-      border-radius: 6px;
+      border-radius: 4px;
       overflow: hidden;
       border: 1px solid #ddd;
       background: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .page-container.portrait .left-col .img-wrapper {
+      aspect-ratio: 16 / 10;
+      max-height: 85mm;
+    }
+
+    .page-container.landscape .left-col .img-wrapper {
+      aspect-ratio: 16 / 9;
+      max-height: 48mm;
     }
 
     .img-wrapper img {
@@ -2349,20 +2381,40 @@ export default function App() {
     }
 
     .no-img {
-      font-size: 8.5pt;
+      font-size: 8pt;
       color: #9ca3af;
       text-align: center;
+      padding: 15px 0;
+    }
+
+    .view-photos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .view-photos-grid .photo-box {
+      padding: 4px;
+    }
+
+    .view-photos-grid .img-wrapper {
+      aspect-ratio: 4 / 3;
+    }
+
+    .page-container.portrait .view-photos-grid .img-wrapper {
+      max-height: 40mm;
+    }
+
+    .page-container.landscape .view-photos-grid .img-wrapper {
+      max-height: 28mm;
     }
 
     .footer { 
-      position: absolute;
-      bottom: 12mm;
-      left: 15mm;
-      right: 15mm;
+      height: 16px;
       font-size: 7.5pt; 
       color: #9ca3af; 
       border-top: 1px solid #e5e7eb; 
-      padding-top: 6px; 
+      padding-top: 4px; 
       text-align: center; 
     }
     
@@ -2375,10 +2427,10 @@ export default function App() {
         background: none;
       }
       .page-container {
-        width: 100%;
-        min-height: auto;
-        padding: 0;
-        margin: 0;
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
         box-shadow: none;
         border: none;
       }
