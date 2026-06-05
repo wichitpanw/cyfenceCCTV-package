@@ -531,7 +531,8 @@ export default function ProjectHistory({
             </div>
 
             {/* Selection Options */}
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              {/* Option 1: Portrait */}
               <button
                 type="button"
                 onClick={() => {
@@ -540,22 +541,49 @@ export default function ProjectHistory({
                   }
                   setShowReportDialog(null);
                 }}
-                className="flex items-center justify-center p-4 rounded-xl border border-indigo-200 bg-indigo-50/10 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all cursor-pointer group text-center gap-3"
+                className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-gray-200 hover:border-indigo-500 hover:bg-indigo-50/10 transition-all cursor-pointer group text-center gap-2"
               >
-                <div className="w-10 h-7 rounded border border-indigo-300 group-hover:border-indigo-400 flex flex-col justify-between p-0.5 shadow-2xs transition-all bg-white relative shrink-0">
+                <div className="w-9 h-12 rounded border border-gray-300 group-hover:border-indigo-400 flex flex-col justify-between p-0.5 shadow-2xs transition-all bg-white relative">
+                  <div className="w-full h-0.5 bg-indigo-500 rounded-3xs"></div>
+                  <div className="w-full h-1 bg-gray-200 rounded-3xs"></div>
+                  <div className="w-full h-1 bg-gray-200 rounded-3xs"></div>
+                  <div className="w-full h-1 bg-gray-200 rounded-3xs"></div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-gray-950 group-hover:text-indigo-600 transition-colors">
+                    📄 แนวตั้ง
+                  </span>
+                  <span className="text-[8.5px] text-gray-400 leading-none">
+                    (Portrait)
+                  </span>
+                </div>
+              </button>
+
+              {/* Option 2: Landscape */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (onPrintSurveyReport) {
+                    onPrintSurveyReport(showReportDialog, "landscape");
+                  }
+                  setShowReportDialog(null);
+                }}
+                className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-gray-200 hover:border-indigo-500 hover:bg-indigo-50/10 transition-all cursor-pointer group text-center gap-2"
+              >
+                <div className="w-12 h-9 rounded border border-gray-300 group-hover:border-indigo-400 flex flex-col justify-between p-0.5 shadow-2xs transition-all bg-white relative">
                   <div className="w-full h-0.5 bg-indigo-500 rounded-3xs"></div>
                   <div className="flex gap-0.5">
-                    <div className="w-1/2 h-0.5 bg-gray-250 rounded-3xs"></div>
-                    <div className="w-1/2 h-0.5 bg-gray-250 rounded-3xs"></div>
+                    <div className="w-1/2 h-1 bg-gray-200 rounded-3xs"></div>
+                    <div className="w-1/2 h-1 bg-gray-200 rounded-3xs"></div>
                   </div>
-                  <div className="w-full h-1 bg-gray-250 rounded-3xs"></div>
+                  <div className="w-full h-1 bg-gray-200 rounded-3xs"></div>
                 </div>
-                <div className="flex flex-col text-left">
-                  <span className="text-[12px] font-bold text-gray-950 group-hover:text-indigo-600 transition-colors">
-                    📊 รายงาน PowerPoint (16:9 แนวนอน)
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-gray-950 group-hover:text-indigo-600 transition-colors">
+                    📖 แนวนอน
                   </span>
-                  <span className="text-[9.5px] text-gray-400 leading-none mt-0.5">
-                    เปิดดูตัวอย่างสไลด์และดาวน์โหลด PPTX
+                  <span className="text-[8.5px] text-gray-400 leading-none">
+                    (Landscape)
                   </span>
                 </div>
               </button>
