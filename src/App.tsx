@@ -2045,12 +2045,14 @@ export default function App() {
 </script>
 </body></html>`;
 
+      printWin.document.open();
+      printWin.document.write(htmlContent);
       printWin.document.close();
     }
   };
 
   // Print Detailed Survey Report (1 point per page)
-  const handlePrintSurveyReportPDF = (proj: ProjectSurvey) => {
+  const handlePrintSurveyReportPDF = (proj: ProjectSurvey, orientation: "portrait" | "landscape" = "portrait") => {
     const printWin = window.open("", "_blank", "width=860,height=1100");
     if (printWin) {
       const today = new Date().toLocaleDateString("th-TH", {
@@ -2173,9 +2175,11 @@ export default function App() {
       background: #fff; 
     }
 
+    @page { size: A4 ${orientation}; margin: 15mm 15mm; }
+
     .page-container {
-      width: 210mm;
-      min-height: 297mm;
+      width: ${orientation === "portrait" ? "210mm" : "297mm"};
+      min-height: ${orientation === "portrait" ? "297mm" : "210mm"};
       padding: 15mm 15mm;
       margin: 0 auto;
       page-break-after: always;
@@ -2321,6 +2325,10 @@ export default function App() {
       text-align: center; 
     }
     
+    .no-print {
+      display: flex;
+    }
+
     @media print {
       body {
         background: none;
@@ -2333,19 +2341,24 @@ export default function App() {
         box-shadow: none;
         border: none;
       }
+      .no-print {
+        display: none !important;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Floating Action Buttons (Hidden when printing) -->
+  <div class="no-print" style="position: fixed; top: 15px; right: 15px; z-index: 9999; display: flex; gap: 8px;">
+    <button onclick="window.print()" style="padding: 8px 16px; background-color: #0071e3; color: white; border: none; border-radius: 6px; font-family: 'Noto Sans Thai', sans-serif; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,113,227,0.25); display: flex; align-items: center; gap: 6px;">
+      🖨️ สั่งพิมพ์รายงาน
+    </button>
+    <button onclick="window.close()" style="padding: 8px 16px; background-color: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 6px; font-family: 'Noto Sans Thai', sans-serif; font-size: 12px; font-weight: bold; cursor: pointer;">
+      ปิดหน้าต่าง
+    </button>
+  </div>
+
   ${pointsHtml}
-  
-  <script>
-    window.onload = () => {
-      setTimeout(() => {
-        window.print();
-      }, 1000);
-    };
-  </script>
 </body>
 </html>`;
 

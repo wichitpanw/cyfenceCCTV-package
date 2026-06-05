@@ -65,7 +65,7 @@ interface ProjectHistoryProps {
   showConfirm?: (title: string, message: string, onConfirm: () => void, options?: { confirmText?: string; cancelText?: string; onCancel?: () => void }) => void;
   showAlert?: (title: string, message: string) => void;
   onPrintProject?: (project: ProjectSurvey) => void;
-  onPrintSurveyReport?: (project: ProjectSurvey) => void;
+  onPrintSurveyReport?: (project: ProjectSurvey, orientation: "portrait" | "landscape") => void;
 }
 
 export default function ProjectHistory({
@@ -90,6 +90,7 @@ export default function ProjectHistory({
   const [search, setSearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("all");
   const [sidebarStatusFilter, setSidebarStatusFilter] = useState<"all" | "presented" | "delivered">("all");
+  const [showReportDialog, setShowReportDialog] = useState<ProjectSurvey | null>(null);
 
   // สิทธิ์ที่แสดงได้ทั้งหมด
   const canSeeAllProjects = userRole === "superadmin" || userRole === "admin";
@@ -371,7 +372,7 @@ export default function ProjectHistory({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onPrintSurveyReport(proj);
+                            setShowReportDialog(proj);
                           }}
                           className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
                             isActive 
@@ -526,6 +527,100 @@ export default function ProjectHistory({
           )}
         </div>
       </div>
+
+      {/* Modal เลือกแนวตั้ง/แนวนอนสำหรับการออกรายงาน Survey Report */}
+      {showReportDialog && (
+        <div className="fixed inset-0 bg-black/55 backdrop-blur-xs flex items-center justify-center z-[9999] p-4 select-none">
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full border border-gray-200 p-5 space-y-4">
+            
+            {/* Header */}
+            <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+              <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-bold text-xs text-gray-900 leading-tight">
+                  เลือกรูปแบบรายงานผลสำรวจ
+                </h4>
+                <p className="text-[10px] text-gray-500 mt-0.5 truncate">
+                  {showReportDialog.customerInfo.projectName || showReportDialog.customerInfo.customerName}
+                </p>
+              </div>
+            </div>
+
+            {/* Selection Options */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* Option 1: Portrait */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (onPrintSurveyReport) {
+                    onPrintSurveyReport(showReportDialog, "portrait");
+                  }
+                  setShowReportDialog(null);
+                }}
+                className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-gray-200 hover:border-indigo-500 hover:bg-indigo-50/10 transition-all cursor-pointer group text-center gap-2"
+              >
+                <div className="w-9 h-12 rounded border border-gray-300 group-hover:border-indigo-400 flex flex-col justify-between p-0.5 shadow-2xs transition-all bg-white relative">
+                  <div className="w-full h-0.5 bg-indigo-500 rounded-3xs"></div>
+                  <div className="w-full h-1 bg-gray-200 rounded-3xs"></div>
+                  <div className="w-full h-1 bg-gray-200 rounded-3xs"></div>
+                  <div className="w-full h-1 bg-gray-200 rounded-3xs"></div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-gray-950 group-hover:text-indigo-600 transition-colors">
+                    📄 แนวตั้ง
+                  </span>
+                  <span className="text-[8.5px] text-gray-400 leading-none">
+                    (Portrait)
+                  </span>
+                </div>
+              </button>
+
+              {/* Option 2: Landscape */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (onPrintSurveyReport) {
+                    onPrintSurveyReport(showReportDialog, "landscape");
+                  }
+                  setShowReportDialog(null);
+                }}
+                className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-gray-200 hover:border-indigo-500 hover:bg-indigo-50/10 transition-all cursor-pointer group text-center gap-2"
+              >
+                <div className="w-12 h-9 rounded border border-gray-300 group-hover:border-indigo-400 flex flex-col justify-between p-0.5 shadow-2xs transition-all bg-white relative">
+                  <div className="w-full h-0.5 bg-indigo-500 rounded-3xs"></div>
+                  <div className="flex gap-0.5">
+                    <div className="w-1/2 h-1 bg-gray-200 rounded-3xs"></div>
+                    <div className="w-1/2 h-1 bg-gray-200 rounded-3xs"></div>
+                  </div>
+                  <div className="w-full h-1 bg-gray-200 rounded-3xs"></div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-gray-950 group-hover:text-indigo-600 transition-colors">
+                    📖 แนวนอน
+                  </span>
+                  <span className="text-[8.5px] text-gray-400 leading-none">
+                    (Landscape)
+                  </span>
+                </div>
+              </button>
+            </div>
+
+            {/* Cancel Button */}
+            <div className="flex justify-end pt-2.5 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setShowReportDialog(null)}
+                className="px-3.5 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-[11px] font-semibold rounded-lg transition-all cursor-pointer"
+              >
+                ยกเลิก
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
