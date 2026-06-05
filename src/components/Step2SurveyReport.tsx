@@ -1360,7 +1360,7 @@ export default function Step2SurveyReport({
                                       const reader = new FileReader();
                                       reader.onload = () => {
                                         if (typeof reader.result === "string") {
-                                          handleUpdatePointField(selectedPoint.id, "photoUrl", reader.result);
+                                          handleUpdatePointFields(selectedPoint.id, { photoUrl: reader.result });
                                         }
                                       };
                                       reader.readAsDataURL(file);
@@ -1447,9 +1447,15 @@ export default function Step2SurveyReport({
                                                         if (newUrls[i] === undefined) newUrls[i] = "";
                                                       }
                                                       newUrls[camIdx] = reader.result;
-                                                      handleUpdatePointField(selectedPoint.id, "viewPhotoUrls", newUrls);
                                                       if (camIdx === 0) {
-                                                        handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", reader.result);
+                                                        handleUpdatePointFields(selectedPoint.id, {
+                                                          viewPhotoUrls: newUrls,
+                                                          viewPhotoUrl: reader.result
+                                                        });
+                                                      } else {
+                                                        handleUpdatePointFields(selectedPoint.id, {
+                                                          viewPhotoUrls: newUrls
+                                                        });
                                                       }
                                                     }
                                                   };
@@ -1464,9 +1470,15 @@ export default function Step2SurveyReport({
                                             onClick={() => {
                                               const newUrls = [...currentUrls];
                                               newUrls[camIdx] = "";
-                                              handleUpdatePointField(selectedPoint.id, "viewPhotoUrls", newUrls);
                                               if (camIdx === 0) {
-                                                handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", "");
+                                                handleUpdatePointFields(selectedPoint.id, {
+                                                  viewPhotoUrls: newUrls,
+                                                  viewPhotoUrl: ""
+                                                });
+                                              } else {
+                                                handleUpdatePointFields(selectedPoint.id, {
+                                                  viewPhotoUrls: newUrls
+                                                });
                                               }
                                             }}
                                             className="px-2.5 py-1.5 bg-red-650 hover:bg-red-700 text-white rounded-md text-[9px] font-bold cursor-pointer transition-all shadow-xs"
@@ -1496,10 +1508,16 @@ export default function Step2SurveyReport({
                                                     if (newUrls[i] === undefined) newUrls[i] = "";
                                                   }
                                                   newUrls[camIdx] = reader.result;
-                                                  handleUpdatePointField(selectedPoint.id, "viewPhotoUrls", newUrls);
-                                                  if (camIdx === 0) {
-                                                    handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", reader.result);
-                                                  }
+                                                   if (camIdx === 0) {
+                                                     handleUpdatePointFields(selectedPoint.id, {
+                                                       viewPhotoUrls: newUrls,
+                                                       viewPhotoUrl: reader.result
+                                                     });
+                                                   } else {
+                                                     handleUpdatePointFields(selectedPoint.id, {
+                                                       viewPhotoUrls: newUrls
+                                                     });
+                                                   }
                                                 }
                                               };
                                               reader.readAsDataURL(file);
