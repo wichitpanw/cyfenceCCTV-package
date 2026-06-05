@@ -2094,11 +2094,123 @@ export default function App() {
         const hasSd = pt.hasSdCard ? "มี (SD Card 128G)" : "ไม่มี";
         const hasPower = pt.hasPowerMeter ? "มี (มิเตอร์ไฟ + สาย THW)" : "ไม่มี";
 
+        // Generate the 2x2 grid contents for camera views
+        const camsCount = pt.selectedSet === "Set 2" ? 2 : pt.selectedSet === "Set 3" ? 3 : pt.selectedSet === "Set 4" ? 4 : 1;
+        const viewUrls = pt.viewPhotoUrls || (pt.viewPhotoUrl ? [pt.viewPhotoUrl] : []);
+        const gridItemsHtml = Array.from({ length: camsCount }).map((_, camIdx) => {
+          const url = viewUrls[camIdx] || "";
+          return `
+            <div class="photo-box">
+              <div class="photo-title">📐 ภาพมุมกล้องตัวที่ ${camIdx + 1}</div>
+              <div class="img-wrapper">
+                ${url ? `
+                  <img src="${url}" alt="ภาพมุมกล้องตัวที่ ${camIdx + 1}" />
+                ` : `
+                  <div class="no-img">ไม่มีภาพมุมกล้อง (#${camIdx + 1})</div>
+                `}
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        const tableHtml = `
+          <table class="detail-table">
+            <tr>
+              <td class="label">ประเภทกล้อง:</td>
+              <td class="val bold">${pt.type}</td>
+              <td class="label">การติดตั้งเสา:</td>
+              <td class="val">${pt.poleType !== "None" ? pt.poleType : "ยึดติดอาคาร/ผนัง"}</td>
+            </tr>
+            <tr>
+              <td class="label">ความยาวสาย LAN:</td>
+              <td class="val">${pt.lanCableLength || 25} เมตร</td>
+              <td class="label">ชุดแขนซัปพอร์ต:</td>
+              <td class="val">${pt.hasSupportArm ? "มี" : "ไม่มี"}</td>
+            </tr>
+            <tr>
+              <td class="label">กล่องเหล็ก/ตู้กันฝน:</td>
+              <td class="val">${hasCabinet}</td>
+              <td class="label">สวิตช์ PoE ปลายทาง:</td>
+              <td class="val">${hasPoe}</td>
+            </tr>
+            <tr>
+              <td class="label">อุปกรณ์ระบบสายดิน:</td>
+              <td class="val">${hasGround}</td>
+              <td class="label">เครื่องสำรองไฟ (UPS):</td>
+              <td class="val">${hasUps}</td>
+            </tr>
+            <tr>
+              <td class="label">SD Card สำรองข้อมูล:</td>
+              <td class="val">${hasSd}</td>
+              <td class="label">มิเตอร์ & ชุดวัดไฟ:</td>
+              <td class="val">${hasPower}</td>
+            </tr>
+            <tr>
+              <td class="label">ชุดกล้องที่จัดกลุ่ม:</td>
+              <td class="val bold text-blue">${pt.selectedSet || "Set 1"}</td>
+              <td class="label">พิกัด GPS:</td>
+              <td class="val font-mono">${pt.lat ? pt.lat.toFixed(6) : "-"}, ${pt.lng ? pt.lng.toFixed(6) : "-"}</td>
+            </tr>
+            ${pt.notes ? `
+            <tr>
+              <td class="label">บันทึกเพิ่มเติม:</td>
+              <td class="val" colspan="3">${pt.notes}</td>
+            </tr>
+            ` : ""}
+          </table>
+        `;
+
+        const mainPhotoHtml = `
+          <div class="photo-box">
+            <div class="photo-title">📸 ภาพประกอบจุดสำรวจหน้างานจริง</div>
+            <div class="img-wrapper">
+              ${pt.photoUrl ? `
+                <img src="${pt.photoUrl}" alt="ภาพหน้างานจริง" />
+              ` : `
+                <div class="no-img">ไม่มีภาพประกอบจุดติดตั้งหน้างาน</div>
+              `}
+            </div>
+          </div>
+        `;
+
+        // Compose HTML layout based on orientation
+        let layoutHtml = "";
+        if (orientation === "portrait") {
+          layoutHtml = `
+            ${tableHtml}
+            <div class="content-split">
+              <div class="left-col">
+                ${mainPhotoHtml}
+              </div>
+              <div class="right-col">
+                <div class="view-photos-grid">
+                  ${gridItemsHtml}
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          // landscape layout: split left/right
+          layoutHtml = `
+            <div class="content-split">
+              <div class="left-col">
+                ${tableHtml}
+                ${mainPhotoHtml}
+              </div>
+              <div class="right-col">
+                <div class="view-photos-grid">
+                  ${gridItemsHtml}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
         return `
-          <div class="page-container">
+          <div class="page-container ${orientation}">
             <div class="header">
               <div>
-                <img src="/cyfence_logo.png" alt="NT Cyfence" style="height: 40px; display: block; margin-bottom: 2px;" />
+                <img src="/cyfence_logo.png" alt="NT Cyfence" style="height: 30px; display: block;" />
               </div>
               <div class="doc-info">
                 <div class="doc-title">รายงานผลการสำรวจจุดติดตั้งกล้อง (Survey Report)</div>
@@ -2110,90 +2222,7 @@ export default function App() {
               จุดที่ ${idx + 1}: ${pt.name}
             </div>
 
-            <table class="detail-table">
-              <tr>
-                <td class="label">ประเภทกล้อง:</td>
-                <td class="val bold">${pt.type}</td>
-                <td class="label">การติดตั้งเสา:</td>
-                <td class="val">${pt.poleType !== "None" ? pt.poleType : "ยึดติดอาคาร/ผนัง"}</td>
-              </tr>
-              <tr>
-                <td class="label">ความยาวสาย LAN:</td>
-                <td class="val">${pt.lanCableLength || 25} เมตร</td>
-                <td class="label">ชุดแขนซัปพอร์ต:</td>
-                <td class="val">${pt.hasSupportArm ? "มี" : "ไม่มี"}</td>
-              </tr>
-              <tr>
-                <td class="label">กล่องเหล็ก/ตู้กันฝน:</td>
-                <td class="val">${hasCabinet}</td>
-                <td class="label">สวิตช์ PoE ปลายทาง:</td>
-                <td class="val">${hasPoe}</td>
-              </tr>
-              <tr>
-                <td class="label">อุปกรณ์ระบบสายดิน:</td>
-                <td class="val">${hasGround}</td>
-                <td class="label">เครื่องสำรองไฟ (UPS):</td>
-                <td class="val">${hasUps}</td>
-              </tr>
-              <tr>
-                <td class="label">SD Card สำรองข้อมูล:</td>
-                <td class="val">${hasSd}</td>
-                <td class="label">มิเตอร์ & ชุดวัดไฟ:</td>
-                <td class="val">${hasPower}</td>
-              </tr>
-              <tr>
-                <td class="label">ชุดกล้องที่จัดกลุ่ม:</td>
-                <td class="val bold text-blue">${pt.selectedSet || "Set 1"}</td>
-                <td class="label">พิกัด GPS:</td>
-                <td class="val font-mono">${pt.lat ? pt.lat.toFixed(6) : "-"}, ${pt.lng ? pt.lng.toFixed(6) : "-"}</td>
-              </tr>
-              ${pt.notes ? `
-              <tr>
-                <td class="label">บันทึกเพิ่มเติม:</td>
-                <td class="val" colspan="3">${pt.notes}</td>
-              </tr>
-              ` : ""}
-            </table>
-
-            <!-- ภาพประกอบหน้างานจริง (ภาพหลัก) -->
-            <div class="photos-section" style="display: grid; grid-template-cols: 1fr; margin-top: 10px;">
-              <div class="photo-box">
-                <div class="photo-title">📸 ภาพประกอบจุดสำรวจหน้างานจริง</div>
-                <div class="img-wrapper" style="aspect-ratio: ${orientation === "portrait" ? "21 / 9" : "32 / 9"};">
-                  ${pt.photoUrl ? `
-                    <img src="${pt.photoUrl}" alt="ภาพหน้างานจริง" />
-                  ` : `
-                    <div class="no-img">ไม่มีภาพประกอบจุดติดตั้งหน้างาน</div>
-                  `}
-                </div>
-              </div>
-            </div>
-
-            <!-- ภาพมุมกล้องตามจำนวนเซ็ตที่เลือก -->
-            <div class="view-photos-section" style="display: grid; grid-template-cols: repeat(${(() => {
-              const camsCount = pt.selectedSet === "Set 2" ? 2 : pt.selectedSet === "Set 3" ? 3 : pt.selectedSet === "Set 4" ? 4 : 1;
-              return camsCount > 2 ? 3 : camsCount;
-            })()}, 1fr); gap: 12px; margin-top: 12px;">
-              ${(() => {
-                const camsCount = pt.selectedSet === "Set 2" ? 2 : pt.selectedSet === "Set 3" ? 3 : pt.selectedSet === "Set 4" ? 4 : 1;
-                const viewUrls = pt.viewPhotoUrls || (pt.viewPhotoUrl ? [pt.viewPhotoUrl] : []);
-                return Array.from({ length: camsCount }).map((_, camIdx) => {
-                  const url = viewUrls[camIdx] || "";
-                  return `
-                    <div class="photo-box">
-                      <div class="photo-title">📐 ภาพมุมกล้องตัวที่ ${camIdx + 1}</div>
-                      <div class="img-wrapper">
-                        ${url ? `
-                          <img src="${url}" alt="ภาพมุมกล้องตัวที่ ${camIdx + 1}" />
-                        ` : `
-                          <div class="no-img" style="padding: 10px 0;">ไม่มีภาพมุมกล้องประกอบ (กล้อง#${camIdx + 1})</div>
-                        `}
-                      </div>
-                    </div>
-                  `;
-                }).join("");
-              })()}
-            </div>
+            ${layoutHtml}
 
             <div class="footer">หน้า ${idx + 1} จาก ${cameraPoints.length} | NT Cyfence CCTV Survey System</div>
           </div>
