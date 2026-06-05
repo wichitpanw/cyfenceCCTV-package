@@ -2107,7 +2107,7 @@ export default function App() {
             🗺️ แผนผังพิกัดและจุดติดตั้งกล้องจริงทั้งหมดของโครงการ
           </div>
 
-          <div id="survey-report-map" style="width: 100%; flex: 1; min-height: ${orientation === "portrait" ? "180mm" : "100mm"}; border-radius: 8px; border: 1px solid #ddd; background: #fafafa; margin-bottom: 12px;"></div>
+          <div id="survey-report-map" style="width: 100%; height: ${orientation === "portrait" ? "190mm" : "110mm"}; border-radius: 8px; border: 1px solid #ddd; background: #fafafa; margin-bottom: 12px;"></div>
 
           <div class="footer">แผนผังโครงการ | NT Cyfence CCTV Survey System</div>
         </div>
@@ -2517,8 +2517,8 @@ export default function App() {
         background: none;
       }
       .page-container {
-        width: 100% !important;
-        height: 100% !important;
+        width: ${orientation === "portrait" ? "190mm" : "277mm"} !important;
+        height: ${orientation === "portrait" ? "277mm" : "190mm"} !important;
         padding: 0 !important;
         margin: 0 !important;
         box-shadow: none;
@@ -2638,7 +2638,15 @@ export default function App() {
           bounds.extend([pt.lat, pt.lng]);
         });
         
-        map.fitBounds(bounds, { padding: [30, 30] });
+        setTimeout(() => {
+          map.invalidateSize();
+          map.fitBounds(bounds, { padding: [30, 30] });
+        }, 200);
+
+        setTimeout(() => {
+          map.invalidateSize();
+          map.fitBounds(bounds, { padding: [30, 30] });
+        }, 600);
       }
     } catch (err) {
       console.error("Leaflet map print initialization failed:", err);
