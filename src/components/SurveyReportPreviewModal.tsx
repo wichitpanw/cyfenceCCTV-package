@@ -3,8 +3,25 @@ import { X, ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { ProjectSurvey } from "../types";
 import { exportSurveyReportToPPTX } from "../utils/pptxExporter";
 import html2canvas from "html2canvas-pro";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
+
+// Sub-component to force Leaflet to recalculate container bounds and render all markers in offscreen div
+function MapSizeInvalidator() {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    const timer1 = setTimeout(() => map.invalidateSize(), 200);
+    const timer2 = setTimeout(() => map.invalidateSize(), 500);
+    const timer3 = setTimeout(() => map.invalidateSize(), 1000);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [map]);
+  return null;
+}
 
 interface PreviewModalProps {
   isOpen: boolean;
@@ -264,7 +281,7 @@ export default function SurveyReportPreviewModal({ isOpen, onClose, project }: P
           <div className="absolute top-[-9999px] left-[-9999px]">
             <div
               ref={mapContainerRef}
-              style={{ width: "800px", height: "500px" }}
+              style={{ width: "650px", height: "500px" }}
               className="relative rounded-lg overflow-hidden border border-slate-200"
             >
               <MapContainer
@@ -275,6 +292,7 @@ export default function SurveyReportPreviewModal({ isOpen, onClose, project }: P
                 attributionControl={false}
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <MapSizeInvalidator />
                 
                 {/* Project Control Center Pin */}
                 <Marker

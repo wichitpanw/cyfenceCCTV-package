@@ -106,7 +106,7 @@ export async function exportSurveyReportToPPTX(
     slide1.addImage({
       data: mapImageBase64,
       x: 4.3, y: 0.8, w: 5.2, h: 4.0,
-      sizing: { type: "contain" }
+      sizing: { type: "contain", w: 5.2, h: 4.0 }
     });
   } else {
     slide1.addText("[ไม่มีภาพแผนผังโครงการ]", {
@@ -248,7 +248,7 @@ export async function exportSurveyReportToPPTX(
       slide.addImage({
         data: mainPhotoBase64,
         x: rightColX, y: 0.8, w: rightColW, h: 2.3,
-        sizing: { type: "contain" }
+        sizing: { type: "contain", w: rightColW, h: 2.3 }
       });
     } else {
       slide.addText("[ไม่มีภาพประกอบจุดสำรวจหน้างาน]", {
@@ -276,7 +276,7 @@ export async function exportSurveyReportToPPTX(
         slide.addImage({
           data: b64,
           x, y: gridStartY, w, h: gridH,
-          sizing: { type: "contain" }
+          sizing: { type: "contain", w, h: gridH }
         });
       } else {
         slide.addText(`[ไม่มีภาพมุมกล้องตัวที่ ${i + 1}]`, {
