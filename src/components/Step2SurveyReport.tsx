@@ -165,6 +165,7 @@ export default function Step2SurveyReport({
           hasSupportArm: true,
           notes: "",
           photoUrl: "",
+          viewPhotoUrl: "",
           x: 50,
           y: 50,
           focalAngle: 90,
@@ -196,6 +197,7 @@ export default function Step2SurveyReport({
       hasSupportArm: true,
       notes: "",
       photoUrl: "", // Start empty
+      viewPhotoUrl: "",
       x: 50,
       y: 50,
       focalAngle: 90,
@@ -273,6 +275,7 @@ export default function Step2SurveyReport({
             hasSupportArm: true,
             notes: "",
             photoUrl: "", // Start empty
+            viewPhotoUrl: "",
             x: 50,
             y: 50,
             focalAngle: 90,
@@ -1335,7 +1338,7 @@ export default function Step2SurveyReport({
                       </label>
                       
                       {/* Apple Style Direct Upload Container */}
-                      <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-white border border-gray-200 border-dashed hover:border-zinc-350 transition-colors flex flex-col items-center justify-center group">
+                      <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-white border border-gray-200 border-dashed hover:border-zinc-355 transition-colors flex flex-col items-center justify-center group">
                         {selectedPoint.photoUrl ? (
                           <>
                             <img 
@@ -1385,6 +1388,73 @@ export default function Step2SurveyReport({
                                   reader.onload = () => {
                                     if (typeof reader.result === "string") {
                                       handleUpdatePointField(selectedPoint.id, "photoUrl", reader.result);
+                                    }
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                              className="hidden"
+                            />
+                          </label>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Camera View Angle Image Upload Container */}
+                    <div className="space-y-2 mt-4">
+                      <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
+                        ภาพมุมกล้อง / ทิศทางการมองเห็น
+                      </label>
+                      
+                      <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-white border border-gray-200 border-dashed hover:border-zinc-355 transition-colors flex flex-col items-center justify-center group">
+                        {selectedPoint.viewPhotoUrl ? (
+                          <>
+                            <img 
+                              src={selectedPoint.viewPhotoUrl} 
+                              alt="Camera view angle reference" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                            <div className="absolute inset-x-0 bottom-0 bg-gray-900/70 p-2 flex items-center justify-center z-20">
+                              <label className="px-3 py-1.5 bg-white hover:bg-gray-50 text-zinc-900 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors">
+                                อัปโหลดเปลี่ยนรูปมุมกล้องจุดนี้
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      const reader = new FileReader();
+                                      reader.onload = () => {
+                                        if (typeof reader.result === "string") {
+                                          handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", reader.result);
+                                        }
+                                      };
+                                      reader.readAsDataURL(file);
+                                    }
+                                  }}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
+                          </>
+                        ) : (
+                          <label className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-gray-50/50 transition-colors group/label">
+                            <ImageIcon className="w-8 h-8 text-gray-400 group-hover/label:text-[#111827] transition-colors mb-2" />
+                            <span className="block text-xs font-semibold text-gray-700">อัปโหลดภาพมุมกล้อง / ทิศทาง</span>
+                            <span className="block text-[10px] text-gray-400 mt-1 leading-relaxed">
+                              คลิกตรงนี้เพื่อเลือกไฟล์ภาพจำลองมุมมองหรือทิศทางกล้อง
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = () => {
+                                    if (typeof reader.result === "string") {
+                                      handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", reader.result);
                                     }
                                   };
                                   reader.readAsDataURL(file);

@@ -1209,6 +1209,7 @@ export default function App() {
                 hasSupportArm: c.has_support_arm || false,
                 notes: c.notes || "",
                 photoUrl: c.photo_url_cache || "",
+                viewPhotoUrl: c.view_photo_url_cache || "",
                 x: parseFloat(c.x) || 50,
                 y: parseFloat(c.y) || 50,
                 focalAngle: parseFloat(c.focal_angle) || 90,
@@ -1598,6 +1599,7 @@ export default function App() {
               has_support_arm: c.hasSupportArm,
               notes: c.notes,
               photo_url_cache: c.photoUrl,
+              view_photo_url_cache: c.viewPhotoUrl || "",
               x: c.x,
               y: c.y,
               focal_angle: c.focalAngle,
@@ -2043,6 +2045,310 @@ export default function App() {
 </script>
 </body></html>`;
 
+      printWin.document.close();
+    }
+  };
+
+  // Print Detailed Survey Report (1 point per page)
+  const handlePrintSurveyReportPDF = (proj: ProjectSurvey) => {
+    const printWin = window.open("", "_blank", "width=860,height=1100");
+    if (printWin) {
+      const today = new Date().toLocaleDateString("th-TH", {
+        year: "numeric", month: "long", day: "numeric"
+      });
+      
+      const customerInfo = proj.customerInfo;
+      const cameraPoints = proj.cameraPoints || [];
+
+      const pointsHtml = cameraPoints.map((pt, idx) => {
+        const hasPoe = pt.hasPoeSwitch ? "มี (Industrial Grade)" : "ไม่มี";
+        const hasGround = pt.hasGroundRod ? "มี (Ground Rod 2.4m)" : "ไม่มี";
+        const hasCabinet = pt.hasOutdoorCabinet ? "มี (ตู้กันน้ำระบายความร้อน)" : "ไม่มี";
+        const hasUps = pt.hasCabinetUps ? "มี (UPS 800VA)" : "ไม่มี";
+        const hasSd = pt.hasSdCard ? "มี (SD Card 128G)" : "ไม่มี";
+        const hasPower = pt.hasPowerMeter ? "มี (มิเตอร์ไฟ + สาย THW)" : "ไม่มี";
+
+        return `
+          <div class="page-container">
+            <div class="header">
+              <div>
+                <img src="/cyfence_logo.png" alt="NT Cyfence" style="height: 40px; display: block; margin-bottom: 2px;" />
+              </div>
+              <div class="doc-info">
+                <div class="doc-title">รายงานผลการสำรวจจุดติดตั้งกล้อง (Survey Report)</div>
+                <div class="doc-date">โครงการ: ${customerInfo?.projectName || "-"} | วันที่สำรวจ: ${today}</div>
+              </div>
+            </div>
+
+            <div class="point-title">
+              จุดที่ ${idx + 1}: ${pt.name}
+            </div>
+
+            <table class="detail-table">
+              <tr>
+                <td class="label">ประเภทกล้อง:</td>
+                <td class="val bold">${pt.type}</td>
+                <td class="label">การติดตั้งเสา:</td>
+                <td class="val">${pt.poleType !== "None" ? pt.poleType : "ยึดติดอาคาร/ผนัง"}</td>
+              </tr>
+              <tr>
+                <td class="label">ความยาวสาย LAN:</td>
+                <td class="val">${pt.lanCableLength || 25} เมตร</td>
+                <td class="label">ชุดแขนซัปพอร์ต:</td>
+                <td class="val">${pt.hasSupportArm ? "มี" : "ไม่มี"}</td>
+              </tr>
+              <tr>
+                <td class="label">กล่องเหล็ก/ตู้กันฝน:</td>
+                <td class="val">${hasCabinet}</td>
+                <td class="label">สวิตช์ PoE ปลายทาง:</td>
+                <td class="val">${hasPoe}</td>
+              </tr>
+              <tr>
+                <td class="label">อุปกรณ์ระบบสายดิน:</td>
+                <td class="val">${hasGround}</td>
+                <td class="label">เครื่องสำรองไฟ (UPS):</td>
+                <td class="val">${hasUps}</td>
+              </tr>
+              <tr>
+                <td class="label">SD Card สำรองข้อมูล:</td>
+                <td class="val">${hasSd}</td>
+                <td class="label">มิเตอร์ & ชุดวัดไฟ:</td>
+                <td class="val">${hasPower}</td>
+              </tr>
+              <tr>
+                <td class="label">ชุดกล้องที่จัดกลุ่ม:</td>
+                <td class="val bold text-blue">${pt.selectedSet || "Set 1"}</td>
+                <td class="label">พิกัด GPS:</td>
+                <td class="val font-mono">${pt.lat ? pt.lat.toFixed(6) : "-"}, ${pt.lng ? pt.lng.toFixed(6) : "-"}</td>
+              </tr>
+              ${pt.notes ? `
+              <tr>
+                <td class="label">บันทึกเพิ่มเติม:</td>
+                <td class="val" colspan="3">${pt.notes}</td>
+              </tr>
+              ` : ""}
+            </table>
+
+            <div class="photos-section">
+              <div class="photo-box">
+                <div class="photo-title">📸 ภาพประกอบจุดสำรวจหน้างานจริง</div>
+                <div class="img-wrapper">
+                  ${pt.photoUrl ? `
+                    <img src="${pt.photoUrl}" alt="ภาพหน้างานจริง" />
+                  ` : `
+                    <div class="no-img">ไม่มีภาพประกอบจุดติดตั้งหน้างาน</div>
+                  `}
+                </div>
+              </div>
+              <div class="photo-box">
+                <div class="photo-title">📐 ภาพมุมกล้อง / ทิศทางการมองเห็น</div>
+                <div class="img-wrapper">
+                  ${pt.viewPhotoUrl ? `
+                    <img src="${pt.viewPhotoUrl}" alt="ภาพมุมกล้อง" />
+                  ` : `
+                    <div class="no-img">ไม่มีภาพมุมกล้องประกอบจุดติดตั้ง</div>
+                  `}
+                </div>
+              </div>
+            </div>
+
+            <div class="footer">หน้า ${idx + 1} จาก ${cameraPoints.length} | NT Cyfence CCTV Survey System</div>
+          </div>
+        `;
+      }).join("");
+
+      const htmlContent = `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>รายงานการสำรวจระบบกล้อง - ${customerInfo?.customerName || "-"}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    
+    body { 
+      font-family: 'Noto Sans Thai', sans-serif; 
+      font-size: 10pt; 
+      color: #111; 
+      background: #fff; 
+    }
+
+    .page-container {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 15mm 15mm;
+      margin: 0 auto;
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      background: #fff;
+    }
+    
+    .page-container:last-child {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    .header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding-bottom: 8px; 
+      border-bottom: 2px solid #111827; 
+      margin-bottom: 12px; 
+    }
+    
+    .doc-info { 
+      text-align: right; 
+    }
+    
+    .doc-title { 
+      font-size: 13pt; 
+      font-weight: 700; 
+      color: #111827; 
+    }
+    
+    .doc-date { 
+      font-size: 8.5pt; 
+      color: #555; 
+      margin-top: 2px; 
+    }
+
+    .point-title {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0071e3;
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+      font-size: 9pt;
+    }
+    
+    .detail-table td {
+      padding: 6px 10px;
+      border: 1px solid #e5e7eb;
+      vertical-align: middle;
+    }
+    
+    .detail-table td.label {
+      width: 18%;
+      font-weight: 600;
+      color: #4b5563;
+      background: #f9fafb;
+    }
+    
+    .detail-table td.val {
+      width: 32%;
+      color: #111827;
+    }
+    
+    .detail-table td.bold {
+      font-weight: 700;
+    }
+    
+    .detail-table td.font-mono {
+      font-family: monospace;
+      font-size: 8.5pt;
+    }
+    
+    .text-blue {
+      color: #0071e3;
+    }
+
+    .photos-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+    }
+
+    .photo-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fafafa;
+    }
+
+    .photo-title {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .img-wrapper {
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .no-img {
+      font-size: 8.5pt;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    .footer { 
+      position: absolute;
+      bottom: 12mm;
+      left: 15mm;
+      right: 15mm;
+      font-size: 7.5pt; 
+      color: #9ca3af; 
+      border-top: 1px solid #e5e7eb; 
+      padding-top: 6px; 
+      text-align: center; 
+    }
+    
+    @media print {
+      body {
+        background: none;
+      }
+      .page-container {
+        width: 100%;
+        min-height: auto;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  ${pointsHtml}
+  
+  <script>
+    window.onload = () => {
+      setTimeout(() => {
+        window.print();
+      }, 1000);
+    };
+  </script>
+</body>
+</html>`;
+
       printWin.document.open();
       printWin.document.write(htmlContent);
       printWin.document.close();
@@ -2297,6 +2603,7 @@ export default function App() {
             onDeleteProject={handleDeleteProject}
             onNewProject={handleNewProject}
             onPrintProject={handlePrintProjectPDF}
+            onPrintSurveyReport={handlePrintSurveyReportPDF}
             currentProjectId={activeProjectId}
             isCloudSyncActive={isSupabaseConfigured}
             costLastUpdated={formattedCostTimestamp}

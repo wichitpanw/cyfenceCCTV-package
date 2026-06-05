@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle, Pencil, RefreshCw, Printer } from "lucide-react";
+import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle, Pencil, RefreshCw, Printer, FileText } from "lucide-react";
 import { ProjectSurvey, CameraPoint, calculateLeasePayments } from "../types";
 
 // ฟังก์ชันคำนวณค่าใช้จ่ายรายเดือนที่ลูกค้าต้องจ่าย (เหมือนกับ Step6Pricing)
@@ -65,6 +65,7 @@ interface ProjectHistoryProps {
   showConfirm?: (title: string, message: string, onConfirm: () => void, options?: { confirmText?: string; cancelText?: string; onCancel?: () => void }) => void;
   showAlert?: (title: string, message: string) => void;
   onPrintProject?: (project: ProjectSurvey) => void;
+  onPrintSurveyReport?: (project: ProjectSurvey) => void;
 }
 
 export default function ProjectHistory({
@@ -83,7 +84,8 @@ export default function ProjectHistory({
   onUpdateProjectStatus,
   showConfirm,
   showAlert,
-  onPrintProject
+  onPrintProject,
+  onPrintSurveyReport
 }: ProjectHistoryProps) {
   const [search, setSearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("all");
@@ -360,6 +362,25 @@ export default function ProjectHistory({
                           title="เปิดดู PDF ใบเสนอราคา"
                         >
                           <Printer className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+
+                      {/* ปุ่มพิมพ์รายงานการสำรวจ (Survey Report) */}
+                      {onPrintSurveyReport && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onPrintSurveyReport(proj);
+                          }}
+                          className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
+                            isActive 
+                              ? "text-gray-400 hover:bg-white/10 hover:text-indigo-400" 
+                              : "text-gray-400 hover:bg-indigo-50 hover:text-indigo-600"
+                          }`}
+                          title="เปิดดูรายงานผลสำรวจ (Survey Report)"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
                         </button>
                       )}
                       

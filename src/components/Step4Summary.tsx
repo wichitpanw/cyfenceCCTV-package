@@ -540,7 +540,7 @@ export default function Step4Summary({
 
                 {/* Floating Camera Detail & Photo Preview Card (Bottom Left) */}
                 {activeSummaryPoint && (
-                  <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-gray-200 text-xs shadow-md z-[400] w-64 select-none flex flex-col gap-2 transition-all">
+                  <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-gray-200 text-xs shadow-md z-[400] w-80 select-none flex flex-col gap-2 transition-all">
                     <div className="flex items-center justify-between border-b border-gray-150 pb-1.5">
                       <span className="font-bold text-[#0071e3] font-mono">
                         #{cameraPoints.findIndex(p => p.id === activeSummaryPoint.id) + 1} {activeSummaryPoint.type}
@@ -552,21 +552,50 @@ export default function Step4Summary({
                     
                     <strong className="text-gray-900 truncate text-[11px] block">{activeSummaryPoint.name}</strong>
                     
-                    {activeSummaryPoint.photoUrl ? (
-                      <div className="relative aspect-video w-full rounded-lg overflow-hidden border border-gray-200 bg-white  group">
-                        <img 
-                          src={activeSummaryPoint.photoUrl} 
-                          alt={activeSummaryPoint.name} 
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-video w-full rounded-lg border border-gray-200 border-dashed bg-white flex flex-col items-center justify-center text-zinc-400 gap-1 py-4">
-                        <ImageIcon className="w-5 h-5 text-zinc-350 animate-pulse" />
-                        <span className="text-[9px]">ไม่มีภาพประกอบหน้างานจริง</span>
-                      </div>
-                    )}
+                    {/* Photos Preview Section (Supports Dual Images) */}
+                    <div className={(activeSummaryPoint.photoUrl && activeSummaryPoint.viewPhotoUrl) ? "grid grid-cols-2 gap-1.5" : "flex flex-col gap-1.5"}>
+                      {/* Photo 1: Actual Site Photo */}
+                      {activeSummaryPoint.photoUrl ? (
+                        <div className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-white group">
+                          <img 
+                            src={activeSummaryPoint.photoUrl} 
+                            alt="ภาพหน้างานจริง" 
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-[2px] text-[8px] text-white px-1 py-0.5 rounded font-semibold z-10">
+                            หน้างานจริง
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="aspect-video rounded-lg border border-gray-200 border-dashed bg-white flex flex-col items-center justify-center text-zinc-400 gap-1 py-2">
+                          <ImageIcon className="w-4 h-4 text-zinc-350 animate-pulse" />
+                          <span className="text-[8px]">ไม่มีภาพหน้างานจริง</span>
+                        </div>
+                      )}
+
+                      {/* Photo 2: Camera View Photo */}
+                      {activeSummaryPoint.viewPhotoUrl ? (
+                        <div className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-white group">
+                          <img 
+                            src={activeSummaryPoint.viewPhotoUrl} 
+                            alt="ภาพมุมกล้อง" 
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute bottom-1 left-1 bg-[#0071e3]/85 backdrop-blur-[2px] text-[8px] text-white px-1 py-0.5 rounded font-semibold z-10">
+                            มุมกล้อง
+                          </div>
+                        </div>
+                      ) : (
+                        activeSummaryPoint.photoUrl ? (
+                          <div className="aspect-video rounded-lg border border-gray-200 border-dashed bg-white flex flex-col items-center justify-center text-zinc-400 gap-1 py-2">
+                            <ImageIcon className="w-4 h-4 text-zinc-350" />
+                            <span className="text-[8px]">ไม่มีภาพมุมกล้อง</span>
+                          </div>
+                        ) : null
+                      )}
+                    </div>
 
                     {activeSummaryPoint.notes && (
                       <p className="text-[9.5px] text-gray-400 leading-relaxed bg-white px-2 py-1.5 rounded-lg border border-gray-150 max-h-16 overflow-y-auto">
