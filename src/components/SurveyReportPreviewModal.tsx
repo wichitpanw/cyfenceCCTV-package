@@ -93,22 +93,126 @@ export default function SurveyReportPreviewModal({ isOpen, onClose, project }: P
   const centerLat = isNaN(defaultLat) ? 13.7563 : defaultLat;
   const centerLng = isNaN(defaultLng) ? 100.5018 : defaultLng;
 
-  // Custom marker icon for static capture
-  const createCaptureIcon = () => {
+  // Custom marker icon for static capture (white circle with color border, index badge, camera SVG, and camera count label)
+  const createCaptureIcon = (type: string, index: number, camCount: number) => {
+    const colorHex = type === "Dome" ? "#0071e3" : type === "PTZ" ? "#bf5af2" : "#30d158";
     return L.divIcon({
       html: `
         <div style="
-          width: 14px;
-          height: 14px;
+          position: relative;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
-          background-color: #30d158;
-          border: 2px solid white;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        "></div>
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: white;
+          border: 2px solid ${colorHex};
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+          box-sizing: border-box;
+        ">
+          <!-- CCTV Security Camera SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${colorHex}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+            <path d="M2 8h15" />
+            <path d="M3 10h14a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H3z" />
+            <path d="M19 11l3-1.5v5l-3-1.5" />
+            <path d="M7 16v3a1 1 0 0 0 1 1h4" />
+          </svg>
+          
+          <!-- Numeric Badge label (top right index) -->
+          <span style="
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background-color: #1c1c1e;
+            color: white;
+            font-size: 7.5px;
+            font-weight: 700;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 0.5px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+          ">
+            ${index}
+          </span>
+          
+          <!-- Camera count indicator (bottom) -->
+          <span style="
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: ${colorHex};
+            color: white;
+            font-size: 7px;
+            font-weight: 850;
+            padding: 0.5px 3.5px;
+            border-radius: 3.5px;
+            border: 0.5px solid white;
+            white-space: nowrap;
+            box-shadow: 0 1.5px 3px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+          ">
+            ${camCount} ตัว
+          </span>
+        </div>
       `,
       className: "",
-      iconSize: [14, 14],
-      iconAnchor: [7, 7]
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+  };
+
+  const createControlCenterIcon = () => {
+    return L.divIcon({
+      html: `
+        <div style="
+          position: relative;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #111827;
+          border: 2px solid white;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+          box-sizing: border-box;
+        ">
+          <!-- Monitor SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          
+          <span style="
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            color: #111827;
+            font-size: 7px;
+            font-weight: 850;
+            padding: 1.5px 5px;
+            border-radius: 4.5px;
+            white-space: nowrap;
+            border: 1px solid #111827;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          ">
+            ห้องควบคุม (ต้นทาง)
+          </span>
+        </div>
+      `,
+      className: "",
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
     });
   };
 
@@ -175,32 +279,23 @@ export default function SurveyReportPreviewModal({ isOpen, onClose, project }: P
                 {/* Project Control Center Pin */}
                 <Marker
                   position={[centerLat, centerLng]}
-                  icon={L.divIcon({
-                    html: `
-                      <div style="
-                        width: 16px;
-                        height: 16px;
-                        border-radius: 50%;
-                        background-color: #111827;
-                        border: 2px solid white;
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-                      "></div>
-                    `,
-                    className: "",
-                    iconSize: [16, 16],
-                    iconAnchor: [8, 8]
-                  })}
+                  icon={createControlCenterIcon()}
                 />
 
                 {/* Camera Markers */}
-                {project.cameraPoints?.map((pt) => {
-                  const ptLat = pt.lat !== undefined ? pt.lat : centerLat;
-                  const ptLng = pt.lng !== undefined ? pt.lng : centerLng;
+                {project.cameraPoints?.map((pt, idx) => {
+                  const ptLat = pt.lat !== undefined && pt.lat !== null ? parseFloat(pt.lat as any) : centerLat;
+                  const ptLng = pt.lng !== undefined && pt.lng !== null ? parseFloat(pt.lng as any) : centerLng;
+                  const camCount = pt.selectedSet === "Set 1" ? 1
+                                 : pt.selectedSet === "Set 2" ? 2
+                                 : pt.selectedSet === "Set 3" ? 3
+                                 : pt.selectedSet === "Set 4" ? 4
+                                 : 1;
                   return (
                     <Marker
                       key={pt.id}
                       position={[ptLat, ptLng]}
-                      icon={createCaptureIcon()}
+                      icon={createCaptureIcon(pt.type || "Bullet", idx + 1, camCount)}
                     />
                   );
                 })}

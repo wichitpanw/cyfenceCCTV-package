@@ -105,13 +105,8 @@ export async function exportSurveyReportToPPTX(
   if (mapImageBase64) {
     slide1.addImage({
       data: mapImageBase64,
-      x: 4.3, y: 0.8, w: 5.2, h: 4.0
-    });
-    // Visual border decoration around the map
-    slide1.addShape(pptx.shapes.RECTANGLE, {
       x: 4.3, y: 0.8, w: 5.2, h: 4.0,
-      fill: { color: "transparent" },
-      line: { color: "E5E7EB", width: 1.5 }
+      sizing: { type: "contain" }
     });
   } else {
     slide1.addText("[ไม่มีภาพแผนผังโครงการ]", {
@@ -255,12 +250,6 @@ export async function exportSurveyReportToPPTX(
         x: rightColX, y: 0.8, w: rightColW, h: 2.3,
         sizing: { type: "contain" }
       });
-      // Outer border for main photo
-      slide.addShape(pptx.shapes.RECTANGLE, {
-        x: rightColX, y: 0.8, w: rightColW, h: 2.3,
-        fill: { color: "transparent" },
-        line: { color: "E5E7EB", width: 1.0 }
-      });
     } else {
       slide.addText("[ไม่มีภาพประกอบจุดสำรวจหน้างาน]", {
         x: rightColX, y: 0.8, w: rightColW, h: 2.3,
@@ -288,11 +277,6 @@ export async function exportSurveyReportToPPTX(
           data: b64,
           x, y: gridStartY, w, h: gridH,
           sizing: { type: "contain" }
-        });
-        slide.addShape(pptx.shapes.RECTANGLE, {
-          x, y: gridStartY, w, h: gridH,
-          fill: { color: "transparent" },
-          line: { color: "E5E7EB", width: 1.0 }
         });
       } else {
         slide.addText(`[ไม่มีภาพมุมกล้องตัวที่ ${i + 1}]`, {
