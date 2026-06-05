@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle, Pencil, RefreshCw, Printer, FileText } from "lucide-react";
+import { FolderKanban, Search, Trash2, Calendar, ArrowUpRight, PlusCircle, CheckCircle, Pencil, RefreshCw, FileText } from "lucide-react";
 import { ProjectSurvey, CameraPoint, calculateLeasePayments } from "../types";
 
 // ฟังก์ชันคำนวณค่าใช้จ่ายรายเดือนที่ลูกค้าต้องจ่าย (เหมือนกับ Step6Pricing)
@@ -346,25 +346,7 @@ export default function ProjectHistory({
                           <RefreshCw className={`w-3.5 h-3.5 ${isActive ? "text-amber-400 hover:text-amber-300" : "text-amber-600"}`} />
                         </button>
                       )}
-                      
-                      {/* ปุ่มเปิดดู PDF ใบเสนอราคา */}
-                      {onPrintProject && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onPrintProject(proj);
-                          }}
-                          className={`p-1 rounded transition-colors shrink-0 cursor-pointer ${
-                            isActive 
-                              ? "text-gray-400 hover:bg-white/10 hover:text-emerald-400" 
-                              : "text-gray-400 hover:bg-emerald-50 hover:text-emerald-600"
-                          }`}
-                          title="เปิดดู PDF ใบเสนอราคา"
-                        >
-                          <Printer className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+
 
                       {/* ปุ่มพิมพ์รายงานการสำรวจ (Survey Report) */}
                       {onPrintSurveyReport && (
