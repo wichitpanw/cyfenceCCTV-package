@@ -2444,8 +2444,24 @@ export default function App() {
       max-height: 48mm;
     }
 
+    /* Landscape sub-camera views: side-by-side single row flexbox layout */
+    .page-container.landscape .view-photos-grid.lower-half {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .page-container.landscape .view-photos-grid.lower-half .photo-box {
+      flex: 1;
+      max-width: 130mm;
+      min-width: 0;
+      padding: 4px;
+    }
+
     .page-container.landscape .view-photos-grid.lower-half .img-wrapper {
-      max-height: 42mm;
+      aspect-ratio: 16 / 10;
+      max-height: 48mm;
     }
 
     .footer { 
