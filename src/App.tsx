@@ -1209,7 +1209,29 @@ export default function App() {
                 hasSupportArm: c.has_support_arm || false,
                 notes: c.notes || "",
                 photoUrl: c.photo_url_cache || "",
-                viewPhotoUrl: c.view_photo_url_cache || "",
+                viewPhotoUrl: (() => {
+                  const val = c.view_photo_url_cache || "";
+                  if (val.startsWith("[")) {
+                    try {
+                      const arr = JSON.parse(val);
+                      return arr[0] || "";
+                    } catch (e) {
+                      return val;
+                    }
+                  }
+                  return val;
+                })(),
+                viewPhotoUrls: (() => {
+                  const val = c.view_photo_url_cache || "";
+                  if (val.startsWith("[")) {
+                    try {
+                      return JSON.parse(val) as string[];
+                    } catch (e) {
+                      return [val];
+                    }
+                  }
+                  return val ? [val] : [];
+                })(),
                 x: parseFloat(c.x) || 50,
                 y: parseFloat(c.y) || 50,
                 focalAngle: parseFloat(c.focal_angle) || 90,
@@ -1599,7 +1621,9 @@ export default function App() {
               has_support_arm: c.hasSupportArm,
               notes: c.notes,
               photo_url_cache: c.photoUrl,
-              view_photo_url_cache: c.viewPhotoUrl || "",
+              view_photo_url_cache: c.viewPhotoUrls && c.viewPhotoUrls.length > 0 
+                ? JSON.stringify(c.viewPhotoUrls)
+                : (c.viewPhotoUrl || ""),
               x: c.x,
               y: c.y,
               focal_angle: c.focalAngle,
@@ -2131,10 +2155,11 @@ export default function App() {
               ` : ""}
             </table>
 
-            <div class="photos-section">
+            <!-- ภาพประกอบหน้างานจริง (ภาพหลัก) -->
+            <div class="photos-section" style="display: grid; grid-template-cols: 1fr; margin-top: 10px;">
               <div class="photo-box">
                 <div class="photo-title">📸 ภาพประกอบจุดสำรวจหน้างานจริง</div>
-                <div class="img-wrapper">
+                <div class="img-wrapper" style="aspect-ratio: ${orientation === "portrait" ? "21 / 9" : "32 / 9"};">
                   ${pt.photoUrl ? `
                     <img src="${pt.photoUrl}" alt="ภาพหน้างานจริง" />
                   ` : `
@@ -2142,16 +2167,32 @@ export default function App() {
                   `}
                 </div>
               </div>
-              <div class="photo-box">
-                <div class="photo-title">📐 ภาพมุมกล้อง / ทิศทางการมองเห็น</div>
-                <div class="img-wrapper">
-                  ${pt.viewPhotoUrl ? `
-                    <img src="${pt.viewPhotoUrl}" alt="ภาพมุมกล้อง" />
-                  ` : `
-                    <div class="no-img">ไม่มีภาพมุมกล้องประกอบจุดติดตั้ง</div>
-                  `}
-                </div>
-              </div>
+            </div>
+
+            <!-- ภาพมุมกล้องตามจำนวนเซ็ตที่เลือก -->
+            <div class="view-photos-section" style="display: grid; grid-template-cols: repeat(${(() => {
+              const camsCount = pt.selectedSet === "Set 2" ? 2 : pt.selectedSet === "Set 3" ? 3 : pt.selectedSet === "Set 4" ? 4 : 1;
+              return camsCount > 2 ? 3 : camsCount;
+            })()}, 1fr); gap: 12px; margin-top: 12px;">
+              ${(() => {
+                const camsCount = pt.selectedSet === "Set 2" ? 2 : pt.selectedSet === "Set 3" ? 3 : pt.selectedSet === "Set 4" ? 4 : 1;
+                const viewUrls = pt.viewPhotoUrls || (pt.viewPhotoUrl ? [pt.viewPhotoUrl] : []);
+                return Array.from({ length: camsCount }).map((_, camIdx) => {
+                  const url = viewUrls[camIdx] || "";
+                  return `
+                    <div class="photo-box">
+                      <div class="photo-title">📐 ภาพมุมกล้องตัวที่ ${camIdx + 1}</div>
+                      <div class="img-wrapper">
+                        ${url ? `
+                          <img src="${url}" alt="ภาพมุมกล้องตัวที่ ${camIdx + 1}" />
+                        ` : `
+                          <div class="no-img" style="padding: 10px 0;">ไม่มีภาพมุมกล้องประกอบ (กล้อง#${camIdx + 1})</div>
+                        `}
+                      </div>
+                    </div>
+                  `;
+                }).join("");
+              })()}
             </div>
 
             <div class="footer">หน้า ${idx + 1} จาก ${cameraPoints.length} | NT Cyfence CCTV Survey System</div>

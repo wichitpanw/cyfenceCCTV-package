@@ -10,7 +10,8 @@ export interface CameraPoint {
   hasSupportArm: boolean;
   notes: string;
   photoUrl: string; // Base64 or mock stock image URL
-  viewPhotoUrl?: string; // Camera view angle/view photo Base64 or URL
+  viewPhotoUrl?: string; // Camera view angle/view photo Base64 or URL (legacy/primary)
+  viewPhotoUrls?: string[]; // Up to 4 camera view photos (synced with selectedSet count)
   // Visual position coordinates on our plan preview grid
   x: number; // percentage width (0-100)
   y: number; // percentage height (0-100)

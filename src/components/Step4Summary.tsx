@@ -552,50 +552,62 @@ export default function Step4Summary({
                     
                     <strong className="text-gray-900 truncate text-[11px] block">{activeSummaryPoint.name}</strong>
                     
-                    {/* Photos Preview Section (Supports Dual Images) */}
-                    <div className={(activeSummaryPoint.photoUrl && activeSummaryPoint.viewPhotoUrl) ? "grid grid-cols-2 gap-1.5" : "flex flex-col gap-1.5"}>
-                      {/* Photo 1: Actual Site Photo */}
-                      {activeSummaryPoint.photoUrl ? (
-                        <div className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-white group">
-                          <img 
-                            src={activeSummaryPoint.photoUrl} 
-                            alt="ภาพหน้างานจริง" 
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            referrerPolicy="no-referrer"
-                          />
-                          <div className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-[2px] text-[8px] text-white px-1 py-0.5 rounded font-semibold z-10">
-                            หน้างานจริง
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="aspect-video rounded-lg border border-gray-200 border-dashed bg-white flex flex-col items-center justify-center text-zinc-400 gap-1 py-2">
-                          <ImageIcon className="w-4 h-4 text-zinc-350 animate-pulse" />
-                          <span className="text-[8px]">ไม่มีภาพหน้างานจริง</span>
-                        </div>
-                      )}
+                    {/* Photos Preview Section (Supports Dynamic Multi-Photo) */}
+                    {(() => {
+                      const viewUrls = activeSummaryPoint.viewPhotoUrls || (activeSummaryPoint.viewPhotoUrl ? [activeSummaryPoint.viewPhotoUrl] : []);
+                      const activeViewUrls = viewUrls.filter(Boolean);
+                      const hasViewPhotos = activeViewUrls.length > 0;
+                      
+                      return (
+                        <div className="space-y-1.5">
+                          {/* Photo 1: Actual Site Photo */}
+                          {activeSummaryPoint.photoUrl ? (
+                            <div className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-white group">
+                              <img 
+                                src={activeSummaryPoint.photoUrl} 
+                                alt="ภาพหน้างานจริง" 
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                referrerPolicy="no-referrer"
+                              />
+                              <div className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-[2px] text-[8px] text-white px-1 py-0.5 rounded font-semibold z-10">
+                                📸 หน้างานจริง
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="aspect-video rounded-lg border border-gray-200 border-dashed bg-white flex flex-col items-center justify-center text-zinc-400 gap-1 py-2">
+                              <ImageIcon className="w-4 h-4 text-zinc-350 animate-pulse" />
+                              <span className="text-[8px]">ไม่มีภาพหน้างานจริง</span>
+                            </div>
+                          )}
 
-                      {/* Photo 2: Camera View Photo */}
-                      {activeSummaryPoint.viewPhotoUrl ? (
-                        <div className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-white group">
-                          <img 
-                            src={activeSummaryPoint.viewPhotoUrl} 
-                            alt="ภาพมุมกล้อง" 
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            referrerPolicy="no-referrer"
-                          />
-                          <div className="absolute bottom-1 left-1 bg-[#0071e3]/85 backdrop-blur-[2px] text-[8px] text-white px-1 py-0.5 rounded font-semibold z-10">
-                            มุมกล้อง
-                          </div>
+                          {/* Photo 2: Camera View Photos Grid */}
+                          {hasViewPhotos ? (
+                            <div className={`grid gap-1 ${activeViewUrls.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+                              {activeViewUrls.map((url, urlIdx) => (
+                                <div key={urlIdx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-white group">
+                                  <img 
+                                    src={url} 
+                                    alt={`ภาพมุมกล้องตัวที่ ${urlIdx + 1}`} 
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                  <div className="absolute bottom-1 left-1 bg-[#0071e3]/85 backdrop-blur-[2px] text-[8px] text-white px-1 py-0.5 rounded font-semibold z-10">
+                                    📐 มุมกล้อง #{urlIdx + 1}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            activeSummaryPoint.photoUrl ? (
+                              <div className="aspect-video rounded-lg border border-gray-200 border-dashed bg-white flex flex-col items-center justify-center text-zinc-400 gap-1 py-2">
+                                <ImageIcon className="w-4 h-4 text-zinc-350" />
+                                <span className="text-[8px]">ไม่มีภาพมุมกล้อง</span>
+                              </div>
+                            ) : null
+                          )}
                         </div>
-                      ) : (
-                        activeSummaryPoint.photoUrl ? (
-                          <div className="aspect-video rounded-lg border border-gray-200 border-dashed bg-white flex flex-col items-center justify-center text-zinc-400 gap-1 py-2">
-                            <ImageIcon className="w-4 h-4 text-zinc-350" />
-                            <span className="text-[8px]">ไม่มีภาพมุมกล้อง</span>
-                          </div>
-                        ) : null
-                      )}
-                    </div>
+                      );
+                    })()}
 
                     {activeSummaryPoint.notes && (
                       <p className="text-[9.5px] text-gray-400 leading-relaxed bg-white px-2 py-1.5 rounded-lg border border-gray-150 max-h-16 overflow-y-auto">

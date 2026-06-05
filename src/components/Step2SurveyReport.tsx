@@ -1400,72 +1400,123 @@ export default function Step2SurveyReport({
                       </div>
                     </div>
 
-                    {/* Camera View Angle Image Upload Container */}
-                    <div className="space-y-2 mt-4">
-                      <label className="block text-zinc-555 font-semibold mb-1 uppercase tracking-wide">
-                        ภาพมุมกล้อง / ทิศทางการมองเห็น
-                      </label>
-                      
-                      <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-white border border-gray-200 border-dashed hover:border-zinc-355 transition-colors flex flex-col items-center justify-center group">
-                        {selectedPoint.viewPhotoUrl ? (
-                          <>
-                            <img 
-                              src={selectedPoint.viewPhotoUrl} 
-                              alt="Camera view angle reference" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                            <div className="absolute inset-x-0 bottom-0 bg-gray-900/70 p-2 flex items-center justify-center z-20">
-                              <label className="px-3 py-1.5 bg-white hover:bg-gray-50 text-zinc-900 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors">
-                                อัปโหลดเปลี่ยนรูปมุมกล้องจุดนี้
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      const reader = new FileReader();
-                                      reader.onload = () => {
-                                        if (typeof reader.result === "string") {
-                                          handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", reader.result);
-                                        }
-                                      };
-                                      reader.readAsDataURL(file);
-                                    }
-                                  }}
-                                  className="hidden"
-                                />
-                              </label>
-                            </div>
-                          </>
-                        ) : (
-                          <label className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-gray-50/50 transition-colors group/label">
-                            <ImageIcon className="w-8 h-8 text-gray-400 group-hover/label:text-[#111827] transition-colors mb-2" />
-                            <span className="block text-xs font-semibold text-gray-700">อัปโหลดภาพมุมกล้อง / ทิศทาง</span>
-                            <span className="block text-[10px] text-gray-400 mt-1 leading-relaxed">
-                              คลิกตรงนี้เพื่อเลือกไฟล์ภาพจำลองมุมมองหรือทิศทางกล้อง
-                            </span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onload = () => {
-                                    if (typeof reader.result === "string") {
-                                      handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", reader.result);
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
-                              }}
-                              className="hidden"
-                            />
+                    {/* Camera View Angle Image Upload Container (Supports Dynamic Multi-Photo based on Selected Set) */}
+                    {(() => {
+                      const camsCount = selectedPoint.selectedSet === "Set 2" ? 2 : selectedPoint.selectedSet === "Set 3" ? 3 : selectedPoint.selectedSet === "Set 4" ? 4 : 1;
+                      const currentUrls = selectedPoint.viewPhotoUrls || (selectedPoint.viewPhotoUrl ? [selectedPoint.viewPhotoUrl] : []);
+                      return (
+                        <div className="space-y-3 mt-4">
+                          <label className="block text-zinc-700 font-semibold mb-1 uppercase tracking-wide text-xs">
+                            ภาพมุมกล้อง / ทิศทางการมองเห็น ({camsCount} ทิศทางตาม Set กล้อง)
                           </label>
-                        )}
-                      </div>
-                    </div>
+                          
+                          <div className="space-y-3.5">
+                            {Array.from({ length: camsCount }).map((_, camIdx) => {
+                              const photoUrl = currentUrls[camIdx] || "";
+                              const hasPhoto = !!photoUrl;
+
+                              return (
+                                <div key={camIdx} className="space-y-1 bg-gray-50/50 p-2.5 rounded-xl border border-gray-150">
+                                  <span className="text-[10px] font-bold text-gray-500 block">
+                                    📐 กล้องตัวที่ {camIdx + 1}:
+                                  </span>
+                                  
+                                  <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-white border border-gray-200 border-dashed hover:border-zinc-350 transition-all flex flex-col items-center justify-center group">
+                                    {hasPhoto ? (
+                                      <>
+                                        <img 
+                                          src={photoUrl} 
+                                          alt={`Camera ${camIdx + 1} view angle`} 
+                                          className="w-full h-full object-cover"
+                                          referrerPolicy="no-referrer"
+                                        />
+                                        <div className="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 z-20">
+                                          <label className="px-2.5 py-1.5 bg-white hover:bg-gray-50 text-zinc-900 rounded-md text-[9px] font-bold cursor-pointer transition-all shadow-xs">
+                                            เปลี่ยนรูป
+                                            <input
+                                              type="file"
+                                              accept="image/*"
+                                              onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                  const reader = new FileReader();
+                                                  reader.onload = () => {
+                                                    if (typeof reader.result === "string") {
+                                                      const newUrls = [...currentUrls];
+                                                      for(let i=0; i<camIdx; i++) {
+                                                        if (newUrls[i] === undefined) newUrls[i] = "";
+                                                      }
+                                                      newUrls[camIdx] = reader.result;
+                                                      handleUpdatePointField(selectedPoint.id, "viewPhotoUrls", newUrls);
+                                                      if (camIdx === 0) {
+                                                        handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", reader.result);
+                                                      }
+                                                    }
+                                                  };
+                                                  reader.readAsDataURL(file);
+                                                }
+                                              }}
+                                              className="hidden"
+                                            />
+                                          </label>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const newUrls = [...currentUrls];
+                                              newUrls[camIdx] = "";
+                                              handleUpdatePointField(selectedPoint.id, "viewPhotoUrls", newUrls);
+                                              if (camIdx === 0) {
+                                                handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", "");
+                                              }
+                                            }}
+                                            className="px-2.5 py-1.5 bg-red-650 hover:bg-red-700 text-white rounded-md text-[9px] font-bold cursor-pointer transition-all shadow-xs"
+                                          >
+                                            ลบรูป
+                                          </button>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <label className="w-full h-full flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50/50 transition-colors group/label">
+                                        <ImageIcon className="w-6 h-6 text-gray-400 group-hover/label:text-[#111827] transition-colors mb-1" />
+                                        <span className="block text-[10.5px] font-bold text-gray-700">อัปโหลดภาพมุมกล้องตัวที่ {camIdx + 1}</span>
+                                        <span className="block text-[8.5px] text-gray-400 mt-0.5 leading-none">
+                                          คลิกเพื่อเลือกไฟล์รูปภาพ
+                                        </span>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                              const reader = new FileReader();
+                                              reader.onload = () => {
+                                                if (typeof reader.result === "string") {
+                                                  const newUrls = [...currentUrls];
+                                                  for(let i=0; i<camIdx; i++) {
+                                                    if (newUrls[i] === undefined) newUrls[i] = "";
+                                                  }
+                                                  newUrls[camIdx] = reader.result;
+                                                  handleUpdatePointField(selectedPoint.id, "viewPhotoUrls", newUrls);
+                                                  if (camIdx === 0) {
+                                                    handleUpdatePointField(selectedPoint.id, "viewPhotoUrl", reader.result);
+                                                  }
+                                                }
+                                              };
+                                              reader.readAsDataURL(file);
+                                            }
+                                          }}
+                                          className="hidden"
+                                        />
+                                      </label>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
