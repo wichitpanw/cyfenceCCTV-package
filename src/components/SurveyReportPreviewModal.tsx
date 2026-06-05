@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { X, ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { ProjectSurvey } from "../types";
 import { exportSurveyReportToPPTX } from "../utils/pptxExporter";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 
