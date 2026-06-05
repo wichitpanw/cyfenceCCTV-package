@@ -217,24 +217,34 @@ export default function SurveyReportPreviewModal({ isOpen, onClose, project }: P
               // ==========================================
               // Slide 1 View: Cover & Map Layout
               // ==========================================
-              <div className="grid grid-cols-12 gap-5 h-full items-center">
+              <div 
+                className="grid grid-cols-12 gap-5 h-full items-center relative p-5 md:p-6"
+                style={{
+                  backgroundImage: "url('/template/image10.jpeg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center"
+                }}
+              >
+                {/* Backdrop overlay to keep text highly legible */}
+                <div className="absolute inset-0 bg-white/85 z-0"></div>
+
                 {/* Left Metadata Column */}
-                <div className="col-span-5 flex flex-col justify-between h-full py-2">
+                <div className="col-span-5 flex flex-col justify-between h-full py-2 z-10">
                   <div>
-                    <img src="/cyfence_logo.png" alt="NT Cyfence" className="h-6 md:h-7 object-contain self-start" />
+                    <img src="/template/image3.png" alt="NT Logo" className="h-10 md:h-12 object-contain self-start" />
                     <h2 className="text-[15px] md:text-[18px] font-extrabold text-slate-900 mt-4 leading-snug">
                       รายงานผลการสำรวจจุดติดตั้งกล้อง (Survey Report)
                     </h2>
                   </div>
-                  <div className="text-[9.5px] md:text-[10.5px] text-slate-600 space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-150">
-                    <p><span className="font-bold text-slate-800">โครงการ:</span> {project.customerInfo?.projectName || "โครงการทั่วไป"}</p>
-                    <p><span className="font-bold text-slate-800">ลูกค้า:</span> {project.customerInfo?.customerName || "-"}</p>
-                    <p><span className="font-bold text-slate-800">ผู้สำรวจ:</span> {project.customerInfo?.surveyorName || "-"}</p>
-                    <p><span className="font-bold text-slate-800">จุดติดตั้งรวม:</span> {project.cameraPoints?.length || 0} จุด</p>
+                  <div className="text-[9.5px] md:text-[10.5px] text-slate-700 space-y-1.5 bg-white/90 p-3 rounded-xl border border-slate-200/50 shadow-xs">
+                    <p><span className="font-bold text-slate-900">โครงการ:</span> {project.customerInfo?.projectName || "โครงการทั่วไป"}</p>
+                    <p><span className="font-bold text-slate-900">ลูกค้า:</span> {project.customerInfo?.customerName || "-"}</p>
+                    <p><span className="font-bold text-slate-900">ผู้สำรวจ:</span> {project.customerInfo?.surveyorName || "-"}</p>
+                    <p><span className="font-bold text-slate-900">จุดติดตั้งรวม:</span> {project.cameraPoints?.length || 0} จุด</p>
                   </div>
                 </div>
                 {/* Right Map Snapshot Column */}
-                <div className="col-span-7 h-full flex items-center justify-center bg-slate-50 border border-slate-150 rounded-xl overflow-hidden relative shadow-inner">
+                <div className="col-span-7 h-full flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl overflow-hidden relative shadow-md z-10">
                   {mapSnapshot ? (
                     <img src={mapSnapshot} alt="Map snapshot" className="w-full h-full object-cover" />
                   ) : (
@@ -266,41 +276,41 @@ export default function SurveyReportPreviewModal({ isOpen, onClose, project }: P
                   <div className="flex flex-col h-full justify-between">
                     {/* Header */}
                     <div className="flex items-center justify-between border-b border-slate-150 pb-2">
-                      <img src="/cyfence_logo.png" alt="NT Cyfence" className="h-5 object-contain" />
-                      <span className="font-extrabold text-[11px] md:text-[12.5px] text-indigo-600 flex items-center gap-1">
+                      <img src="/template/image3.png" alt="NT Logo" className="h-7 md:h-8 object-contain" />
+                      <span className="font-extrabold text-[12px] md:text-[13.5px] text-indigo-700 flex items-center gap-1">
                         จุดที่ {currentSlide}: {pt.name}
                       </span>
                     </div>
 
                     {/* Content Body Grid */}
                     <div className="grid grid-cols-12 gap-4 flex-1 min-h-0 mt-3.5 mb-2">
-                      {/* Left specs table */}
-                      <div className="col-span-5 flex flex-col justify-between h-full min-h-0">
+                      {/* Left specs table (Reduced from col-span-5 to col-span-4 to give photos more room) */}
+                      <div className="col-span-4 flex flex-col justify-between h-full min-h-0">
                         <div className="overflow-auto max-h-full">
-                          <table className="w-full text-[8.5px] md:text-[9.5px] text-slate-700 border-collapse">
+                          <table className="w-full text-[8px] md:text-[9.2px] text-slate-700 border-collapse">
                             <tbody>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">ประเภทกล้อง:</td><td className="py-1 text-slate-800 font-bold">{pt.type}</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">การติดตั้งเสา:</td><td className="py-1 text-slate-800 font-medium">{pt.poleType !== "None" ? pt.poleType : "ยึดผนัง"}</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">ความยาวสาย LAN:</td><td className="py-1 text-slate-800 font-medium">{pt.lanCableLength || 25} เมตร</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">ตู้เหล็กกันฝน:</td><td className="py-1 text-slate-800 font-medium">{hasCabinet}</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">เครื่องสำรองไฟ:</td><td className="py-1 text-slate-800 font-medium">{hasUps}</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">สวิตช์ PoE:</td><td className="py-1 text-slate-800 font-medium">{hasPoe}</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">มิเตอร์ไฟ/สายดิน:</td><td className="py-1 text-slate-800 font-medium">{hasPower} / {hasGround}</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">SD Card:</td><td className="py-1 text-slate-800 font-medium">{hasSd}</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">กลุ่มสเปก (Set):</td><td className="py-1 text-indigo-600 font-bold">{pt.selectedSet || "Set 1"}</td></tr>
-                              <tr className="border-b border-slate-100"><td className="py-1 font-bold text-slate-400">พิกัด GPS:</td><td className="py-1 text-slate-800 font-mono text-[8px]">{pt.lat?.toFixed(6) || "-"}, {pt.lng?.toFixed(6) || "-"}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">ประเภทกล้อง:</td><td className="py-0.5 text-slate-850 font-bold">{pt.type}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">การติดตั้งเสา:</td><td className="py-0.5 text-slate-800 font-medium">{pt.poleType !== "None" ? pt.poleType : "ยึดผนัง"}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">ความยาวสาย LAN:</td><td className="py-0.5 text-slate-800 font-medium">{pt.lanCableLength || 25} เมตร</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">ตู้เหล็กกันฝน:</td><td className="py-0.5 text-slate-800 font-medium">{hasCabinet}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">เครื่องสำรองไฟ:</td><td className="py-0.5 text-slate-800 font-medium">{hasUps}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">สวิตช์ PoE:</td><td className="py-0.5 text-slate-800 font-medium">{hasPoe}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">มิเตอร์ไฟ/สายดิน:</td><td className="py-0.5 text-slate-800 font-medium">{hasPower} / {hasGround}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">SD Card:</td><td className="py-0.5 text-slate-800 font-medium">{hasSd}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">กลุ่มสเปก (Set):</td><td className="py-0.5 text-indigo-600 font-bold">{pt.selectedSet || "Set 1"}</td></tr>
+                              <tr className="border-b border-slate-100"><td className="py-0.5 font-bold text-slate-400">พิกัด GPS:</td><td className="py-0.5 text-slate-800 font-mono text-[7.5px]">{pt.lat?.toFixed(6) || "-"}, {pt.lng?.toFixed(6) || "-"}</td></tr>
                             </tbody>
                           </table>
                         </div>
                         {pt.notes && (
-                          <div className="bg-blue-50/50 border border-blue-100 p-2 rounded-lg mt-2 overflow-auto text-[7.5px] md:text-[8px] text-slate-600 max-h-[60px] leading-relaxed">
-                            <span className="font-bold text-blue-800">บันทึกเพิ่มเติม:</span> {pt.notes}
+                          <div className="bg-blue-50/50 border border-blue-100 p-1.5 rounded-lg mt-1 overflow-auto text-[7.5px] text-slate-600 max-h-[45px] leading-relaxed">
+                            <span className="font-bold text-blue-800">บันทึก:</span> {pt.notes}
                           </div>
                         )}
                       </div>
 
-                      {/* Right photos col */}
-                      <div className="col-span-7 flex flex-col gap-2 h-full min-h-0">
+                      {/* Right photos col (Expanded from col-span-7 to col-span-8 to make photos much larger) */}
+                      <div className="col-span-8 flex flex-col gap-2.5 h-full min-h-0">
                         {/* Main site photo */}
                         <div className="flex-1 bg-slate-50 border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center min-h-0 relative shadow-inner">
                           {pt.photoUrl ? (
@@ -310,16 +320,19 @@ export default function SurveyReportPreviewModal({ isOpen, onClose, project }: P
                           )}
                         </div>
 
-                        {/* View Grid */}
-                        <div className="grid grid-cols-2 gap-1.5 h-[76px] shrink-0">
-                          {Array.from({ length: Math.min(4, camsCount) }).map((_, camIdx) => {
+                        {/* View Grid (Single-row layout with dynamic columns matching the PPTX export to display camera example images larger) */}
+                        <div 
+                          className="grid gap-2 h-[120px] shrink-0"
+                          style={{ gridTemplateColumns: `repeat(${camsCount}, minmax(0, 1fr))` }}
+                        >
+                          {Array.from({ length: camsCount }).map((_, camIdx) => {
                             const url = viewUrls[camIdx];
                             return (
-                              <div key={camIdx} className="bg-slate-50 border border-slate-200 rounded-md overflow-hidden flex items-center justify-center relative shadow-xs">
+                              <div key={camIdx} className="bg-slate-50 border border-slate-200 rounded-md overflow-hidden flex items-center justify-center relative shadow-sm">
                                 {url ? (
                                   <img src={url} alt="View" className="w-full h-full object-contain" />
                                 ) : (
-                                  <span className="text-[7.5px] text-slate-400">มุมกล้อง {camIdx + 1}</span>
+                                  <span className="text-[7.5px] text-slate-400 font-medium text-center px-1">ภาพมุมกล้องตัวที่ {camIdx + 1}</span>
                                 )}
                               </div>
                             );

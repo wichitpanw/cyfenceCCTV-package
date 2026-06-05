@@ -35,27 +35,35 @@ export async function exportSurveyReportToPPTX(
   const TEXT_DARK = "111827";
   const BG_LIGHT = "F3F4F6";
 
-  // Pre-load NT logo if available
+  // Pre-load NT logos and backgrounds from template folder
+  const logoYellowBase64 = await fetchImageAsBase64("/template/image3.png");
+  const coverBgBase64 = await fetchImageAsBase64("/template/image10.jpeg");
   const logoBase64 = await fetchImageAsBase64("/cyfence_logo.png");
 
   // ==========================================
   // SLIDE 1: Cover & Project Map
   // ==========================================
   const slide1 = pptx.addSlide();
-  slide1.background = { color: "FFFFFF" };
+  
+  if (coverBgBase64) {
+    slide1.background = { data: coverBgBase64 };
+  } else {
+    slide1.background = { color: "FFFFFF" };
+  }
 
-  // Add decorative background elements
+  // Add decorative background semi-transparent overlay to ensure text readability on yellow backdrop
   slide1.addShape(pptx.shapes.RECTANGLE, {
-    x: 0, y: 0, w: 0.15, h: 5.625,
-    fill: { color: NT_BLUE }
-  });
-  slide1.addShape(pptx.shapes.RECTANGLE, {
-    x: 0.15, y: 0, w: 0.08, h: 5.625,
-    fill: { color: NT_ORANGE }
+    x: 0.2, y: 0.2, w: 3.8, h: 5.225,
+    fill: { color: "FFFFFF", transparency: 15 }
   });
 
   // Left Column (Cover)
-  if (logoBase64) {
+  if (logoYellowBase64) {
+    slide1.addImage({
+      data: logoYellowBase64,
+      x: 0.5, y: 0.5, w: 1.8, h: 0.45
+    });
+  } else if (logoBase64) {
     slide1.addImage({
       data: logoBase64,
       x: 0.5, y: 0.5, w: 2.2, h: 0.5
@@ -69,13 +77,13 @@ export async function exportSurveyReportToPPTX(
   }
 
   slide1.addText(project.customerInfo?.projectName || "โครงการทั่วไป", {
-    x: 0.5, y: 1.5, w: 3.5, h: 0.8,
+    x: 0.5, y: 1.4, w: 3.2, h: 0.8,
     fontSize: 22, bold: true, color: NT_BLUE,
     fontFace: "Noto Sans Thai"
   });
 
   slide1.addText("รายงานผลการสำรวจจุดติดตั้งกล้อง\n(Survey Report)", {
-    x: 0.5, y: 2.3, w: 3.5, h: 1.0,
+    x: 0.5, y: 2.2, w: 3.2, h: 1.0,
     fontSize: 15, color: TEXT_DARK,
     bold: true,
     fontFace: "Noto Sans Thai"
@@ -87,8 +95,8 @@ export async function exportSurveyReportToPPTX(
 
   const metadataText = `ลูกค้า: ${project.customerInfo?.customerName || "-"}\nวันที่สำรวจ: ${today}\nผู้สำรวจ: ${project.customerInfo?.surveyorName || "-"}\nจำนวนจุดติดตั้ง: ${project.cameraPoints?.length || 0} จุด`;
   slide1.addText(metadataText, {
-    x: 0.5, y: 3.4, w: 3.5, h: 1.6,
-    fontSize: 10.5, color: "4B5563",
+    x: 0.5, y: 3.3, w: 3.2, h: 1.6,
+    fontSize: 10.5, color: "374151",
     lineSpacing: 18,
     fontFace: "Noto Sans Thai"
   });
@@ -141,7 +149,12 @@ export async function exportSurveyReportToPPTX(
     });
 
     // Slide Header
-    if (logoBase64) {
+    if (logoYellowBase64) {
+      slide.addImage({
+        data: logoYellowBase64,
+        x: 0.4, y: 0.15, w: 1.2, h: 0.3
+      });
+    } else if (logoBase64) {
       slide.addImage({
         data: logoBase64,
         x: 0.4, y: 0.2, w: 1.5, h: 0.34
@@ -193,18 +206,19 @@ export async function exportSurveyReportToPPTX(
     const hasNotes = !!pt.notes;
     const tableHeight = hasNotes ? 3.3 : 4.2;
 
+    // Narrowed width w from 4.2 to 3.6 to leave more room for photos
     slide.addTable(tableData, {
-      x: 0.4, y: 0.8, w: 4.2, h: tableHeight,
+      x: 0.4, y: 0.8, w: 3.6, h: tableHeight,
       fontSize: 8.0,
       fontFace: "Noto Sans Thai",
       border: { pt: 0.5, color: "E5E7EB" },
-      colW: [1.3, 2.9],
+      colW: [1.2, 2.4],
       valign: "middle"
     });
 
     if (hasNotes) {
       slide.addText(`บันทึกเพิ่มเติม:\n${pt.notes}`, {
-        x: 0.4, y: 4.25, w: 4.2, h: 0.85,
+        x: 0.4, y: 4.25, w: 3.6, h: 0.85,
         fontSize: 8,
         color: "374151",
         fill: { color: "EFF6FF" },
@@ -230,9 +244,9 @@ export async function exportSurveyReportToPPTX(
       viewPhotosBase64.push(b64);
     }
 
-    // Positions on slide
-    const rightColX = 4.8;
-    const rightColW = 4.8;
+    // Positions on slide (Expanded width rightColW from 4.8 to 5.2 to make photos much larger)
+    const rightColX = 4.4;
+    const rightColW = 5.2;
 
     // Upper Half: Main Photo
     if (mainPhotoBase64) {
@@ -259,78 +273,37 @@ export async function exportSurveyReportToPPTX(
       });
     }
 
-    // Lower Half: View Grid (1-4 sub-cams side-by-side or 2x2 grid)
-    const gridStartY = 3.25;
-    const gridH = 1.85;
+    // Lower Half: View Grid (1-4 sub-cams side-by-side in a single row to maximize image size)
+    const gridStartY = 3.2;
+    const gridH = 1.95;
+    const gap = 0.08;
+    const w = (rightColW - (camsCount - 1) * gap) / camsCount;
 
-    if (camsCount <= 2) {
-      // 1-2 Cameras: Single-row layout (Horizontal side-by-side)
-      const gap = 0.1;
-      const w = (rightColW - (camsCount - 1) * gap) / camsCount;
+    for (let i = 0; i < camsCount; i++) {
+      const x = rightColX + i * (w + gap);
+      const b64 = viewPhotosBase64[i];
 
-      for (let i = 0; i < camsCount; i++) {
-        const x = rightColX + i * (w + gap);
-        const b64 = viewPhotosBase64[i];
-
-        if (b64) {
-          slide.addImage({
-            data: b64,
-            x, y: gridStartY, w, h: gridH,
-            sizing: { type: "contain" }
-          });
-          slide.addShape(pptx.shapes.RECTANGLE, {
-            x, y: gridStartY, w, h: gridH,
-            fill: { color: "transparent" },
-            line: { color: "E5E7EB", width: 1.0 }
-          });
-        } else {
-          slide.addText(`[ไม่มีภาพมุมกล้องตัวที่ ${i + 1}]`, {
-            x, y: gridStartY, w, h: gridH,
-            fill: { color: BG_LIGHT },
-            align: "center",
-            valign: "middle",
-            color: "9CA3AF",
-            fontSize: 8,
-            fontFace: "Noto Sans Thai"
-          });
-        }
-      }
-    } else {
-      // 3-4 Cameras: 2x2 grid layout
-      const gapX = 0.1;
-      const gapY = 0.08;
-      const w = (rightColW - gapX) / 2;
-      const h = (gridH - gapY) / 2;
-
-      for (let i = 0; i < camsCount; i++) {
-        const r = Math.floor(i / 2);
-        const c = i % 2;
-        const x = rightColX + c * (w + gapX);
-        const y = gridStartY + r * (h + gapY);
-        const b64 = viewPhotosBase64[i];
-
-        if (b64) {
-          slide.addImage({
-            data: b64,
-            x, y, w, h,
-            sizing: { type: "contain" }
-          });
-          slide.addShape(pptx.shapes.RECTANGLE, {
-            x, y, w, h,
-            fill: { color: "transparent" },
-            line: { color: "E5E7EB", width: 1.0 }
-          });
-        } else {
-          slide.addText(`[ไม่มีภาพมุมกล้อง #${i + 1}]`, {
-            x, y, w, h,
-            fill: { color: BG_LIGHT },
-            align: "center",
-            valign: "middle",
-            color: "9CA3AF",
-            fontSize: 7.5,
-            fontFace: "Noto Sans Thai"
-          });
-        }
+      if (b64) {
+        slide.addImage({
+          data: b64,
+          x, y: gridStartY, w, h: gridH,
+          sizing: { type: "contain" }
+        });
+        slide.addShape(pptx.shapes.RECTANGLE, {
+          x, y: gridStartY, w, h: gridH,
+          fill: { color: "transparent" },
+          line: { color: "E5E7EB", width: 1.0 }
+        });
+      } else {
+        slide.addText(`[ไม่มีภาพมุมกล้องตัวที่ ${i + 1}]`, {
+          x, y: gridStartY, w, h: gridH,
+          fill: { color: BG_LIGHT },
+          align: "center",
+          valign: "middle",
+          color: "9CA3AF",
+          fontSize: camsCount > 2 ? 6.5 : 8,
+          fontFace: "Noto Sans Thai"
+        });
       }
     }
 
