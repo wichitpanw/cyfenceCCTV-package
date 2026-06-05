@@ -2086,6 +2086,33 @@ export default function App() {
       const customerInfo = proj.customerInfo;
       const cameraPoints = proj.cameraPoints || [];
 
+      const defaultLat = customerInfo?.latitude ? parseFloat(customerInfo.latitude) : 13.7563;
+      const defaultLng = customerInfo?.longitude ? parseFloat(customerInfo.longitude) : 100.5018;
+      const centerLat = isNaN(defaultLat) ? 13.7563 : defaultLat;
+      const centerLng = isNaN(defaultLng) ? 100.5018 : defaultLng;
+
+      const mapPageHtml = `
+        <div class="page-container ${orientation} map-page">
+          <div class="header">
+            <div>
+              <img src="/cyfence_logo.png" alt="NT Cyfence" style="height: 30px; display: block;" />
+            </div>
+            <div class="doc-info">
+              <div class="doc-title">รายงานผลการสำรวจจุดติดตั้งกล้อง (Survey Report)</div>
+              <div class="doc-date">โครงการ: ${customerInfo?.projectName || "-"} | วันที่สำรวจ: ${today}</div>
+            </div>
+          </div>
+
+          <div class="point-title" style="border-bottom: 2px solid #0071e3; margin-bottom: 12px; height: 28px;">
+            🗺️ แผนผังพิกัดและจุดติดตั้งกล้องจริงทั้งหมดของโครงการ
+          </div>
+
+          <div id="survey-report-map" style="width: 100%; flex: 1; min-height: ${orientation === "portrait" ? "180mm" : "100mm"}; border-radius: 8px; border: 1px solid #ddd; background: #fafafa; margin-bottom: 12px;"></div>
+
+          <div class="footer">แผนผังโครงการ | NT Cyfence CCTV Survey System</div>
+        </div>
+      `;
+
       const pointsHtml = cameraPoints.map((pt, idx) => {
         const hasPoe = pt.hasPoeSwitch ? "มี (Industrial Grade)" : "ไม่มี";
         const hasGround = pt.hasGroundRod ? "มี (Ground Rod 2.4m)" : "ไม่มี";
@@ -2229,6 +2256,8 @@ export default function App() {
 <head>
   <meta charset="UTF-8">
   <title>รายงานการสำรวจระบบกล้อง - ${customerInfo?.customerName || "-"}</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -2238,6 +2267,12 @@ export default function App() {
       font-size: 10pt; 
       color: #111; 
       background: #fff; 
+    }
+
+    .custom-print-icon {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
     }
 
     @page { 
@@ -2506,7 +2541,110 @@ export default function App() {
     </button>
   </div>
 
+  ${mapPageHtml}
   ${pointsHtml}
+
+<script>
+  window.onload = () => {
+    try {
+      const mapEl = document.getElementById('survey-report-map');
+      if (mapEl) {
+        const map = L.map('survey-report-map', { zoomControl: false, attributionControl: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        const centerLat = ${centerLat};
+        const centerLng = ${centerLng};
+        
+        // Control Center icon
+        const controlIcon = L.divIcon({
+          html: \`
+            <div style="
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background-color: #111827;
+              border: 2.5px solid white;
+              box-shadow: 0 2px 6px rgba(17, 24, 39, 0.4);
+              box-sizing: border-box;
+            ">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+          \`,
+          className: "custom-print-icon",
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+        L.marker([centerLat, centerLng], { icon: controlIcon }).addTo(map);
+        
+        const points = ${JSON.stringify(cameraPoints.map((p, pIdx) => ({
+          lat: p.lat ?? centerLat,
+          lng: p.lng ?? centerLng,
+          type: p.type,
+          name: p.name,
+          count: p.selectedSet === "Set 1" ? 1 : p.selectedSet === "Set 2" ? 2 : p.selectedSet === "Set 3" ? 3 : p.selectedSet === "Set 4" ? 4 : 1,
+          index: pIdx + 1
+        })))};
+        
+        const bounds = L.latLngBounds([centerLat, centerLng]);
+        
+        points.forEach((pt) => {
+          const colorHex = pt.type === "Dome" ? "#111827" : pt.type === "PTZ" ? "#bf5af2" : "#30d158";
+          const camIcon = L.divIcon({
+            html: \`
+              <div style="
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: white;
+                border: 2px solid \${colorHex};
+                box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                box-sizing: border-box;
+                position: relative;
+              ">
+                <span style="
+                  position: absolute;
+                  top: -5px;
+                  right: -5px;
+                  background-color: #1c1c1e;
+                  color: white;
+                  font-size: 6px;
+                  font-weight: 700;
+                  width: 10px;
+                  height: 10px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border: 0.5px solid white;
+                ">\${pt.index}</span>
+                <span style="font-size: 8px; font-weight: 850; color: \${colorHex}">\${pt.count}</span>
+              </div>
+            \`,
+            className: "custom-print-icon",
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+          });
+          L.marker([pt.lat, pt.lng], { icon: camIcon }).addTo(map);
+          bounds.extend([pt.lat, pt.lng]);
+        });
+        
+        map.fitBounds(bounds, { padding: [30, 30] });
+      }
+    } catch (err) {
+      console.error("Leaflet map print initialization failed:", err);
+    }
+  };
+</script>
 </body>
 </html>`;
 
