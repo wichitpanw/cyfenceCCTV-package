@@ -2185,18 +2185,18 @@ export default function App() {
             </div>
           `;
         } else {
-          // Landscape layout: side-by-side split
+          // Landscape layout: Table (left) and Main Photo (right) in upper-half, Grid in lower-half
           layoutHtml = `
-            <div class="content-split">
+            <div class="content-split upper-half">
               <div class="left-col">
                 ${tableHtml}
-                ${mainPhotoHtml}
               </div>
               <div class="right-col">
-                <div class="view-photos-grid">
-                  ${gridItemsHtml}
-                </div>
+                ${mainPhotoHtml}
               </div>
+            </div>
+            <div class="view-photos-grid lower-half">
+              ${gridItemsHtml}
             </div>
           `;
         }
@@ -2392,9 +2392,24 @@ export default function App() {
       max-height: 65mm;
     }
 
+    .page-container.landscape .upper-half {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .page-container.landscape .upper-half .left-col {
+      width: 50%;
+    }
+
+    .page-container.landscape .upper-half .right-col {
+      width: 50%;
+    }
+
     .page-container.landscape .main-photo .img-wrapper {
       aspect-ratio: 16 / 9;
-      max-height: 75mm;
+      max-height: 52mm;
     }
 
     .img-wrapper img {
@@ -2429,8 +2444,8 @@ export default function App() {
       max-height: 48mm;
     }
 
-    .page-container.landscape .view-photos-grid .img-wrapper {
-      max-height: 48mm;
+    .page-container.landscape .view-photos-grid.lower-half .img-wrapper {
+      max-height: 42mm;
     }
 
     .footer { 
