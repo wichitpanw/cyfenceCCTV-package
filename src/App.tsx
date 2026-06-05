@@ -2161,7 +2161,7 @@ export default function App() {
         `;
 
         const mainPhotoHtml = `
-          <div class="photo-box">
+          <div class="photo-box main-photo">
             <div class="photo-title">📸 ภาพประกอบจุดสำรวจหน้างานจริง</div>
             <div class="img-wrapper">
               ${pt.photoUrl ? `
@@ -2176,21 +2176,16 @@ export default function App() {
         // Compose HTML layout based on orientation
         let layoutHtml = "";
         if (orientation === "portrait") {
+          // Portrait layout: vertical stack for larger images
           layoutHtml = `
             ${tableHtml}
-            <div class="content-split">
-              <div class="left-col">
-                ${mainPhotoHtml}
-              </div>
-              <div class="right-col">
-                <div class="view-photos-grid">
-                  ${gridItemsHtml}
-                </div>
-              </div>
+            ${mainPhotoHtml}
+            <div class="view-photos-grid">
+              ${gridItemsHtml}
             </div>
           `;
         } else {
-          // landscape layout: split left/right
+          // Landscape layout: side-by-side split
           layoutHtml = `
             <div class="content-split">
               <div class="left-col">
@@ -2392,14 +2387,14 @@ export default function App() {
       justify-content: center;
     }
 
-    .page-container.portrait .left-col .img-wrapper {
-      aspect-ratio: 16 / 10;
-      max-height: 85mm;
+    .page-container.portrait .main-photo .img-wrapper {
+      aspect-ratio: 16 / 7;
+      max-height: 65mm;
     }
 
-    .page-container.landscape .left-col .img-wrapper {
+    .page-container.landscape .main-photo .img-wrapper {
       aspect-ratio: 16 / 9;
-      max-height: 48mm;
+      max-height: 75mm;
     }
 
     .img-wrapper img {
@@ -2427,15 +2422,15 @@ export default function App() {
     }
 
     .view-photos-grid .img-wrapper {
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 16 / 10;
     }
 
     .page-container.portrait .view-photos-grid .img-wrapper {
-      max-height: 40mm;
+      max-height: 48mm;
     }
 
     .page-container.landscape .view-photos-grid .img-wrapper {
-      max-height: 28mm;
+      max-height: 48mm;
     }
 
     .footer { 
