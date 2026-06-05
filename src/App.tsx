@@ -2183,7 +2183,7 @@ export default function App() {
             ${pt.notes ? `
             <tr>
               <td class="label">บันทึกเพิ่มเติม:</td>
-              <td class="val" colspan="3">${pt.notes}</td>
+              <td class="val" colspan="3" style="word-break: break-word; white-space: pre-wrap;">${pt.notes}</td>
             </tr>
             ` : ""}
           </table>
